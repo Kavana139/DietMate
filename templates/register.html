@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+<title>Create Account - DietMate</title>
+
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+
+</head>
+
+<body class="register-page">
+
+<div class="register-wrapper">
+
+<div class="register-left">
+
+<h1>DietMate</h1>
+
+<p>Your personal diet planner.</p>
+
+<ul>
+<li>✔ Personalized diet plans</li>
+<li>✔ Weekly meal planner</li>
+<li>✔ Nutrition tracking</li>
+<li>✔ Weight progress monitoring</li>
+</ul>
+
+</div>
+
+
+<div class="register-right">
+
+<h2>Create Account</h2>
+
+<form method="POST">
+
+<div class="form-grid">
+
+<input type="text" name="name" placeholder="Full Name" required>
+
+<input type="email" name="email" placeholder="Email" required>
+
+<input type="password" name="password" placeholder="Password" required>
+
+<input type="number" name="age" placeholder="Age" required>
+
+<select name="gender">
+<option value="">Gender</option>
+<option value="Male">Male</option>
+<option value="Female">Female</option>
+<option value="Other">Other</option>
+</select>
+
+<select name="goal">
+<option value="">Goal</option>
+<option value="weight_loss">Weight Loss</option>
+<option value="weight_gain">Weight Gain</option>
+<option value="muscle_gain">Muscle Gain</option>
+</select>
+
+<select name="food_type">
+<option value="">Food Preference</option>
+<option value="veg">Vegetarian</option>
+<option value="nonveg">Non-Vegetarian</option>
+</select>
+
+<input type="number" name="height" placeholder="Height (cm)" required>
+
+<input type="number" name="weight" placeholder="Weight (kg)" required>
+
+</div>
+
+<button type="submit" class="register-btn">Create Account</button>
+
+</form>
+
+<p class="login-link">
+Already have an account?
+<a href="/">Login</a>
+</p>
+
+</div>
+
+</div>
+
+</body>
+</html>

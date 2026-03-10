@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<h1 class="page-title">Your Auto Generated Diet Plan</h1>
+
+<p>Total Calories: {{ total }}</p>
+
+<div class="diet-container">
+
+{% for time, foods in meals.items() %}
+
+<div class="meal-card">
+
+<h3>{{ time }}</h3>
+
+{% if foods %}
+
+{% for food in foods %}
+
+<div class="meal-item">
+
+<div class="meal-info">
+<span class="meal-name">{{ food[0] }}</span>
+<span class="meal-cal">{{ food[1] }} kcal</span>
+</div>
+
+<form method="POST" action="/complete_meal">
+
+<input type="hidden" name="meal_id" value="{{ food[2] }}">
+<input type="hidden" name="meal_name" value="{{ food[0] }}">
+<input type="hidden" name="calories" value="{{ food[1] }}">
+<input type="hidden" name="meal_time" value="{{ time }}">
+
+<button class="complete-btn">✔ Complete</button>
+
+</form>
+
+</div>
+
+{% endfor %}
+
+{% else %}
+
+<div class="meal-item fasting">
+<span>💧 Hydration / Fasting Period</span>
+</div>
+
+{% endif %}
+
+</div>
+
+{% endfor %}
+
+</div>
+
+{% endblock %}

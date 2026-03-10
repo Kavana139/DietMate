@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<h1 class="page-title">Health Quiz</h1>
+
+<div class="quiz-container">
+
+<form method="POST" class="quiz-card">
+
+<div class="form-group">
+<label>Current Weight (kg)</label>
+<input type="number" name="weight" required>
+</div>
+
+<div class="form-group">
+<label>Target Weight (kg)</label>
+<input type="number" name="target_weight" required>
+</div>
+
+<div class="form-group">
+<label>Height (cm)</label>
+<input type="number" name="height" required>
+</div>
+
+<div class="form-group">
+<label>Age</label>
+<input type="number" name="age" required>
+</div>
+
+<div class="form-group">
+<label>Activity Level</label>
+<select name="activity">
+<option value="1.2">Sedentary</option>
+<option value="1.37">Light Activity</option>
+<option value="1.55">Moderate Activity</option>
+<option value="1.72">Very Active</option>
+</select>
+</div>
+
+<button type="submit" class="quiz-btn">
+Submit Quiz
+</button>
+
+</form>
+
+</div>
+
+{% endblock %}

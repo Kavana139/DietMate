@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<h1 class="page-title">Healthy Recipes</h1>
+
+<div class="recipes-grid">
+
+{% for recipe in recipes %}
+
+<div class="recipe-card">
+
+<h3>{{ recipe[1] }}</h3>
+
+<div class="nutrition-grid">
+
+<div class="nutrition-box">
+<p>{{ recipe[2] }}</p>
+<span>Calories</span>
+</div>
+
+<div class="nutrition-box">
+<p>{{ recipe[3] }} g</p>
+<span>Protein</span>
+</div>
+
+<div class="nutrition-box">
+<p>{{ recipe[4] }} g</p>
+<span>Carbs</span>
+</div>
+
+<div class="nutrition-box">
+<p>{{ recipe[5] }} g</p>
+<span>Fat</span>
+</div>
+
+</div>
+
+<a href="/recipe/{{ recipe[0] }}" class="recipe-btn">View Recipe</a>
+
+</div>
+
+{% endfor %}
+
+</div>
+
+{% endblock %}

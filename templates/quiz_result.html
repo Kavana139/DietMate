@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<h1 class="page-title">Your Nutrition Plan</h1>
+
+<div class="nutrition-grid">
+
+<div class="nutrition-card">
+<h3>Calories</h3>
+<p>{{ calories }}</p>
+</div>
+
+<div class="nutrition-card">
+<h3>Protein</h3>
+<p>{{ protein }} g</p>
+</div>
+
+<div class="nutrition-card">
+<h3>Carbs</h3>
+<p>{{ carbs }} g</p>
+</div>
+
+<div class="nutrition-card">
+<h3>Fat</h3>
+<p>{{ fat }} g</p>
+</div>
+
+</div>
+
+<div class="plan-button-container">
+
+<a href="/dietselect" class="plan-btn">
+Generate Diet Plan
+</a>
+
+</div>
+
+{% endblock %}

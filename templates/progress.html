@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<h1 class="page-title">My Progress</h1>
+
+<div class="progress-card">
+
+<h3>Today's Calories</h3>
+
+<p><strong>{{ calories_today }} kcal</strong> consumed</p>
+
+<p>Daily Goal: {{ goal }} kcal</p>
+
+<p>Remaining: <strong>{{ remaining_calories }} kcal</strong></p>
+
+</div>
+
+
+<div class="progress-meals">
+
+<h3>Completed Meals</h3>
+
+{% if meals %}
+
+<ul class="meal-list">
+
+{% for meal in meals %}
+
+<li>
+<strong>{{ meal[1] }}</strong> – {{ meal[0] }}
+<span>{{ meal[2] }} kcal</span>
+</li>
+
+{% endfor %}
+
+</ul>
+
+{% else %}
+
+<p>No meals completed today.</p>
+
+{% endif %}
+
+</div>
+
+{% endblock %}

@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<h2 class="page-title">Today's Diet Plan</h2>
+
+<div class="diet-container">
+
+{% for time, foods in meals.items() %}
+
+<div class="meal-block">
+
+    <div class="meal-header">
+        <h3>{{ time }}</h3>
+    </div>
+
+    <form method="POST" action="/complete_meal">
+
+        <div class="food-grid">
+
+        {% for food in foods %}
+
+        <label class="food-card">
+            <input type="checkbox" name="meal_id[]" value="{{ food[0] }}">
+            <span>{{ food[1] }}</span>
+        </label>
+
+        {% endfor %}
+
+        </div>
+
+        <button class="complete-btn">Complete</button>
+
+    </form>
+
+</div>
+
+{% endfor %}
+
+</div>
+
+</tbody>
+
+</table>
+
+{% endblock %}

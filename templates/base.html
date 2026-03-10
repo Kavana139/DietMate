@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+<title>DietMate</title>
+
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+
+</head>
+
+<body>
+
+<div class="sidebar">
+
+<h2 class="logo">DietMate</h2>
+
+<a href="/dashboard">Dashboard</a>
+<a href="/mealplanner">Meal Planner</a>
+<a href="/recipes">Recipes</a>
+<a href="/quiz">Health Quiz</a>
+<a href="/dietselect">Generate Diet Plan</a>
+<a href="/progress">My Progress</a>
+
+</div>
+
+<div class="main-content">
+
+{% block content %}
+{% endblock %}
+
+</div>
+
+</body>
+</html>

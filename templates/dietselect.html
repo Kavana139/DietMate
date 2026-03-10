@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<h1 class="page-title">Create Your Diet Plan</h1>
+
+<div class="diet-select-container">
+
+<form method="POST" action="/auto_diet" class="diet-form">
+
+<div class="form-group">
+<label>Select Day</label>
+<select name="day">
+<option>Monday</option>
+<option>Tuesday</option>
+<option>Wednesday</option>
+<option>Thursday</option>
+<option>Friday</option>
+<option>Saturday</option>
+<option>Sunday</option>
+</select>
+</div>
+
+
+<div class="form-group">
+<label>Diet Type</label>
+<select name="diet_type">
+<option value="veg">Veg</option>
+<option value="nonveg">Non Veg</option>
+</select>
+</div>
+
+<button type="submit" class="generate-btn">
+Auto Generate Diet Plan
+</button>
+
+</form>
+
+</div>
+
+{% endblock %}

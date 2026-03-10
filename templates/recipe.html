@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<h1 class="page-title">{{ recipe[1] }}</h1>
+
+<div class="recipe-layout">
+
+    <!-- LEFT SIDE -->
+    <div class="recipe-left">
+
+        <div class="recipe-card">
+
+            <h2>Recipe Instructions</h2>
+
+            <p class="recipe-text">{{ recipe[2] }}</p>
+
+            <hr class="recipe-divider">
+
+            <h2>Nutrition Information</h2>
+
+            <div class="nutrition-list">
+
+                <div class="nutrition-row">
+                    <span>Calories</span>
+                    <span>{{ recipe[4] }}</span>
+                </div>
+
+                <div class="nutrition-row">
+                    <span>Protein</span>
+                    <span>{{ recipe[5] }} g</span>
+                </div>
+
+                <div class="nutrition-row">
+                    <span>Carbs</span>
+                    <span>{{ recipe[6] }} g</span>
+                </div>
+
+                <div class="nutrition-row">
+                    <span>Fat</span>
+                    <span>{{ recipe[7] }} g</span>
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- RIGHT SIDE -->
+
+    <div class="recipe-right">
+
+        <div class="image-card">
+
+            <img src="{{ url_for('static', filename='images/' ~ recipe[3]) }}">
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}
