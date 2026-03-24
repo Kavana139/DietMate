@@ -1,33 +1,76 @@
 <!DOCTYPE html>
-<html>
-
+<html lang="en">
 <head>
-
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>DietMate</title>
-
 <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-
 </head>
-
 <body>
 
 <div class="sidebar">
+    <div class="sidebar-top">
+        <div class="sidebar-logo">
+            <img src="{{ url_for('static', filename='images/logo.png') }}" alt="DietMate" class="logo-img" onerror="this.style.display='none'">
+            <span class="logo-text">DietMate</span>
+        </div>
 
-<h2 class="logo">DietMate</h2>
+        <nav class="sidebar-nav">
+            <a href="/dashboard" class="nav-link {% if request.path == '/dashboard' %}active{% endif %}">
+                <span class="nav-icon-wrap">🏠</span>
+                <span>Dashboard</span>
+            </a>
+            <a href="/quiz" class="nav-link {% if request.path in ['/quiz','/quiz_result'] %}active{% endif %}">
+                <span class="nav-icon-wrap">🧬</span>
+                <span>Health Quiz</span>
+            </a>
+            <a href="/dietselect" class="nav-link {% if request.path in ['/dietselect','/auto_diet'] %}active{% endif %}">
+                <span class="nav-icon-wrap">🥗</span>
+                <span>Generate Diet Plan</span>
+            </a>
+            <a href="/mealplanner" class="nav-link {% if request.path == '/mealplanner' %}active{% endif %}">
+                <span class="nav-icon-wrap">📅</span>
+                <span>Meal Planner</span>
+            </a>
+            <a href="/recipes" class="nav-link {% if request.path.startswith('/recipe') %}active{% endif %}">
+                <span class="nav-icon-wrap">📖</span>
+                <span>Recipes</span>
+            </a>
+            <a href="/food_scanner" class="nav-link {% if request.path == '/food_scanner' %}active{% endif %}">
+                <span class="nav-icon-wrap">📷</span>
+                <span>AI Food Scanner</span>
+                <span style="font-size:9px;background:var(--sage);color:white;padding:2px 7px;border-radius:999px;margin-left:auto;font-weight:800;letter-spacing:.3px;">NEW</span>
+            </a>
+            <a href="/progress" class="nav-link {% if request.path == '/progress' %}active{% endif %}">
+                <span class="nav-icon-wrap">📊</span>
+                <span>My Progress</span>
+            </a>
+        </nav>
+    </div>
 
-<a href="/dashboard">Dashboard</a>
-<a href="/mealplanner">Meal Planner</a>
-<a href="/recipes">Recipes</a>
-<a href="/quiz">Health Quiz</a>
-<a href="/dietselect">Generate Diet Plan</a>
-<a href="/progress">My Progress</a>
-
+    <div class="sidebar-bottom">
+        <a href="/logout" class="nav-link logout-link">
+            <span class="nav-icon-wrap" style="background:rgba(214,79,79,0.12);">🚪</span>
+            <span>Logout</span>
+        </a>
+    </div>
 </div>
 
 <div class="main-content">
 
-{% block content %}
-{% endblock %}
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+            <div class="flash-message flash-{{ category }}">
+                {% if category == 'success' %}✅{% elif category == 'error' %}❌{% else %}⚠️{% endif %}
+                {{ message }}
+            </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    {% block content %}
+    {% endblock %}
 
 </div>
 

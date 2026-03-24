@@ -2,45 +2,132 @@
 
 {% block content %}
 
-<h1 class="page-title">Dashboard</h1>
+<div class="dashboard-welcome">
+    <div>
+        <h1>Good to see you 👋</h1>
+        <p>Here's your nutrition overview for today.</p>
+    </div>
+    <span class="welcome-date" id="todayDate"></span>
+</div>
 
+<!-- STAT CARDS -->
 <div class="dashboard-grid">
 
-<div class="dashboard-card">
+    <div class="dashboard-card">
+        <div class="card-icon-row">
+            <div class="card-icon-circle">📖</div>
+            <span class="card-trend">Library</span>
+        </div>
+        <h3>Total Recipes</h3>
+        <div class="card-label">{{ total_recipes }}</div>
+    </div>
 
-<h3>Total Recipes</h3>
+    <div class="dashboard-card">
+        <div class="card-icon-row">
+            <div class="card-icon-circle">🍽️</div>
+            <span class="card-trend">Daily</span>
+        </div>
+        <h3>Meal Types</h3>
+        <div class="card-label">{{ meal_types }}</div>
+    </div>
 
-<p>{{ total_recipes }}</p>
+    <div class="dashboard-card">
+        <div class="card-icon-row">
+            <div class="card-icon-circle">🥗</div>
+            <span class="card-trend">Plans</span>
+        </div>
+        <h3>Diet Plans</h3>
+        <div class="card-label">{{ diet_plans }}</div>
+    </div>
+
+    <div class="dashboard-card tip-card">
+        <div class="card-icon-row">
+            <div class="card-icon-circle">💡</div>
+            <span class="card-trend">Tip</span>
+        </div>
+        <h3>Today's Tip</h3>
+        <div class="card-label">{{ healthy_tips }}</div>
+    </div>
 
 </div>
 
+<!-- BOTTOM SECTION -->
+<div class="dashboard-bottom">
 
-<div class="dashboard-card">
+    <!-- Calorie Ring -->
+    <div class="dash-section">
+        <h2>🔥 Today's Calories</h2>
+        <div class="calorie-ring-wrapper">
+            <div style="position:relative; width:120px; height:120px; flex-shrink:0;">
+                <canvas id="calorieRing" width="120" height="120"></canvas>
+                <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;">
+                    <span style="font-family:'Fraunces',serif;font-size:20px;font-weight:700;color:var(--forest);">{{ calories_today }}</span>
+                    <span style="font-size:10px;color:var(--muted);font-weight:600;">kcal</span>
+                </div>
+            </div>
+            <div class="calorie-ring-labels">
+                <div class="ring-label">
+                    <span class="ring-dot consumed"></span>
+                    <span>Consumed: <strong>{{ calories_today }} kcal</strong></span>
+                </div>
+                <div class="ring-label">
+                    <span class="ring-dot remaining"></span>
+                    <span>Remaining: <strong>{{ remaining_calories }} kcal</strong></span>
+                </div>
+                <div class="ring-label" style="margin-top:2px;">
+                    <span class="ring-dot" style="background:transparent;border:1.5px solid var(--border);"></span>
+                    <span style="font-size:12px;color:var(--muted);">Goal: 2000 kcal/day</span>
+                </div>
+                {% if calories_today >= 2000 %}
+                <div style="background:var(--foam);border:1px solid var(--border);border-radius:6px;padding:8px 12px;font-size:12px;font-weight:600;color:var(--green);margin-top:4px;">
+                    🎉 Daily goal reached!
+                </div>
+                {% elif calories_today >= 1500 %}
+                <div style="background:var(--gold-light);border:1px solid #e5c47a;border-radius:6px;padding:8px 12px;font-size:12px;font-weight:600;color:#7a5500;margin-top:4px;">
+                    🌟 Almost there — keep going!
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
 
-<h3>Total Meal Types</h3>
-
-<p>{{ meal_types }}</p>
+    <!-- Quick Links -->
+    <div class="dash-section">
+        <h2>⚡ Quick Actions</h2>
+        <div class="quick-links">
+            <a href="/quiz" class="quick-link-btn"><span>🧬</span> Health Quiz</a>
+            <a href="/dietselect" class="quick-link-btn"><span>🥗</span> Diet Plan</a>
+            <a href="/recipes" class="quick-link-btn"><span>📖</span> Browse Recipes</a>
+            <a href="/progress" class="quick-link-btn"><span>📊</span> My Progress</a>
+        </div>
+    </div>
 
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+// Date display
+const d = new Date();
+document.getElementById('todayDate').textContent = d.toLocaleDateString('en-IN', { weekday:'long', day:'numeric', month:'long' });
 
-<div class="dashboard-card">
+const consumed  = parseInt("{{ calories_today }}") || 0;
+const remaining = Math.max(0, parseInt("{{ remaining_calories }}") || 2000);
 
-<h3>Diet Plans</h3>
-
-<p>{{ diet_plans }}</p>
-
-</div>
-
-
-<div class="dashboard-card">
-
-<h3>Healthy Tips</h3>
-
-<p>{{ healthy_tips }}</p>
-
-</div>
-
-</div>
+new Chart(document.getElementById('calorieRing'), {
+    type: 'doughnut',
+    data: {
+        datasets: [{
+            data: [consumed || 0.01, remaining],
+            backgroundColor: ['#3a8a62', '#e6f3ea'],
+            borderWidth: 0,
+        }]
+    },
+    options: {
+        responsive: false,
+        cutout: '78%',
+        plugins: { legend: { display: false }, tooltip: { enabled: false } }
+    }
+});
+</script>
 
 {% endblock %}

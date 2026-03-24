@@ -2,45 +2,52 @@
 
 {% block content %}
 
-<h2 class="page-title">Today's Diet Plan</h2>
+<h1 class="page-title">Today's Diet Plan</h1>
+<p class="page-subtitle">Your personalised plan for the day. Mark meals as done to log your calories.</p>
 
+{% if meals %}
 <div class="diet-container">
+
+{% set meal_icons = {'Early Morning':'🌅','Breakfast':'☀️','Mid Snack':'🍎','Lunch':'🍛','Evening Snack':'🌤️','Dinner':'🌙'} %}
 
 {% for time, foods in meals.items() %}
 
-<div class="meal-block">
+<div class="meal-card">
 
-    <div class="meal-header">
+    <div class="meal-card-header">
+        <span class="meal-time-icon">{{ meal_icons.get(time, '🍽️') }}</span>
         <h3>{{ time }}</h3>
+        <span class="meal-time-badge" style="margin-left:auto;">{{ foods|length }} item{% if foods|length != 1 %}s{% endif %}</span>
     </div>
 
-    <form method="POST" action="/complete_meal">
-
-        <div class="food-grid">
-
-        {% for food in foods %}
-
-        <label class="food-card">
-            <input type="checkbox" name="meal_id[]" value="{{ food[0] }}">
-            <span>{{ food[1] }}</span>
-        </label>
-
-        {% endfor %}
-
+    <div class="meal-card-body">
+    {% for food in foods %}
+    <div class="meal-item">
+        <div class="meal-info">
+            <span class="meal-name">{{ food[1] }}</span>
         </div>
-
-        <button class="complete-btn">Complete</button>
-
-    </form>
+        <form method="POST" action="/complete_meal" style="margin:0;">
+            <input type="hidden" name="meal_id"   value="{{ food[0] }}">
+            <input type="hidden" name="meal_name" value="{{ food[1] }}">
+            <input type="hidden" name="calories"  value="0">
+            <input type="hidden" name="meal_time" value="{{ time }}">
+            <button class="complete-btn" type="submit">✓ Mark Done</button>
+        </form>
+    </div>
+    {% endfor %}
+    </div>
 
 </div>
 
 {% endfor %}
 
 </div>
-
-</tbody>
-
-</table>
+{% else %}
+<div class="empty-state" style="background:white;border-radius:var(--r-lg);padding:60px;border:1px solid var(--border-light);">
+    <div class="empty-icon">🥗</div>
+    <p>No meals found for your plan. Make sure you've completed the Health Quiz and selected your preferences.</p>
+    <a href="/quiz">Take the Health Quiz →</a>
+</div>
+{% endif %}
 
 {% endblock %}

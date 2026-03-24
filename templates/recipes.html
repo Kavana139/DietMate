@@ -4,44 +4,103 @@
 
 <h1 class="page-title">Healthy Recipes</h1>
 
-<div class="recipes-grid">
+<!-- TOOLBAR -->
+<div class="recipes-toolbar">
+    <input
+        type="text"
+        class="search-input"
+        id="recipeSearch"
+        placeholder="🔍 Search recipes..."
+        oninput="filterRecipes()"
+    >
+    <div class="filter-pills">
+        <button class="filter-pill active" onclick="setFilter('all', this)">All</button>
+        <button class="filter-pill" onclick="setFilter('low-cal', this)">🥬 Low Calorie</button>
+        <button class="filter-pill" onclick="setFilter('high-protein', this)">💪 High Protein</button>
+        <button class="filter-pill" onclick="setFilter('veg', this)">🥦 Vegetarian</button>
+    </div>
+</div>
+
+<p class="recipe-count" id="recipeCount">{{ recipes|length }} recipes found</p>
+
+<!-- RECIPES GRID -->
+<div class="recipes-grid" id="recipesGrid">
 
 {% for recipe in recipes %}
 
-<div class="recipe-card">
+<div class="recipe-card"
+     data-name="{{ recipe[1]|lower }}"
+     data-calories="{{ recipe[2] }}"
+     data-protein="{{ recipe[3] }}"
+     data-type="veg">
 
-<h3>{{ recipe[1] }}</h3>
+    <div class="recipe-card-top"></div>
+    <div class="recipe-card-body">
 
-<div class="nutrition-grid">
+        <h3>{{ recipe[1] }}</h3>
 
-<div class="nutrition-box">
-<p>{{ recipe[2] }}</p>
-<span>Calories</span>
-</div>
+        <div class="nutrition-boxes">
+            <div class="nutrition-box">
+                <p>{{ recipe[2] }}</p>
+                <span>Cal</span>
+            </div>
+            <div class="nutrition-box">
+                <p>{{ recipe[3] }}g</p>
+                <span>Protein</span>
+            </div>
+            <div class="nutrition-box">
+                <p>{{ recipe[4] }}g</p>
+                <span>Carbs</span>
+            </div>
+            <div class="nutrition-box">
+                <p>{{ recipe[5] }}g</p>
+                <span>Fat</span>
+            </div>
+        </div>
 
-<div class="nutrition-box">
-<p>{{ recipe[3] }} g</p>
-<span>Protein</span>
-</div>
+        <a href="/recipe/{{ recipe[0] }}" class="recipe-btn">View Recipe →</a>
 
-<div class="nutrition-box">
-<p>{{ recipe[4] }} g</p>
-<span>Carbs</span>
-</div>
-
-<div class="nutrition-box">
-<p>{{ recipe[5] }} g</p>
-<span>Fat</span>
-</div>
-
-</div>
-
-<a href="/recipe/{{ recipe[0] }}" class="recipe-btn">View Recipe</a>
+    </div>
 
 </div>
 
 {% endfor %}
 
 </div>
+
+<script>
+let activeFilter = 'all';
+
+function setFilter(filter, btn) {
+    activeFilter = filter;
+    document.querySelectorAll('.filter-pill').forEach(p => p.classList.remove('active'));
+    btn.classList.add('active');
+    filterRecipes();
+}
+
+function filterRecipes() {
+    const query = document.getElementById('recipeSearch').value.toLowerCase().trim();
+    const cards = document.querySelectorAll('.recipe-card');
+    let visible = 0;
+
+    cards.forEach(card => {
+        const name     = card.dataset.name;
+        const calories = parseInt(card.dataset.calories);
+        const protein  = parseInt(card.dataset.protein);
+
+        const matchName = !query || name.includes(query);
+        let matchFilter = true;
+
+        if (activeFilter === 'low-cal')      matchFilter = calories <= 300;
+        if (activeFilter === 'high-protein') matchFilter = protein  >= 15;
+
+        const show = matchName && matchFilter;
+        card.style.display = show ? 'flex' : 'none';
+        if (show) visible++;
+    });
+
+    document.getElementById('recipeCount').textContent = visible + ' recipe' + (visible !== 1 ? 's' : '') + ' found';
+}
+</script>
 
 {% endblock %}

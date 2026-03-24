@@ -2,46 +2,290 @@
 
 {% block content %}
 
+{% set safe_calories   = calories_today     if calories_today     is defined else 0 %}
+{% set safe_remaining  = remaining_calories if remaining_calories is defined else 2000 %}
+{% set safe_goal       = goal               if goal               is defined else 2000 %}
+{% set safe_meals      = meals              if meals              is defined else [] %}
+{% set safe_weekly     = weekly_data        if weekly_data        is defined else [] %}
+
 <h1 class="page-title">My Progress</h1>
+<p class="page-subtitle">Track your daily nutrition, hydration, and weekly consistency.</p>
 
-<div class="progress-card">
+<!-- STAT CARDS -->
+<div class="progress-stats">
+    <div class="stat-card">
+        <h3>🔥 Calories Today</h3>
+        <p>{{ safe_calories }} <span style="font-size:15px;font-weight:500;color:var(--muted);">kcal</span></p>
+        <div class="stat-sub">Goal: {{ safe_goal }} kcal/day</div>
+        <div style="margin-top:10px;background:var(--border-light);border-radius:999px;height:5px;overflow:hidden;">
+            <div style="width:'{{ [[safe_calories|float / safe_goal|float * 100, 100]|min, 0]|max|round|int }}%;height:100%;background:linear-gradient(90deg,var(--green-bright),var(--sage));border-radius:999px;transition:width .6s;"></div>
+        </div>
+    </div>
+    <div class="stat-card">
+        <h3>🎯 Remaining</h3>
+        <p>{{ safe_remaining }} <span style="font-size:15px;font-weight:500;color:var(--muted);">kcal</span></p>
+        <div class="stat-sub">Left for today</div>
+    </div>
+    <div class="stat-card">
+        <h3>🍽️ Meals Logged</h3>
+        <p>{{ safe_meals | length }}</p>
+        <div class="stat-sub">Completed today</div>
+    </div>
+</div>
 
-<h3>Today's Calories</h3>
+<!-- CHART + RING -->
+<div class="progress-grid">
 
-<p><strong>{{ calories_today }} kcal</strong> consumed</p>
+    <div class="chart-card">
+        <h2>📈 Calorie Intake — Last 7 Days</h2>
+        <canvas id="weeklyChart" height="160"></canvas>
+    </div>
 
-<p>Daily Goal: {{ goal }} kcal</p>
-
-<p>Remaining: <strong>{{ remaining_calories }} kcal</strong></p>
+    <div class="chart-card" style="display:flex;flex-direction:column;gap:16px;">
+        <h2>🎯 Today's Goal</h2>
+        <div style="display:flex;align-items:center;gap:26px;flex:1;">
+            <div style="position:relative;width:150px;height:150px;flex-shrink:0;">
+                <canvas id="todayRing" width="150" height="150"></canvas>
+                <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;">
+                    <span style="font-family:'Fraunces',serif;font-size:22px;font-weight:700;color:var(--forest);">{{ safe_calories }}</span>
+                    <span style="font-size:11px;color:var(--muted);">kcal</span>
+                </div>
+            </div>
+            <div style="flex:1;">
+                {% set pct = [[safe_calories|float / safe_goal|float * 100, 100]|min, 0]|max|round|int %}
+                <div style="font-size:13px;color:var(--muted);margin-bottom:10px;">
+                    <strong style="color:var(--forest);">{{ pct }}%</strong> of daily goal
+                </div>
+                {% if pct >= 100 %}
+                <span class="badge badge-green">🎉 Goal reached!</span>
+                {% elif pct >= 75 %}
+                <span class="badge badge-green">💪 Great progress</span>
+                {% elif pct >= 40 %}
+                <span class="badge badge-gold">🌟 Keep going</span>
+                {% else %}
+                <span class="badge badge-gold">⚡ Get started</span>
+                {% endif %}
+                <div style="margin-top:14px;font-size:13px;color:var(--muted);line-height:1.9;">
+                    <div>🟢 Consumed: <strong style="color:var(--forest);">{{ safe_calories }}</strong> kcal</div>
+                    <div>⬜ Remaining: <strong style="color:var(--forest);">{{ safe_remaining }}</strong> kcal</div>
+                </div>
+            </div>
+        </div>
+    </div>
 
 </div>
 
+<!-- WEEKLY CALENDAR -->
+<div class="calendar-card">
+    <h2>📅 Weekly Activity</h2>
+    <div class="calendar">
+        {% if safe_weekly | length > 0 %}
+            {% for day in safe_weekly %}
+            <div class="day-box {{ day[2] }}">
+                <p>{{ day[0] }}</p>
+                <span>{{ day[1] }} kcal</span>
+            </div>
+            {% endfor %}
+        {% else %}
+            <p style="color:var(--muted);font-size:14px;grid-column:span 7;padding:12px 0;">
+                No weekly data yet — start logging meals to see your progress here.
+            </p>
+        {% endif %}
+    </div>
+</div>
 
+<!-- MEAL LOG -->
 <div class="progress-meals">
+    <h2>🍽️ Meals Completed Today</h2>
 
-<h3>Completed Meals</h3>
-
-{% if meals %}
-
-<ul class="meal-list">
-
-{% for meal in meals %}
-
-<li>
-<strong>{{ meal[1] }}</strong> – {{ meal[0] }}
-<span>{{ meal[2] }} kcal</span>
-</li>
-
-{% endfor %}
-
-</ul>
-
-{% else %}
-
-<p>No meals completed today.</p>
-
-{% endif %}
-
+    {% if safe_meals | length > 0 %}
+    <table class="meal-log-table">
+        <thead>
+            <tr>
+                <th>Meal Time</th>
+                <th>Meal Name</th>
+                <th>Calories</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for meal in safe_meals %}
+            <tr>
+                <td>
+                    {% if   meal[0] == 'Early Morning' %}🌅
+                    {% elif meal[0] == 'Breakfast'     %}☀️
+                    {% elif meal[0] == 'Mid Snack'     %}🍎
+                    {% elif meal[0] == 'Lunch'         %}🍛
+                    {% elif meal[0] == 'Evening Snack' %}🌤️
+                    {% elif meal[0] == 'Dinner'        %}🌙
+                    {% else %}🍽️{% endif %}
+                    {{ meal[0] }}
+                </td>
+                <td>{{ meal[1] }}</td>
+                <td class="cal-cell">{{ meal[2] }} kcal</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <div class="empty-state">
+        <div class="empty-icon">🍽️</div>
+        <p>No meals logged today. Go to your <a href="/dietselect">diet plan</a> and mark meals as complete.</p>
+    </div>
+    {% endif %}
 </div>
+
+<!-- WATER TRACKER (fully working) -->
+<div class="water-tracker">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:5px;flex-wrap:wrap;gap:8px;">
+        <h2>💧 Water Intake</h2>
+        <button onclick="resetWater()" style="font-size:12px;padding:5px 14px;border-radius:var(--r-pill);border:1px solid var(--border);background:white;color:var(--muted);cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;transition:all .2s;" onmouseover="this.style.borderColor='var(--red)';this.style.color='var(--red)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--muted)'">Reset</button>
+    </div>
+    <p>Tap a glass to log it. Aim for 8 glasses (2 litres) per day.</p>
+
+    <div class="water-glasses">
+        {% for i in range(8) %}
+        <button class="glass-btn" id="glass-{{ i }}" type="button" onclick="clickGlass('{{ i }}')">
+            <span class="glass-emoji">💧</span>
+            <span class="glass-label">{{ i + 1 }}</span>
+        </button>
+        {% endfor %}
+    </div>
+
+    <!-- Progress bar -->
+    <div style="margin-top:16px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+            <span class="water-count" id="waterCountText">0 / 8 glasses</span>
+            <span id="waterMl" style="font-size:13px;color:var(--muted);font-weight:600;">0 ml / 2000 ml</span>
+        </div>
+        <div style="background:var(--border-light);border-radius:var(--r-pill);height:8px;overflow:hidden;">
+            <div id="waterBar" style="width:0%;height:100%;background:linear-gradient(90deg,#60c0f0,#2272a8);border-radius:var(--r-pill);transition:width .4s ease;"></div>
+        </div>
+        <div id="waterMsg" style="margin-top:8px;font-size:13px;font-weight:600;color:#2272a8;min-height:20px;"></div>
+    </div>
+</div>
+
+<!-- AI FOOD SCANNER PROMO CARD -->
+<div style="background:linear-gradient(135deg,var(--forest-mid) 0%,var(--forest) 100%);border-radius:var(--r-xl);padding:28px 30px;margin-top:22px;display:flex;align-items:center;gap:24px;flex-wrap:wrap;box-shadow:var(--shadow-md);">
+    <div style="font-size:48px;flex-shrink:0;">📷</div>
+    <div style="flex:1;min-width:200px;">
+        <h3 style="font-family:'Fraunces',serif;font-size:20px;font-weight:700;color:var(--mint);margin-bottom:6px;">AI Food Scanner</h3>
+        <p style="font-size:14px;color:rgba(255,255,255,0.65);line-height:1.6;margin-bottom:0;">Upload a photo of any food and our AI will instantly estimate its calories, protein, carbs and fat. No more manual logging!</p>
+    </div>
+    <a href="/food_scanner" style="display:inline-flex;align-items:center;gap:8px;background:var(--green-bright);color:white;padding:12px 24px;border-radius:var(--r-md);font-size:14px;font-weight:700;text-decoration:none;transition:all .2s;white-space:nowrap;flex-shrink:0;" onmouseover="this.style.background='var(--sage)'" onmouseout="this.style.background='var(--green-bright)'">
+        Try it now →
+    </a>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+/* ── CHARTS ────────────────────────────────────────────────── */
+(function () {
+    var weeklyCanvas = document.getElementById('weeklyChart');
+    if (weeklyCanvas) {
+        var weeklyData = "{{ safe_weekly | tojson }}";
+        new Chart(weeklyCanvas, {
+            type: 'bar',
+            data: {
+                labels: weeklyData.map(d => d[0]),
+                datasets: [{
+                    label: 'Calories',
+                    data:  weeklyData.map(d => d[1]),
+                    backgroundColor: weeklyData.map(d => d[1] >= 1500 ? '#3a8a62' : d[1] > 0 ? '#f5c842' : '#e6f3ea'),
+                    borderRadius: 8,
+                    borderSkipped: false
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: { callbacks: { label: ctx => ctx.parsed.y + ' kcal' } }
+                },
+                scales: {
+                    y: { beginAtZero: true, grid: { color: '#f1f5f9' }, ticks: { font: { size: 11 }, callback: v => v + '' } },
+                    x: { grid: { display: false }, ticks: { font: { size: 12, weight: '700' } } }
+                }
+            }
+        });
+    }
+
+    var ringCanvas = document.getElementById('todayRing');
+    if (ringCanvas) {
+        var consumed  = parseInt("{{ safe_calories }}") || 0;
+        var goalVal   = parseInt("{{ safe_goal }}")     || 2000;
+        var remaining = Math.max(0, goalVal - consumed);
+        new Chart(ringCanvas, {
+            type: 'doughnut',
+            data: {
+                datasets: [{
+                    data: [consumed || 0.01, remaining],
+                    backgroundColor: ['#3a8a62', '#e6f3ea'],
+                    borderWidth: 0
+                }]
+            },
+            options: {
+                responsive: false,
+                cutout: '72%',
+                plugins: { legend: { display: false }, tooltip: { enabled: false } }
+            }
+        });
+    }
+})();
+
+/* ── WATER TRACKER ─────────────────────────────────────────── */
+// Use today's date as key so it resets automatically each day
+const TODAY_KEY = 'dm_water_' + new Date().toISOString().slice(0,10);
+var waterCount = parseInt(localStorage.getItem(TODAY_KEY) || '0');
+
+const WATER_MSGS = [
+    '', // 0
+    '☁️ Good start — keep drinking!',
+    '💧 2 glasses — warming up!',
+    '💧 3 glasses — great habit!',
+    '🌊 Halfway there — keep it up!',
+    '💪 5 glasses — almost there!',
+    '😎 6 glasses — excellent!',
+    '🌟 7 glasses — nearly at goal!',
+    '🎉 8 glasses — daily goal achieved! Great work!'
+];
+
+function renderWater() {
+    for (var i = 0; i < 8; i++) {
+        var btn = document.getElementById('glass-' + i);
+        if (!btn) continue;
+        if (i < waterCount) {
+            btn.classList.add('filled');
+        } else {
+            btn.classList.remove('filled');
+        }
+    }
+    document.getElementById('waterCountText').textContent = waterCount + ' / 8 glasses';
+    document.getElementById('waterMl').textContent = (waterCount * 250) + ' ml / 2000 ml';
+    document.getElementById('waterBar').style.width = Math.round(waterCount / 8 * 100) + '%';
+    document.getElementById('waterMsg').textContent = WATER_MSGS[waterCount] || '';
+}
+
+function clickGlass(index) {
+    // Clicking a filled glass that is the last one → undo last
+    // Clicking any glass → fill up to that glass
+    if (waterCount === index + 1) {
+        // toggle: undo the last glass
+        waterCount = index;
+    } else {
+        waterCount = index + 1;
+    }
+    localStorage.setItem(TODAY_KEY, waterCount);
+    renderWater();
+}
+
+function resetWater() {
+    waterCount = 0;
+    localStorage.setItem(TODAY_KEY, 0);
+    renderWater();
+}
+
+// Initialize on load
+renderWater();
+</script>
 
 {% endblock %}

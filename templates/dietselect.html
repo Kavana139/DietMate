@@ -2,40 +2,88 @@
 
 {% block content %}
 
-<h1 class="page-title">Create Your Diet Plan</h1>
+<h1 class="page-title">Generate Diet Plan</h1>
+<p class="page-subtitle">Choose a day and food preference to get a personalised meal plan tailored to your calorie goal.</p>
 
 <div class="diet-select-container">
 
-<form method="POST" action="/auto_diet" class="diet-form">
+<form method="POST" action="/auto_diet" id="dietForm">
 
-<div class="form-group">
-<label>Select Day</label>
-<select name="day">
-<option>Monday</option>
-<option>Tuesday</option>
-<option>Wednesday</option>
-<option>Thursday</option>
-<option>Friday</option>
-<option>Saturday</option>
-<option>Sunday</option>
-</select>
-</div>
+    <input type="hidden" name="diet_type" id="selectedDiet" required>
 
+    <!-- DAY PILLS -->
+    <span class="section-label">📅 Select Day</span>
+    <div class="day-pills">
+        {% for day in ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'] %}
+        <button type="button" class="day-pill" onclick="selectDay(this, '{{ day }}')">{{ day }}</button>
+        {% endfor %}
+    </div>
 
-<div class="form-group">
-<label>Diet Type</label>
-<select name="diet_type">
-<option value="veg">Veg</option>
-<option value="nonveg">Non Veg</option>
-</select>
-</div>
+    <!-- DIET TYPE CARDS -->
+    <span class="section-label">🥗 Diet Preference</span>
+    <div class="diet-type-cards">
 
-<button type="submit" class="generate-btn">
-Auto Generate Diet Plan
-</button>
+        <div class="diet-type-card" onclick="selectDiet(this, 'veg')" id="card-veg">
+            <span class="selected-tick">✓</span>
+            <span class="diet-emoji">🥦</span>
+            <h3>Vegetarian</h3>
+            <p>Plant-based meals with dairy and eggs</p>
+        </div>
+
+        <div class="diet-type-card" onclick="selectDiet(this, 'nonveg')" id="card-nonveg">
+            <span class="selected-tick">✓</span>
+            <span class="diet-emoji">🍗</span>
+            <h3>Non-Vegetarian</h3>
+            <p>Includes chicken, fish, eggs and more</p>
+        </div>
+
+    </div>
+
+    <!-- Calorie note -->
+    <div id="calorieNote" style="display:none;background:var(--foam-light);border:1.5px solid var(--border);border-radius:10px;padding:14px 16px;margin-bottom:24px;font-size:13px;color:var(--green);font-weight:600;">
+        🔥 Your calorie target: <span id="calDisplay">—</span> kcal/day — plan will be generated accordingly.
+    </div>
+
+    <div id="noCalNote" style="background:var(--gold-light);border:1.5px solid #e5c47a;border-radius:10px;padding:14px 16px;margin-bottom:24px;font-size:13px;color:#7a5800;font-weight:600;">
+        💡 <strong>Tip:</strong> Complete the <a href="/quiz" style="color:inherit;font-weight:800;text-decoration:underline;">Health Quiz</a> first to get a personalised calorie-matched plan.
+    </div>
+
+    <button type="submit" class="generate-btn" onclick="return validateForm()">
+        🚀 Generate Diet Plan
+    </button>
 
 </form>
 
 </div>
+
+<script>
+// Show calorie note if session has calories
+const storedCals = sessionStorage.getItem('dm_calories');
+
+function selectDay(btn, day) {
+    document.querySelectorAll('.day-pill').forEach(p => p.classList.remove('selected'));
+    btn.classList.add('selected');
+    // No hidden day input needed for auto_diet — it doesn't use day
+}
+
+function selectDiet(card, type) {
+    document.querySelectorAll('.diet-type-card').forEach(c => c.classList.remove('selected'));
+    card.classList.add('selected');
+    document.getElementById('selectedDiet').value = type;
+}
+
+function validateForm() {
+    const diet = document.getElementById('selectedDiet').value;
+    if (!diet) {
+        // Highlight cards
+        document.querySelectorAll('.diet-type-card').forEach(c => {
+            c.style.borderColor = '#d64f4f';
+            setTimeout(() => c.style.borderColor = '', 1800);
+        });
+        return false;
+    }
+    return true;
+}
+</script>
 
 {% endblock %}

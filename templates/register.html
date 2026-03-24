@@ -1,88 +1,86 @@
 <!DOCTYPE html>
-<html>
-
+<html lang="en">
 <head>
-
-<title>Create Account - DietMate</title>
-
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Create Account — DietMate</title>
 <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-
 </head>
-
 <body class="register-page">
 
-<div class="register-wrapper">
+<div class="register-wrapper" style="max-width:980px;">
 
-<div class="register-left">
+    <!-- LEFT PANEL -->
+    <div class="register-left">
+        <h1>DietMate</h1>
+        <p class="tagline">Start your nutrition journey today.</p>
+        <ul>
+            <li><span class="check-icon">✓</span> Personalized diet plans based on your goals</li>
+            <li><span class="check-icon">✓</span> Full weekly meal planner with variety</li>
+            <li><span class="check-icon">✓</span> Complete nutrition information for every meal</li>
+            <li><span class="check-icon">✓</span> Track your weekly calorie progress</li>
+        </ul>
+    </div>
 
-<h1>DietMate</h1>
+    <!-- RIGHT PANEL -->
+    <div class="register-right">
 
-<p>Your personal diet planner.</p>
+        <h2>Create Account</h2>
+        <p class="sub-h">Fill in your details to get started.</p>
 
-<ul>
-<li>✔ Personalized diet plans</li>
-<li>✔ Weekly meal planner</li>
-<li>✔ Nutrition tracking</li>
-<li>✔ Weight progress monitoring</li>
-</ul>
+        {% if error %}
+        <div class="error-message" style="margin-bottom:18px;">⚠️ {{ error }}</div>
+        {% endif %}
 
-</div>
+        <form method="POST">
+            <div class="form-grid">
+                <div style="grid-column:1/-1">
+                    <input type="text" name="name" placeholder="Full Name" required style="width:100%;padding:12px 13px;border-radius:8px;border:1.5px solid var(--border);font-size:14px;font-family:'Plus Jakarta Sans',sans-serif;color:var(--ink);background:var(--paper);">
+                </div>
+                <input type="email"  name="email"    placeholder="Email address" required>
+                <div class="input-group" style="position:relative;">
+                    <input type="password" name="password" id="regPassword" placeholder="Password" required style="width:100%;padding:12px 50px 12px 13px;border-radius:8px;border:1.5px solid var(--border);font-size:14px;font-family:'Plus Jakarta Sans',sans-serif;color:var(--ink);background:var(--paper);">
+                    <button type="button" class="show-password-btn" onclick="togglePassword('regPassword', this)">Show</button>
+                </div>
+                <input type="number" name="age"      placeholder="Age" min="10" max="100" required>
+                <select name="gender" required>
+                    <option value="">Gender</option>
+                    <option value="Male">Male</option>
+                    <option value="Female">Female</option>
+                    <option value="Other">Other</option>
+                </select>
+                <input type="number" name="height"   placeholder="Height (cm)" min="100" max="250" required>
+                <input type="number" name="weight"   placeholder="Weight (kg)" min="20" max="300" step="0.1" required>
+                <select name="goal" required>
+                    <option value="">Goal</option>
+                    <option value="Weight Loss">Weight Loss</option>
+                    <option value="Weight Gain">Weight Gain</option>
+                    <option value="Muscle Gain">Muscle Gain</option>
+                </select>
+                <select name="food_type" required>
+                    <option value="">Food Preference</option>
+                    <option value="veg">🥦 Vegetarian</option>
+                    <option value="nonveg">🍗 Non-Vegetarian</option>
+                </select>
+            </div>
 
+            <button type="submit" class="register-btn" style="margin-top:16px;">Create Account →</button>
+        </form>
 
-<div class="register-right">
+        <p class="login-link">
+            Already have an account? <a href="/">Sign In</a>
+        </p>
 
-<h2>Create Account</h2>
-
-<form method="POST">
-
-<div class="form-grid">
-
-<input type="text" name="name" placeholder="Full Name" required>
-
-<input type="email" name="email" placeholder="Email" required>
-
-<input type="password" name="password" placeholder="Password" required>
-
-<input type="number" name="age" placeholder="Age" required>
-
-<select name="gender">
-<option value="">Gender</option>
-<option value="Male">Male</option>
-<option value="Female">Female</option>
-<option value="Other">Other</option>
-</select>
-
-<select name="goal">
-<option value="">Goal</option>
-<option value="weight_loss">Weight Loss</option>
-<option value="weight_gain">Weight Gain</option>
-<option value="muscle_gain">Muscle Gain</option>
-</select>
-
-<select name="food_type">
-<option value="">Food Preference</option>
-<option value="veg">Vegetarian</option>
-<option value="nonveg">Non-Vegetarian</option>
-</select>
-
-<input type="number" name="height" placeholder="Height (cm)" required>
-
-<input type="number" name="weight" placeholder="Weight (kg)" required>
-
-</div>
-
-<button type="submit" class="register-btn">Create Account</button>
-
-</form>
-
-<p class="login-link">
-Already have an account?
-<a href="/">Login</a>
-</p>
+    </div>
 
 </div>
 
-</div>
-
+<script>
+function togglePassword(inputId, btn) {
+    const input = document.getElementById(inputId);
+    if (input.type === 'password') { input.type = 'text'; btn.textContent = 'Hide'; }
+    else { input.type = 'password'; btn.textContent = 'Show'; }
+}
+</script>
 </body>
 </html>
