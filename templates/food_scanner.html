@@ -1,518 +1,141 @@
 {% extends "base.html" %}
-
 {% block content %}
 
 <h1 class="page-title">AI Food Scanner</h1>
-<p class="page-subtitle">Upload or snap a photo of any food — our AI will estimate its calories and macros instantly.</p>
+<p class="page-subtitle">Upload a photo of any food — AI will estimate its calories and macros instantly.</p>
 
-<!-- UPLOAD AREA -->
-<div class="scanner-layout">
+<div class="scanner-grid">
 
-    <!-- LEFT: Upload + Controls -->
-    <div class="scanner-left">
-
+    <div>
         <div class="upload-zone" id="uploadZone">
             <input type="file" id="fileInput" accept="image/*" capture="environment" style="display:none;">
             <div class="upload-inner" id="uploadInner">
-                <div class="upload-icon">📷</div>
+                <span class="upload-icon">◎</span>
                 <h3>Drop a food photo here</h3>
                 <p>or click to browse / use your camera</p>
-                <div class="upload-actions">
-                    <button class="upload-btn-primary" onclick="document.getElementById('fileInput').click()">
-                        📁 Choose Photo
-                    </button>
-                    <button class="upload-btn-secondary" onclick="openCamera()">
-                        📸 Take Photo
-                    </button>
+                <div class="upload-btn-row">
+                    <button class="btn btn-primary btn-sm" onclick="document.getElementById('fileInput').click()">Choose Photo</button>
+                    <button class="btn btn-secondary btn-sm" onclick="openCamera()">Take Photo</button>
                 </div>
-                <p class="upload-hint">JPG, PNG, WEBP supported · Max 10MB</p>
+                <p class="upload-hint">JPG, PNG, WEBP — max 10MB</p>
             </div>
             <div class="upload-preview" id="uploadPreview" style="display:none;">
-                <img id="previewImg" src="" alt="Food preview">
-                <button class="remove-img-btn" onclick="clearImage()">✕ Remove</button>
+                <img id="previewImg" src="" alt="Preview">
+                <button class="remove-btn" onclick="clearImage()">Remove</button>
             </div>
         </div>
 
-        <div id="portionRow" style="display:none;margin-top:16px;">
-            <label class="section-label" style="display:block;margin-bottom:8px;">Portion Size</label>
+        <div class="portion-row" id="portionRow" style="display:none;">
+            <span class="section-label-text" style="display:block;margin-bottom:8px;">Portion Size</span>
             <div class="portion-btns">
-                <button class="portion-btn active" data-portion="half"  onclick="setPortion(this,'half')">½ serving</button>
-                <button class="portion-btn" data-portion="one"   onclick="setPortion(this,'one')">1 serving</button>
-                <button class="portion-btn" data-portion="onehalf" onclick="setPortion(this,'onehalf')">1½ servings</button>
-                <button class="portion-btn" data-portion="two"   onclick="setPortion(this,'two')">2 servings</button>
+                <button class="portion-btn active" onclick="setPortion(this,.5)">½ serving</button>
+                <button class="portion-btn" onclick="setPortion(this,1.0)">1 serving</button>
+                <button class="portion-btn" onclick="setPortion(this,1.5)">1½ servings</button>
+                <button class="portion-btn" onclick="setPortion(this,2.0)">2 servings</button>
             </div>
         </div>
 
-        <button class="scan-btn" id="scanBtn" onclick="scanFood()" style="display:none;">
-            🔍 Analyse Food
-        </button>
-
+        <button class="btn btn-primary btn-lg" id="scanBtn" onclick="scanFood()" style="display:none;width:100%;margin-top:16px;">Analyse Food</button>
     </div>
 
-    <!-- RIGHT: Results -->
-    <div class="scanner-right">
-
-        <!-- Idle state -->
+    <div class="scanner-panel">
         <div class="scanner-idle" id="scannerIdle">
-            <div style="font-size:60px;margin-bottom:16px;">🥗</div>
+            <span style="font-size:52px;opacity:.3;">◎</span>
             <h3>Results will appear here</h3>
-            <p>Upload a food image and click "Analyse Food" to get instant nutrition estimates.</p>
-            <div class="scanner-examples">
-                <span class="example-chip">🍕 Pizza slice</span>
-                <span class="example-chip">🍗 Chicken curry</span>
-                <span class="example-chip">🥗 Salad bowl</span>
-                <span class="example-chip">🍜 Noodles</span>
-                <span class="example-chip">🍎 Apple</span>
-                <span class="example-chip">🍰 Dessert</span>
+            <p>Upload a food image and click Analyse Food to get instant nutrition estimates.</p>
+            <div class="example-tags">
+                <span class="example-tag">Pizza slice</span>
+                <span class="example-tag">Chicken curry</span>
+                <span class="example-tag">Salad bowl</span>
+                <span class="example-tag">Noodles</span>
+                <span class="example-tag">Apple</span>
+                <span class="example-tag">Dessert</span>
             </div>
         </div>
 
-        <!-- Loading state -->
         <div class="scanner-loading" id="scannerLoading" style="display:none;">
-            <div class="loading-spinner"></div>
+            <div class="scan-spinner"></div>
             <h3>Analysing your food…</h3>
             <p id="loadingMsg">Identifying ingredients</p>
         </div>
 
-        <!-- Error state -->
         <div class="scanner-error" id="scannerError" style="display:none;">
-            <div style="font-size:48px;">⚠️</div>
+            <span style="font-size:36px;opacity:.4;">◌</span>
             <h3>Could not analyse this image</h3>
             <p id="errorMsg">Please try a clearer photo of a food item.</p>
-            <button onclick="resetScanner()" class="scan-btn" style="margin-top:12px;width:auto;padding:10px 24px;">Try Again</button>
+            <button onclick="resetScanner()" class="btn btn-secondary btn-sm" style="margin-top:10px;">Try Again</button>
         </div>
 
-        <!-- Results state -->
         <div class="scanner-results" id="scannerResults" style="display:none;">
+            <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:8px;flex-wrap:wrap;">
+                <div class="scan-food-name" id="scanFoodName">—</div>
+                <span class="scan-confidence" id="scanConfidence">—</span>
+            </div>
+            <div class="scan-description" id="scanDescription"></div>
 
-            <div class="result-header">
-                <div class="result-food-name" id="resultFoodName">—</div>
-                <span class="result-confidence" id="resultConfidence">—</span>
+            <div class="scan-macros">
+                <div class="scan-macro-card"><div class="scan-macro-icon">◉</div><div class="scan-macro-val" id="sCalories">—</div><div class="scan-macro-lbl">Calories</div><div class="scan-macro-unit">kcal</div></div>
+                <div class="scan-macro-card"><div class="scan-macro-icon">◈</div><div class="scan-macro-val" id="sProtein">—</div><div class="scan-macro-lbl">Protein</div><div class="scan-macro-unit">g</div></div>
+                <div class="scan-macro-card"><div class="scan-macro-icon">◎</div><div class="scan-macro-val" id="sCarbs">—</div><div class="scan-macro-lbl">Carbs</div><div class="scan-macro-unit">g</div></div>
+                <div class="scan-macro-card"><div class="scan-macro-icon">◌</div><div class="scan-macro-val" id="sFat">—</div><div class="scan-macro-lbl">Fat</div><div class="scan-macro-unit">g</div></div>
             </div>
 
-            <div class="result-description" id="resultDescription"></div>
-
-            <!-- Macro cards -->
-            <div class="result-macros">
-                <div class="result-macro-card result-cal">
-                    <div class="macro-icon">🔥</div>
-                    <div class="macro-val" id="rCalories">—</div>
-                    <div class="macro-lbl">Calories</div>
-                    <div class="macro-unit">kcal</div>
+            <div class="scan-bar-section">
+                <div class="scan-bar-header"><span>Macro split</span><span id="macroSplitTxt">—</span></div>
+                <div class="scan-bar-track">
+                    <div id="barP" style="height:100%;background:var(--accent);border-radius:4px 0 0 4px;transition:width .5s;"></div>
+                    <div id="barC" style="height:100%;background:rgba(0,232,122,0.45);transition:width .5s;"></div>
+                    <div id="barF" style="height:100%;background:rgba(0,232,122,0.2);border-radius:0 4px 4px 0;transition:width .5s;"></div>
                 </div>
-                <div class="result-macro-card">
-                    <div class="macro-icon">🥩</div>
-                    <div class="macro-val" id="rProtein">—</div>
-                    <div class="macro-lbl">Protein</div>
-                    <div class="macro-unit">grams</div>
-                </div>
-                <div class="result-macro-card">
-                    <div class="macro-icon">🍚</div>
-                    <div class="macro-val" id="rCarbs">—</div>
-                    <div class="macro-lbl">Carbs</div>
-                    <div class="macro-unit">grams</div>
-                </div>
-                <div class="result-macro-card">
-                    <div class="macro-icon">🥑</div>
-                    <div class="macro-val" id="rFat">—</div>
-                    <div class="macro-lbl">Fat</div>
-                    <div class="macro-unit">grams</div>
+                <div class="scan-bar-legends">
+                    <div class="scan-legend"><span class="legend-dot" style="background:var(--accent);"></span>Protein</div>
+                    <div class="scan-legend"><span class="legend-dot" style="background:rgba(0,232,122,0.45);"></span>Carbs</div>
+                    <div class="scan-legend"><span class="legend-dot" style="background:rgba(0,232,122,0.2);"></span>Fat</div>
                 </div>
             </div>
 
-            <!-- Macro bar -->
-            <div class="macro-bar-section">
-                <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--muted);font-weight:700;margin-bottom:6px;">
-                    <span>Macro split</span>
-                    <span id="macroSplitText">—</span>
-                </div>
-                <div class="macro-split-bar">
-                    <div id="barProtein" style="height:100%;background:#3a8a62;border-radius:4px 0 0 4px;transition:width .5s;"></div>
-                    <div id="barCarbs"   style="height:100%;background:#4dab7e;transition:width .5s;"></div>
-                    <div id="barFat"     style="height:100%;background:#7ecaa4;border-radius:0 4px 4px 0;transition:width .5s;"></div>
-                </div>
-                <div style="display:flex;gap:16px;margin-top:8px;font-size:12px;">
-                    <span style="display:flex;align-items:center;gap:5px;color:var(--muted);"><span style="width:10px;height:10px;background:#3a8a62;border-radius:50%;display:inline-block;"></span>Protein</span>
-                    <span style="display:flex;align-items:center;gap:5px;color:var(--muted);"><span style="width:10px;height:10px;background:#4dab7e;border-radius:50%;display:inline-block;"></span>Carbs</span>
-                    <span style="display:flex;align-items:center;gap:5px;color:var(--muted);"><span style="width:10px;height:10px;background:#7ecaa4;border-radius:50%;display:inline-block;"></span>Fat</span>
-                </div>
-            </div>
-
-            <!-- Ingredients -->
-            <div class="result-ingredients" id="resultIngredients" style="display:none;">
-                <h4>🧾 Detected Ingredients</h4>
+            <div class="scan-ingredients" id="scanIngredients" style="display:none;">
+                <h4>Detected Ingredients</h4>
                 <div id="ingredientsList"></div>
             </div>
 
-            <!-- Health tags -->
-            <div id="healthTags" style="display:flex;flex-wrap:wrap;gap:8px;margin-top:14px;"></div>
+            <div class="health-tags" id="healthTags"></div>
 
-            <!-- Disclaimer -->
-            <p style="font-size:11px;color:var(--muted);margin-top:16px;padding-top:12px;border-top:1px solid var(--border-light);line-height:1.6;">
-                ⚠️ These are AI estimates for reference only. Actual nutrition may vary based on portion size, cooking method, and ingredients.
-            </p>
+            <p class="scan-disclaimer">AI estimates for reference only. Actual nutrition may vary based on portion size, cooking method, and ingredients.</p>
 
-            <button onclick="resetScanner()" style="margin-top:14px;width:100%;padding:12px;border-radius:var(--r-sm);border:1.5px solid var(--border);background:white;color:var(--ink-light);font-size:13px;font-weight:700;cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif;transition:all .2s;" onmouseover="this.style.background='var(--parchment)'" onmouseout="this.style.background='white'">
-                🔄 Scan another food
-            </button>
-
+            <button onclick="resetScanner()" class="btn btn-ghost" style="width:100%;margin-top:12px;">Scan another food</button>
         </div>
-
     </div>
 
 </div>
 
-<style>
-.scanner-layout {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 26px;
-    align-items: start;
-}
-
-@media (max-width: 800px) { .scanner-layout { grid-template-columns: 1fr; } }
-
-/* UPLOAD ZONE */
-.upload-zone {
-    border: 2px dashed var(--border);
-    border-radius: var(--r-xl);
-    background: white;
-    transition: border-color .2s, background .2s;
-    min-height: 260px;
-    position: relative;
-    overflow: hidden;
-    cursor: pointer;
-}
-
-.upload-zone.drag-over {
-    border-color: var(--green-bright);
-    background: var(--foam-light);
-}
-
-.upload-inner {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    padding: 36px 24px;
-    text-align: center;
-    min-height: 260px;
-}
-
-.upload-icon   { font-size: 52px; margin-bottom: 4px; }
-.upload-inner h3 { font-family: 'Fraunces', serif; font-size: 18px; font-weight: 700; color: var(--forest); }
-.upload-inner p  { font-size: 14px; color: var(--muted); margin: 0; }
-.upload-hint     { font-size: 12px; color: var(--muted); margin-top: 8px !important; }
-
-.upload-actions { display: flex; gap: 10px; margin-top: 10px; flex-wrap: wrap; justify-content: center; }
-
-.upload-btn-primary {
-    padding: 10px 22px;
-    background: var(--green-bright);
-    color: white;
-    border: none;
-    border-radius: var(--r-sm);
-    font-size: 13px;
-    font-weight: 700;
-    font-family: 'Plus Jakarta Sans', sans-serif;
-    cursor: pointer;
-    transition: all .2s;
-}
-.upload-btn-primary:hover { background: var(--forest); }
-
-.upload-btn-secondary {
-    padding: 10px 22px;
-    background: white;
-    color: var(--green-bright);
-    border: 2px solid var(--green-bright);
-    border-radius: var(--r-sm);
-    font-size: 13px;
-    font-weight: 700;
-    font-family: 'Plus Jakarta Sans', sans-serif;
-    cursor: pointer;
-    transition: all .2s;
-}
-.upload-btn-secondary:hover { background: var(--foam-light); }
-
-.upload-preview {
-    width: 100%;
-    height: 260px;
-    position: relative;
-}
-.upload-preview img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    border-radius: calc(var(--r-xl) - 2px);
-}
-.remove-img-btn {
-    position: absolute;
-    top: 12px; right: 12px;
-    background: rgba(0,0,0,0.55);
-    color: white;
-    border: none;
-    border-radius: var(--r-pill);
-    padding: 6px 14px;
-    font-size: 12px;
-    font-weight: 700;
-    cursor: pointer;
-    font-family: 'Plus Jakarta Sans', sans-serif;
-    transition: background .2s;
-}
-.remove-img-btn:hover { background: rgba(0,0,0,0.75); }
-
-/* PORTION */
-.portion-btns { display: flex; gap: 8px; flex-wrap: wrap; }
-.portion-btn {
-    padding: 8px 18px;
-    border-radius: var(--r-pill);
-    border: 1.5px solid var(--border);
-    background: white;
-    color: var(--ink-light);
-    font-size: 13px;
-    font-weight: 700;
-    font-family: 'Plus Jakarta Sans', sans-serif;
-    cursor: pointer;
-    transition: all .18s;
-}
-.portion-btn:hover  { border-color: var(--sage); color: var(--green); }
-.portion-btn.active { background: var(--green-bright); border-color: var(--green-bright); color: white; }
-
-.scan-btn {
-    width: 100%;
-    padding: 15px;
-    margin-top: 16px;
-    background: linear-gradient(135deg, var(--forest-mid), var(--green));
-    color: white;
-    border: none;
-    border-radius: var(--r-md);
-    font-size: 16px;
-    font-weight: 700;
-    font-family: 'Plus Jakarta Sans', sans-serif;
-    cursor: pointer;
-    transition: all .2s;
-    letter-spacing: .2px;
-    box-shadow: var(--shadow-green);
-}
-.scan-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(39,98,68,.32); }
-.scan-btn:disabled { opacity: .6; cursor: not-allowed; transform: none; }
-
-/* RESULTS PANEL */
-.scanner-right {
-    background: white;
-    border-radius: var(--r-xl);
-    border: 1px solid var(--border-light);
-    box-shadow: var(--shadow-xs);
-    overflow: hidden;
-    min-height: 320px;
-}
-
-.scanner-idle,
-.scanner-loading,
-.scanner-error {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 48px 28px;
-    text-align: center;
-    gap: 8px;
-    min-height: 320px;
-}
-
-.scanner-idle h3,
-.scanner-loading h3,
-.scanner-error h3 {
-    font-family: 'Fraunces', serif;
-    font-size: 18px;
-    font-weight: 700;
-    color: var(--forest);
-}
-
-.scanner-idle p,
-.scanner-loading p,
-.scanner-error p { font-size: 14px; color: var(--muted); max-width: 280px; line-height: 1.6; }
-
-.scanner-examples {
-    display: flex; flex-wrap: wrap; gap: 7px;
-    justify-content: center;
-    margin-top: 14px;
-}
-
-.example-chip {
-    padding: 6px 14px;
-    background: var(--foam-light);
-    border: 1px solid var(--border-light);
-    border-radius: var(--r-pill);
-    font-size: 12px;
-    font-weight: 600;
-    color: var(--green);
-}
-
-/* LOADING SPINNER */
-.loading-spinner {
-    width: 52px; height: 52px;
-    border: 4px solid var(--border-light);
-    border-top-color: var(--green-bright);
-    border-radius: 50%;
-    animation: spin .9s linear infinite;
-    margin-bottom: 8px;
-}
-@keyframes spin { to { transform: rotate(360deg); } }
-
-/* RESULTS */
-.scanner-results { padding: 26px 28px; }
-
-.result-header {
-    display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
-    gap: 12px;
-    margin-bottom: 10px;
-    flex-wrap: wrap;
-}
-
-.result-food-name {
-    font-family: 'Fraunces', serif;
-    font-size: 22px;
-    font-weight: 700;
-    color: var(--forest);
-    flex: 1;
-}
-
-.result-confidence {
-    font-size: 12px;
-    font-weight: 700;
-    padding: 4px 12px;
-    border-radius: var(--r-pill);
-    background: var(--foam);
-    color: var(--green);
-    border: 1px solid var(--border);
-    white-space: nowrap;
-}
-
-.result-description {
-    font-size: 14px;
-    color: var(--muted);
-    line-height: 1.6;
-    margin-bottom: 20px;
-}
-
-.result-macros {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 10px;
-    margin-bottom: 20px;
-}
-
-.result-macro-card {
-    background: var(--parchment);
-    border: 1px solid var(--border-light);
-    border-radius: var(--r-md);
-    padding: 14px 10px;
-    text-align: center;
-    transition: transform .2s;
-}
-
-.result-macro-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-xs); }
-.result-cal { background: var(--foam); border-color: var(--border); }
-
-.macro-icon { font-size: 18px; margin-bottom: 4px; }
-.macro-val  { font-family: 'Fraunces', serif; font-size: 22px; font-weight: 700; color: var(--forest); line-height: 1; }
-.macro-lbl  { font-size: 10px; color: var(--muted); font-weight: 700; text-transform: uppercase; letter-spacing: .5px; margin-top: 3px; }
-.macro-unit { font-size: 10px; color: var(--muted); }
-
-.macro-bar-section {
-    background: var(--parchment);
-    border: 1px solid var(--border-light);
-    border-radius: var(--r-md);
-    padding: 14px 16px;
-    margin-bottom: 16px;
-}
-
-.macro-split-bar {
-    height: 10px;
-    background: var(--border-light);
-    border-radius: 4px;
-    overflow: hidden;
-    display: flex;
-}
-
-.result-ingredients h4 {
-    font-size: 13px;
-    font-weight: 700;
-    color: var(--forest);
-    margin-bottom: 10px;
-}
-
-.ingredient-tag {
-    display: inline-flex;
-    align-items: center;
-    gap: 5px;
-    padding: 5px 12px;
-    background: var(--foam-light);
-    border: 1px solid var(--border-light);
-    border-radius: var(--r-pill);
-    font-size: 12px;
-    font-weight: 600;
-    color: var(--green);
-    margin: 3px;
-}
-
-.health-tag {
-    display: inline-flex;
-    align-items: center;
-    gap: 5px;
-    padding: 5px 12px;
-    border-radius: var(--r-pill);
-    font-size: 12px;
-    font-weight: 700;
-}
-
-.health-tag.good   { background: var(--foam); color: var(--green); border: 1px solid var(--border); }
-.health-tag.warn   { background: var(--gold-light); color: #7a5800; border: 1px solid #e5c47a; }
-.health-tag.bad    { background: var(--red-light); color: #7a1a1a; border: 1px solid #f5c0c0; }
-</style>
-
 <script>
-let selectedFile   = null;
-let portionFactor  = 1.0;
+var selectedFile = null;
+var portionFactor = 1.0;
+var LOAD_MSGS = ['Identifying food items…','Estimating portion sizes…','Calculating macronutrients…','Almost done…'];
 
-const PORTION_MAP = { 'half': 0.5, 'one': 1.0, 'onehalf': 1.5, 'two': 2.0 };
-const LOADING_MSGS = [
-    'Identifying food items…',
-    'Estimating portion sizes…',
-    'Calculating macronutrients…',
-    'Almost done…'
-];
-
-/* ── FILE HANDLING ────────────────────────────────────────── */
 document.getElementById('fileInput').addEventListener('change', function(e) {
     if (e.target.files && e.target.files[0]) handleFile(e.target.files[0]);
 });
 
-const uploadZone = document.getElementById('uploadZone');
-uploadZone.addEventListener('dragover', e => { e.preventDefault(); uploadZone.classList.add('drag-over'); });
-uploadZone.addEventListener('dragleave', () => uploadZone.classList.remove('drag-over'));
-uploadZone.addEventListener('drop', e => {
-    e.preventDefault();
-    uploadZone.classList.remove('drag-over');
+var zone = document.getElementById('uploadZone');
+zone.addEventListener('dragover', function(e){ e.preventDefault(); zone.classList.add('drag-over'); });
+zone.addEventListener('dragleave', function(){ zone.classList.remove('drag-over'); });
+zone.addEventListener('drop', function(e){
+    e.preventDefault(); zone.classList.remove('drag-over');
     if (e.dataTransfer.files[0]) handleFile(e.dataTransfer.files[0]);
 });
-
-uploadZone.addEventListener('click', e => {
-    if (e.target.tagName === 'BUTTON' || e.target.tagName === 'INPUT') return;
+zone.addEventListener('click', function(e){
+    if (e.target.tagName==='BUTTON'||e.target.tagName==='INPUT') return;
     document.getElementById('fileInput').click();
 });
 
 function handleFile(file) {
     if (!file.type.startsWith('image/')) { alert('Please upload an image file.'); return; }
-    if (file.size > 10 * 1024 * 1024)   { alert('File too large. Max 10MB.'); return; }
-
+    if (file.size > 10*1024*1024) { alert('File too large. Max 10MB.'); return; }
     selectedFile = file;
-    const reader = new FileReader();
-    reader.onload = e => {
+    var reader = new FileReader();
+    reader.onload = function(e) {
         document.getElementById('previewImg').src = e.target.result;
         document.getElementById('uploadInner').style.display  = 'none';
         document.getElementById('uploadPreview').style.display = 'block';
@@ -523,173 +146,120 @@ function handleFile(file) {
 }
 
 function openCamera() {
-    const inp = document.getElementById('fileInput');
-    inp.setAttribute('capture', 'environment');
-    inp.click();
+    var inp = document.getElementById('fileInput');
+    inp.setAttribute('capture','environment'); inp.click();
 }
 
 function clearImage() {
     selectedFile = null;
-    document.getElementById('previewImg').src        = '';
-    document.getElementById('uploadInner').style.display   = 'block';
-    document.getElementById('uploadPreview').style.display  = 'none';
-    document.getElementById('portionRow').style.display     = 'none';
-    document.getElementById('scanBtn').style.display        = 'none';
-    document.getElementById('fileInput').value               = '';
+    document.getElementById('previewImg').src='';
+    document.getElementById('uploadInner').style.display  ='block';
+    document.getElementById('uploadPreview').style.display='none';
+    document.getElementById('portionRow').style.display   ='none';
+    document.getElementById('scanBtn').style.display      ='none';
+    document.getElementById('fileInput').value='';
     resetScanner();
 }
 
 function setPortion(btn, val) {
-    document.querySelectorAll('.portion-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.portion-btn').forEach(b=>b.classList.remove('active'));
     btn.classList.add('active');
-    portionFactor = PORTION_MAP[val] || 1.0;
+    portionFactor = val;
 }
 
-function resetScanner() {
-    show('scannerIdle');
-}
+function resetScanner() { show('scannerIdle'); }
 
 function show(id) {
-    ['scannerIdle','scannerLoading','scannerError','scannerResults'].forEach(s => {
-        document.getElementById(s).style.display = s === id ? (id === 'scannerResults' ? 'block' : 'flex') : 'none';
+    ['scannerIdle','scannerLoading','scannerError','scannerResults'].forEach(function(s){
+        var el = document.getElementById(s);
+        el.style.display = (s===id) ? (id==='scannerResults'?'block':'flex') : 'none';
     });
 }
 
-/* ── SCAN ─────────────────────────────────────────────────── */
 async function scanFood() {
     if (!selectedFile) { alert('Please upload a food image first.'); return; }
-
-    const btn = document.getElementById('scanBtn');
-    btn.disabled = true;
-    btn.textContent = '⏳ Analysing…';
+    var btn = document.getElementById('scanBtn');
+    btn.disabled = true; btn.textContent = 'Analysing…';
     show('scannerLoading');
-
-    // Animate loading messages
-    let msgIdx = 0;
-    const msgEl = document.getElementById('loadingMsg');
-    const msgInterval = setInterval(() => {
-        msgEl.textContent = LOADING_MSGS[Math.min(++msgIdx, LOADING_MSGS.length - 1)];
-    }, 1200);
+    var msgEl = document.getElementById('loadingMsg');
+    var mi = 0;
+    var interval = setInterval(function(){ msgEl.textContent = LOAD_MSGS[Math.min(++mi, LOAD_MSGS.length-1)]; }, 1200);
 
     try {
-        // Convert image to base64
-        const base64 = await fileToBase64(selectedFile);
-        const mediaType = selectedFile.type || 'image/jpeg';
+        var b64 = await fileToBase64(selectedFile);
+        var mt  = selectedFile.type || 'image/jpeg';
 
-        const systemPrompt = `You are a professional nutritionist and food analysis expert. When given a food image, you MUST respond ONLY with a valid JSON object and nothing else — no markdown, no explanation, no code fences.
-
-The JSON must follow this exact structure:
-{
-  "food_name": "Name of the food/dish",
-  "description": "Brief 1-2 sentence description",
-  "confidence": "High / Medium / Low",
-  "per_serving": {
-    "calories": number,
-    "protein_g": number,
-    "carbs_g": number,
-    "fat_g": number,
-    "fiber_g": number,
-    "sugar_g": number
-  },
-  "ingredients": ["ingredient1", "ingredient2", ...],
-  "health_tags": [
-    {"label": "High Protein", "type": "good"},
-    {"label": "Low Fat", "type": "good"},
-    {"label": "High Sugar", "type": "warn"},
-    {"label": "High Calories", "type": "bad"}
-  ],
-  "notes": "Any important notes about the estimate"
-}
-
-Be as accurate as possible. If the image is not a food item, set food_name to "Not a food item" and set all numbers to 0.`;
-
-        const response = await fetch('/api/analyze_food', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                image_base64: base64,
-                media_type: mediaType
-            })
+        var res = await fetch('/api/analyze_food', {
+            method:'POST',
+            headers:{'Content-Type':'application/json'},
+            body: JSON.stringify({image_base64:b64, media_type:mt})
         });
 
-        clearInterval(msgInterval);
-
-        if (!response.ok) throw new Error('API error: ' + response.status);
-
-        const data = await response.json();
-
+        clearInterval(interval);
+        if (!res.ok) throw new Error('API error: '+res.status);
+        var data = await res.json();
         if (data.error) throw new Error(data.error);
-
         renderResults(data.result, portionFactor);
-
-    } catch (err) {
-        clearInterval(msgInterval);
-        document.getElementById('errorMsg').textContent = err.message || 'Something went wrong. Please try again.';
+    } catch(err) {
+        clearInterval(interval);
+        document.getElementById('errorMsg').textContent = err.message || 'Something went wrong.';
         show('scannerError');
     } finally {
-        btn.disabled = false;
-        btn.textContent = '🔍 Analyse Food';
+        btn.disabled = false; btn.textContent = 'Analyse Food';
     }
 }
 
-function renderResults(result, portion) {
-    const p = result.per_serving;
+function renderResults(r, portion) {
+    var p = r.per_serving;
+    document.getElementById('scanFoodName').textContent   = r.food_name   || 'Unknown';
+    document.getElementById('scanConfidence').textContent = (r.confidence || 'Medium') + ' confidence';
+    document.getElementById('scanDescription').textContent= r.description || '';
 
-    document.getElementById('resultFoodName').textContent  = result.food_name || 'Unknown Food';
-    document.getElementById('resultConfidence').textContent = `${result.confidence || 'Medium'} confidence`;
-    document.getElementById('resultDescription').textContent = result.description || '';
+    var cal  = Math.round((p.calories  ||0)*portion);
+    var prot = Math.round((p.protein_g ||0)*portion);
+    var carb = Math.round((p.carbs_g   ||0)*portion);
+    var fat  = Math.round((p.fat_g     ||0)*portion);
 
-    const cal   = Math.round((p.calories   || 0) * portion);
-    const prot  = Math.round((p.protein_g  || 0) * portion);
-    const carbs = Math.round((p.carbs_g    || 0) * portion);
-    const fat   = Math.round((p.fat_g      || 0) * portion);
+    document.getElementById('sCalories').textContent = cal;
+    document.getElementById('sProtein').textContent  = prot;
+    document.getElementById('sCarbs').textContent    = carb;
+    document.getElementById('sFat').textContent      = fat;
 
-    document.getElementById('rCalories').textContent = cal;
-    document.getElementById('rProtein').textContent  = prot;
-    document.getElementById('rCarbs').textContent    = carbs;
-    document.getElementById('rFat').textContent      = fat;
+    var total = prot*4 + carb*4 + fat*9 || 1;
+    var pp = Math.round(prot*4/total*100);
+    var cp = Math.round(carb*4/total*100);
+    var fp = 100-pp-cp;
+    document.getElementById('barP').style.width = pp+'%';
+    document.getElementById('barC').style.width = cp+'%';
+    document.getElementById('barF').style.width = fp+'%';
+    document.getElementById('macroSplitTxt').textContent = 'P '+pp+'% · C '+cp+'% · F '+fp+'%';
 
-    // Macro bar
-    const totalKcal = prot * 4 + carbs * 4 + fat * 9 || 1;
-    const pp = Math.round(prot * 4 / totalKcal * 100);
-    const cp = Math.round(carbs * 4 / totalKcal * 100);
-    const fp = 100 - pp - cp;
-
-    document.getElementById('barProtein').style.width = pp + '%';
-    document.getElementById('barCarbs').style.width   = cp + '%';
-    document.getElementById('barFat').style.width     = fp + '%';
-    document.getElementById('macroSplitText').textContent = `P ${pp}% · C ${cp}% · F ${fp}%`;
-
-    // Ingredients
-    const ings = result.ingredients || [];
-    if (ings.length > 0) {
-        document.getElementById('resultIngredients').style.display = 'block';
-        document.getElementById('ingredientsList').innerHTML = ings.map(i =>
-            `<span class="ingredient-tag">• ${escHtml(i)}</span>`
-        ).join('');
+    var ings = r.ingredients || [];
+    if (ings.length>0) {
+        document.getElementById('scanIngredients').style.display='block';
+        document.getElementById('ingredientsList').innerHTML = ings.map(function(i){
+            return '<span class="ingredient-pill">'+esc(i)+'</span>';
+        }).join('');
     }
 
-    // Health tags
-    const tags = result.health_tags || [];
-    document.getElementById('healthTags').innerHTML = tags.map(t =>
-        `<span class="health-tag ${t.type || 'good'}">${escHtml(t.label)}</span>`
-    ).join('');
+    var tags = r.health_tags || [];
+    document.getElementById('healthTags').innerHTML = tags.map(function(t){
+        return '<span class="health-tag '+(t.type||'good')+'">'+esc(t.label)+'</span>';
+    }).join('');
 
     show('scannerResults');
 }
 
 function fileToBase64(file) {
-    return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onload  = e => resolve(e.target.result.split(',')[1]);
-        reader.onerror = reject;
-        reader.readAsDataURL(file);
+    return new Promise(function(resolve,reject){
+        var r=new FileReader();
+        r.onload=function(e){resolve(e.target.result.split(',')[1]);};
+        r.onerror=reject;
+        r.readAsDataURL(file);
     });
 }
 
-function escHtml(s) {
-    return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-}
+function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 </script>
 
 {% endblock %}

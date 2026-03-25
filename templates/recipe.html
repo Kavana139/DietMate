@@ -1,103 +1,74 @@
 {% extends "base.html" %}
-
 {% block content %}
 
-<div style="margin-bottom:6px;">
-    <a href="/recipes" style="font-size:13px;color:var(--muted);text-decoration:none;font-weight:600;display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border-radius:var(--r-pill);border:1px solid var(--border-light);background:white;transition:all 0.2s;">
-        ← Back to Recipes
-    </a>
+<div style="margin-bottom:8px;">
+    <a href="/recipes" class="btn btn-ghost btn-sm">← Back to Recipes</a>
 </div>
 
 <h1 class="page-title">{{ recipe[1] }}</h1>
 
-<div class="recipe-layout">
-
-    <!-- LEFT SIDE -->
-    <div class="recipe-left">
+<div class="recipe-detail-grid">
+    <div>
         <div class="recipe-detail-card">
-
-            <h2>📋 Recipe Instructions</h2>
+            <h3>Recipe Instructions</h3>
             <p class="recipe-text">{{ recipe[2] }}</p>
 
             <hr class="recipe-divider">
 
-            <h2>📊 Nutrition Information</h2>
-
-            <div class="nutrition-list">
-                <div class="nutrition-row">
-                    <span>🔥 Calories</span>
-                    <span class="nut-val">{{ recipe[4] }} kcal</span>
-                </div>
-                <div class="nutrition-row">
-                    <span>🥩 Protein</span>
-                    <span class="nut-val">{{ recipe[5] }} g</span>
-                </div>
-                <div class="nutrition-row">
-                    <span>🍚 Carbohydrates</span>
-                    <span class="nut-val">{{ recipe[6] }} g</span>
-                </div>
-                <div class="nutrition-row">
-                    <span>🥑 Fat</span>
-                    <span class="nut-val">{{ recipe[7] }} g</span>
-                </div>
+            <h3>Nutrition Information</h3>
+            <div>
+                <div class="nut-row"><span class="nut-row-label">Calories</span><span class="nut-row-val">{{ recipe[4] }} kcal</span></div>
+                <div class="nut-row"><span class="nut-row-label">Protein</span><span class="nut-row-val">{{ recipe[5] }} g</span></div>
+                <div class="nut-row"><span class="nut-row-label">Carbohydrates</span><span class="nut-row-val">{{ recipe[6] }} g</span></div>
+                <div class="nut-row"><span class="nut-row-label">Fat</span><span class="nut-row-val">{{ recipe[7] }} g</span></div>
             </div>
 
             <hr class="recipe-divider">
 
-            <!-- Macro mini chart -->
-            <h2>🥧 Macro Split</h2>
-            <div style="display:flex;gap:12px;margin-top:10px;">
-                {% set total_kcal = (recipe[5] * 4 + recipe[6] * 4 + recipe[7] * 9) %}
-                {% if total_kcal > 0 %}
-                {% set p_pct = ((recipe[5] * 4 / total_kcal) * 100)|round|int %}
-                {% set c_pct = ((recipe[6] * 4 / total_kcal) * 100)|round|int %}
-                {% set f_pct = 100 - p_pct - c_pct %}
-                <div style="flex:1;background:var(--foam);border-radius:8px;padding:12px;text-align:center;border:1px solid var(--border-light);">
-                    <div style="font-family:'Fraunces',serif;font-size:20px;font-weight:700;color:var(--forest);">{{ p_pct }}%</div>
-                    <div style="font-size:11px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:0.4px;">Protein</div>
+            <h3>Macro Split</h3>
+            {% set tc = (recipe[5]*4 + recipe[6]*4 + recipe[7]*9) if (recipe[5]*4 + recipe[6]*4 + recipe[7]*9) > 0 else 1 %}
+            <div style="display:flex;gap:10px;margin-top:10px;">
+                <div style="flex:1;background:var(--bg-raised);border:1px solid var(--border);border-radius:var(--r-sm);padding:12px;text-align:center;">
+                    <div style="font-family:'Fraunces',serif;font-size:18px;font-weight:700;color:var(--accent);">{{ ((recipe[5]*4/tc*100)|round|int) }}%</div>
+                    <div style="font-size:10px;color:var(--text-muted);font-weight:700;text-transform:uppercase;letter-spacing:.4px;margin-top:2px;">Protein</div>
                 </div>
-                <div style="flex:1;background:var(--foam-light);border-radius:8px;padding:12px;text-align:center;border:1px solid var(--border-light);">
-                    <div style="font-family:'Fraunces',serif;font-size:20px;font-weight:700;color:var(--forest);">{{ c_pct }}%</div>
-                    <div style="font-size:11px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:0.4px;">Carbs</div>
+                <div style="flex:1;background:var(--bg-raised);border:1px solid var(--border);border-radius:var(--r-sm);padding:12px;text-align:center;">
+                    <div style="font-family:'Fraunces',serif;font-size:18px;font-weight:700;color:var(--text-primary);">{{ ((recipe[6]*4/tc*100)|round|int) }}%</div>
+                    <div style="font-size:10px;color:var(--text-muted);font-weight:700;text-transform:uppercase;letter-spacing:.4px;margin-top:2px;">Carbs</div>
                 </div>
-                <div style="flex:1;background:var(--parchment);border-radius:8px;padding:12px;text-align:center;border:1px solid var(--border-light);">
-                    <div style="font-family:'Fraunces',serif;font-size:20px;font-weight:700;color:var(--forest);">{{ f_pct }}%</div>
-                    <div style="font-size:11px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:0.4px;">Fat</div>
+                <div style="flex:1;background:var(--bg-raised);border:1px solid var(--border);border-radius:var(--r-sm);padding:12px;text-align:center;">
+                    <div style="font-family:'Fraunces',serif;font-size:18px;font-weight:700;color:var(--text-secondary);">{{ ((recipe[7]*9/tc*100)|round|int) }}%</div>
+                    <div style="font-size:10px;color:var(--text-muted);font-weight:700;text-transform:uppercase;letter-spacing:.4px;margin-top:2px;">Fat</div>
                 </div>
-                {% endif %}
             </div>
-
         </div>
     </div>
 
-    <!-- RIGHT SIDE -->
-    <div class="recipe-right">
-        <div class="image-card">
+    <div>
+        <div class="recipe-image-card">
             {% if recipe[3] %}
             <img src="{{ url_for('static', filename='images/' ~ recipe[3]) }}"
                  alt="{{ recipe[1] }}"
-                 onerror="this.parentElement.innerHTML='<div class=\'image-card-placeholder\'><span style=\'font-size:48px;\'>🍽️</span><p>{{ recipe[1] }}</p></div>'">
+                 onerror="this.parentElement.innerHTML='<div class=\'recipe-img-placeholder\'><span style=\'font-size:40px;opacity:.3;\'>◎</span><p>{{ recipe[1] }}</p></div>'">
             {% else %}
-            <div class="image-card-placeholder">
-                <span style="font-size:48px;">🍽️</span>
+            <div class="recipe-img-placeholder">
+                <span style="font-size:40px;opacity:.3;">◎</span>
                 <p>{{ recipe[1] }}</p>
             </div>
             {% endif %}
 
-            <!-- Quick stats below image -->
             <div style="padding:14px 6px 6px;display:grid;grid-template-columns:repeat(2,1fr);gap:8px;">
-                <div style="background:var(--foam-light);border-radius:8px;padding:10px;text-align:center;">
-                    <div style="font-size:16px;font-weight:700;color:var(--forest);font-family:'Fraunces',serif;">{{ recipe[4] }}</div>
-                    <div style="font-size:10px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:0.4px;">Calories</div>
+                <div style="background:var(--bg-raised);border:1px solid var(--border);border-radius:var(--r-sm);padding:10px;text-align:center;">
+                    <div style="font-family:'Fraunces',serif;font-size:15px;font-weight:700;color:var(--accent);">{{ recipe[4] }}</div>
+                    <div style="font-size:9px;color:var(--text-muted);font-weight:700;text-transform:uppercase;letter-spacing:.4px;">Calories</div>
                 </div>
-                <div style="background:var(--foam-light);border-radius:8px;padding:10px;text-align:center;">
-                    <div style="font-size:16px;font-weight:700;color:var(--forest);font-family:'Fraunces',serif;">{{ recipe[5] }}g</div>
-                    <div style="font-size:10px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:0.4px;">Protein</div>
+                <div style="background:var(--bg-raised);border:1px solid var(--border);border-radius:var(--r-sm);padding:10px;text-align:center;">
+                    <div style="font-family:'Fraunces',serif;font-size:15px;font-weight:700;color:var(--text-primary);">{{ recipe[5] }}g</div>
+                    <div style="font-size:9px;color:var(--text-muted);font-weight:700;text-transform:uppercase;letter-spacing:.4px;">Protein</div>
                 </div>
             </div>
         </div>
     </div>
-
 </div>
 
 {% endblock %}

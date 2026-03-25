@@ -1,186 +1,171 @@
 {% extends "base.html" %}
-
 {% block content %}
 
 <h1 class="page-title">Health Calculator</h1>
-<p class="page-subtitle">Answer a few quick questions and we'll calculate your ideal daily nutrition targets.</p>
+<p class="page-subtitle">Answer a few questions and we will calculate your ideal daily nutrition targets.</p>
 
-<div class="quiz-wrapper">
+<div class="quiz-wrap">
 
-    <!-- PROGRESS BAR -->
-    <div class="quiz-progress-bar">
-        <div class="quiz-step-indicator">
-            <div class="step-dot active" id="dot-1">1</div>
-            <span class="step-label active" id="label-1">Body Stats</span>
+    <div class="quiz-stepper">
+        <div class="step-node">
+            <div class="step-circle active" id="dot-1">1</div>
+            <span class="step-lbl active" id="lbl-1">Body Stats</span>
         </div>
-        <div class="step-connector" id="conn-1"></div>
-        <div class="quiz-step-indicator">
-            <div class="step-dot" id="dot-2">2</div>
-            <span class="step-label" id="label-2">Target</span>
+        <div class="step-line" id="ln-1"></div>
+        <div class="step-node">
+            <div class="step-circle" id="dot-2">2</div>
+            <span class="step-lbl" id="lbl-2">Target</span>
         </div>
-        <div class="step-connector" id="conn-2"></div>
-        <div class="quiz-step-indicator">
-            <div class="step-dot" id="dot-3">3</div>
-            <span class="step-label" id="label-3">Activity</span>
+        <div class="step-line" id="ln-2"></div>
+        <div class="step-node">
+            <div class="step-circle" id="dot-3">3</div>
+            <span class="step-lbl" id="lbl-3">Activity</span>
         </div>
     </div>
 
-    <!-- FORM -->
     <form method="POST" id="quizForm">
-
-    <!-- Hidden activity value -->
-    <input type="hidden" name="activity" id="activityValue" value="1.55">
+    <input type="hidden" name="activity" id="activityVal" value="1.55">
 
     <div class="quiz-card">
 
-        <!-- STEP 1 -->
+        <!-- Step 1 -->
         <div class="quiz-step active" id="step-1">
-            <h3>Your body stats</h3>
-            <p class="step-desc">Tell us about your current measurements.</p>
+            <div class="quiz-step-title">Your body stats</div>
+            <p class="quiz-step-desc">Tell us your current measurements.</p>
 
             <div class="form-group">
-                <label>Current Weight (kg)</label>
-                <input type="number" name="weight" id="weight" min="20" max="300" step="0.1" placeholder="e.g. 70" required>
+                <label class="form-label">Current Weight (kg)</label>
+                <input type="number" name="weight" id="weight" class="form-input" min="20" max="300" step="0.1" placeholder="e.g. 70" required>
             </div>
             <div class="form-group">
-                <label>Height (cm)</label>
-                <input type="number" name="height" id="height" min="100" max="250" placeholder="e.g. 170" required>
+                <label class="form-label">Height (cm)</label>
+                <input type="number" name="height" id="height" class="form-input" min="100" max="250" placeholder="e.g. 170" required>
             </div>
             <div class="form-group">
-                <label>Age</label>
-                <input type="number" name="age" id="age" min="10" max="100" placeholder="e.g. 25" required>
+                <label class="form-label">Age</label>
+                <input type="number" name="age" id="age" class="form-input" min="10" max="100" placeholder="e.g. 25" required>
             </div>
 
             <div class="quiz-nav">
-                <button type="button" class="quiz-btn-next" onclick="nextStep(1)">Next →</button>
+                <button type="button" class="btn btn-primary" style="flex:1;" onclick="nextStep(1)">Next</button>
             </div>
         </div>
 
-        <!-- STEP 2 -->
+        <!-- Step 2 -->
         <div class="quiz-step" id="step-2">
-            <h3>Your goal</h3>
-            <p class="step-desc">What weight are you aiming for?</p>
+            <div class="quiz-step-title">Your goal</div>
+            <p class="quiz-step-desc">What weight are you aiming for?</p>
 
             <div class="form-group">
-                <label>Target Weight (kg)</label>
-                <input type="number" name="target_weight" id="target_weight" min="20" max="300" step="0.1" placeholder="e.g. 65" required>
+                <label class="form-label">Target Weight (kg)</label>
+                <input type="number" name="target_weight" id="target_weight" class="form-input" min="20" max="300" step="0.1" placeholder="e.g. 65" required>
             </div>
 
-            <!-- Live BMI preview -->
-            <div id="bmiPreview" style="display:none;background:var(--foam-light);border:1.5px solid var(--border);border-radius:10px;padding:14px 16px;">
-                <p style="font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.6px;margin-bottom:6px;">BMI Preview</p>
+            <div class="bmi-preview" id="bmiPreview" style="display:none;">
+                <div style="font-size:10px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.7px;margin-bottom:6px;">BMI Preview</div>
                 <div style="display:flex;align-items:center;gap:12px;">
-                    <span style="font-family:'Fraunces',serif;font-size:28px;font-weight:700;color:var(--forest);" id="bmiValue">—</span>
-                    <span id="bmiCat" style="font-size:13px;font-weight:700;padding:4px 14px;border-radius:999px;"></span>
+                    <span style="font-family:'Fraunces',serif;font-size:26px;font-weight:700;color:var(--text-primary);" id="bmiVal">—</span>
+                    <span id="bmiCat" style="font-size:12px;font-weight:700;padding:4px 14px;border-radius:999px;border:1px solid;"></span>
                 </div>
             </div>
 
             <div class="quiz-nav">
-                <button type="button" class="quiz-btn-prev" onclick="prevStep(2)">← Back</button>
-                <button type="button" class="quiz-btn-next" onclick="nextStep(2)">Next →</button>
+                <button type="button" class="btn btn-ghost" style="flex:1;" onclick="prevStep(2)">Back</button>
+                <button type="button" class="btn btn-primary" style="flex:1;" onclick="nextStep(2)">Next</button>
             </div>
         </div>
 
-        <!-- STEP 3 -->
+        <!-- Step 3 -->
         <div class="quiz-step" id="step-3">
-            <h3>Activity level</h3>
-            <p class="step-desc">How active are you on a typical week?</p>
+            <div class="quiz-step-title">Activity level</div>
+            <p class="quiz-step-desc">How active are you on a typical week?</p>
 
-            <div class="activity-cards">
-                <div class="activity-card selected" onclick="selectActivity(this, '1.2')">
-                    <div class="act-title">🛋️ Sedentary</div>
+            <div class="activity-grid">
+                <div class="activity-option selected" onclick="setActivity(this,'1.2')">
+                    <div class="act-title">Sedentary</div>
                     <div class="act-desc">Desk job, little or no exercise</div>
                 </div>
-                <div class="activity-card" onclick="selectActivity(this, '1.37')">
-                    <div class="act-title">🚶 Light</div>
+                <div class="activity-option" onclick="setActivity(this,'1.37')">
+                    <div class="act-title">Light</div>
                     <div class="act-desc">Exercise 1–3 days/week</div>
                 </div>
-                <div class="activity-card" onclick="selectActivity(this, '1.55')">
-                    <div class="act-title">🏃 Moderate</div>
+                <div class="activity-option" onclick="setActivity(this,'1.55')">
+                    <div class="act-title">Moderate</div>
                     <div class="act-desc">Exercise 3–5 days/week</div>
                 </div>
-                <div class="activity-card" onclick="selectActivity(this, '1.72')">
-                    <div class="act-title">💪 Very Active</div>
+                <div class="activity-option" onclick="setActivity(this,'1.72')">
+                    <div class="act-title">Very Active</div>
                     <div class="act-desc">Hard exercise 6–7 days/week</div>
                 </div>
             </div>
 
             <div class="quiz-nav">
-                <button type="button" class="quiz-btn-prev" onclick="prevStep(3)">← Back</button>
-                <button type="submit" class="quiz-btn-submit">Calculate My Plan 🚀</button>
+                <button type="button" class="btn btn-ghost" style="flex:1;" onclick="prevStep(3)">Back</button>
+                <button type="submit" class="btn btn-primary" style="flex:1;">Calculate Plan</button>
             </div>
         </div>
 
     </div>
     </form>
-
 </div>
 
 <script>
-const totalSteps = 3;
+const TOTAL = 3;
 
-function selectActivity(card, val) {
-    document.querySelectorAll('.activity-card').forEach(c => c.classList.remove('selected'));
-    card.classList.add('selected');
-    document.getElementById('activityValue').value = val;
+function setActivity(el, val) {
+    document.querySelectorAll('.activity-option').forEach(e => e.classList.remove('selected'));
+    el.classList.add('selected');
+    document.getElementById('activityVal').value = val;
 }
 
-function nextStep(current) {
-    const step   = document.getElementById('step-' + current);
-    const inputs = step.querySelectorAll('input[required]');
-    for (let inp of inputs) {
-        if (!inp.value) {
-            inp.focus();
-            inp.style.borderColor = '#d64f4f';
-            inp.style.boxShadow   = '0 0 0 3px rgba(214,79,79,0.15)';
-            setTimeout(() => { inp.style.borderColor = ''; inp.style.boxShadow = ''; }, 1800);
+function nextStep(cur) {
+    var step = document.getElementById('step-' + cur);
+    var inputs = step.querySelectorAll('input[required]');
+    for (var i = 0; i < inputs.length; i++) {
+        if (!inputs[i].value) {
+            inputs[i].focus();
+            inputs[i].style.borderColor = 'var(--red)';
+            inputs[i].style.boxShadow   = '0 0 0 3px var(--red-bg)';
+            setTimeout(function(el){ return function(){ el.style.borderColor=''; el.style.boxShadow=''; }; }(inputs[i]), 1600);
             return;
         }
     }
-    // Update BMI preview when moving from step 1 or 2
     updateBMI();
-    goTo(current + 1);
+    goTo(cur + 1);
 }
 
-function prevStep(current) { goTo(current - 1); }
+function prevStep(cur) { goTo(cur - 1); }
 
-function goTo(target) {
+function goTo(t) {
     document.querySelectorAll('.quiz-step').forEach(s => s.classList.remove('active'));
-    document.getElementById('step-' + target).classList.add('active');
-
-    for (let i = 1; i <= totalSteps; i++) {
-        const dot   = document.getElementById('dot-' + i);
-        const label = document.getElementById('label-' + i);
-        dot.classList.remove('active', 'done');
-        label.classList.remove('active');
-        if (i < target)      { dot.classList.add('done'); dot.textContent = '✓'; }
-        else if (i === target){ dot.classList.add('active'); dot.textContent = i; label.classList.add('active'); }
-        else                  { dot.textContent = i; }
+    document.getElementById('step-' + t).classList.add('active');
+    for (var i = 1; i <= TOTAL; i++) {
+        var dot = document.getElementById('dot-' + i);
+        var lbl = document.getElementById('lbl-' + i);
+        dot.classList.remove('active','done');
+        lbl.classList.remove('active');
+        if (i < t) { dot.classList.add('done'); dot.textContent = '✓'; }
+        else if (i === t) { dot.classList.add('active'); dot.textContent = i; lbl.classList.add('active'); }
+        else { dot.textContent = i; }
     }
-
-    for (let i = 1; i < totalSteps; i++) {
-        const c = document.getElementById('conn-' + i);
-        if (c) c.classList.toggle('done', i < target);
+    for (var j = 1; j < TOTAL; j++) {
+        var ln = document.getElementById('ln-' + j);
+        if (ln) ln.classList.toggle('done', j < t);
     }
 }
 
 function updateBMI() {
-    const w = parseFloat(document.getElementById('weight').value);
-    const h = parseFloat(document.getElementById('height').value);
+    var w = parseFloat(document.getElementById('weight').value);
+    var h = parseFloat(document.getElementById('height').value);
     if (!w || !h) return;
-
-    const bmi = (w / ((h/100) ** 2)).toFixed(1);
-    const preview = document.getElementById('bmiPreview');
-    const bmiVal  = document.getElementById('bmiValue');
-    const bmiCat  = document.getElementById('bmiCat');
-
-    bmiVal.textContent = bmi;
-    preview.style.display = 'block';
-
-    if      (bmi < 18.5) { bmiCat.textContent = 'Underweight'; bmiCat.style.background = '#fdf6da'; bmiCat.style.color = '#7a5800'; }
-    else if (bmi < 25)   { bmiCat.textContent = 'Normal';      bmiCat.style.background = '#d4f0e0'; bmiCat.style.color = '#1e3d2a'; }
-    else if (bmi < 30)   { bmiCat.textContent = 'Overweight';  bmiCat.style.background = '#fdf6da'; bmiCat.style.color = '#7a5800'; }
-    else                 { bmiCat.textContent = 'Obese';        bmiCat.style.background = '#fdf0f0'; bmiCat.style.color = '#7a1a1a'; }
+    var bmi = (w / Math.pow(h / 100, 2)).toFixed(1);
+    document.getElementById('bmiPreview').style.display = 'block';
+    document.getElementById('bmiVal').textContent = bmi;
+    var cat = document.getElementById('bmiCat');
+    if (bmi < 18.5)      { cat.textContent='Underweight'; cat.style.background='var(--gold-bg)';   cat.style.color='var(--gold)'; cat.style.borderColor='rgba(240,192,96,0.3)'; }
+    else if (bmi < 25)   { cat.textContent='Normal';      cat.style.background='var(--accent-muted)'; cat.style.color='var(--accent)'; cat.style.borderColor='rgba(0,232,122,0.3)'; }
+    else if (bmi < 30)   { cat.textContent='Overweight';  cat.style.background='var(--gold-bg)';   cat.style.color='var(--gold)'; cat.style.borderColor='rgba(240,192,96,0.3)'; }
+    else                 { cat.textContent='Obese';        cat.style.background='var(--red-bg)';    cat.style.color='var(--red)';  cat.style.borderColor='rgba(255,87,87,0.3)'; }
 }
 </script>
 

@@ -1,73 +1,60 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Login — DietMate</title>
 <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+<script>(function(){ var t=localStorage.getItem('dm_theme')||'dark'; document.documentElement.setAttribute('data-theme',t); })();</script>
 </head>
-<body class="register-page">
+<body class="auth-page">
 
-<div class="register-wrapper">
-
-    <!-- LEFT PANEL -->
-    <div class="register-left">
-        <h1>DietMate</h1>
-        <p class="tagline">Your personal nutrition companion — eat better, live longer.</p>
-        <ul>
-            <li><span class="check-icon">✓</span> Personalized diet plans for your goals</li>
-            <li><span class="check-icon">✓</span> AI-assisted weekly meal scheduling</li>
-            <li><span class="check-icon">✓</span> Nutrition tracking with calorie insights</li>
-            <li><span class="check-icon">✓</span> BMI & macro calculator</li>
+<div class="auth-card">
+    <div class="auth-left">
+        <div class="auth-brand">DietMate</div>
+        <p class="auth-tagline">Your personal nutrition companion — eat better, live stronger.</p>
+        <ul class="auth-features">
+            <li><span class="feature-dot"></span> Personalised diet plans for your goals</li>
+            <li><span class="feature-dot"></span> AI-powered food scanner</li>
+            <li><span class="feature-dot"></span> Weekly meal scheduling</li>
+            <li><span class="feature-dot"></span> Calorie &amp; macro tracking</li>
         </ul>
     </div>
 
-    <!-- RIGHT PANEL -->
-    <div class="register-right">
-
+    <div class="auth-right">
         <h2>Welcome back</h2>
-        <p class="sub-h">Sign in to continue your nutrition journey.</p>
+        <p class="sub-text">Sign in to continue your journey.</p>
 
         {% if error %}
-        <div class="error-message">
-            ⚠️ {{ error }}
-        </div>
+        <div class="error-box" style="margin-bottom:18px;">{{ error }}</div>
         {% endif %}
 
-        <form method="POST" class="login-form">
-
+        <form method="POST" class="auth-form">
             <div class="form-group">
-                <label>Email address</label>
-                <div class="input-group">
-                    <input type="email" name="email" placeholder="you@email.com" required autocomplete="email">
-                </div>
+                <label class="form-label">Email address</label>
+                <input type="email" name="email" class="form-input" placeholder="you@email.com" required autocomplete="email">
             </div>
 
             <div class="form-group">
-                <label>Password</label>
-                <div class="input-group">
-                    <input type="password" name="password" id="loginPassword" placeholder="Enter your password" required autocomplete="current-password">
-                    <button type="button" class="show-password-btn" onclick="togglePassword('loginPassword', this)">Show</button>
+                <label class="form-label">Password</label>
+                <div class="input-wrap">
+                    <input type="password" name="password" id="loginPwd" class="form-input" placeholder="Enter your password" required autocomplete="current-password">
+                    <button type="button" class="input-action-btn" onclick="togglePwd('loginPwd',this)">Show</button>
                 </div>
             </div>
 
-            <button type="submit" class="register-btn">Sign In →</button>
-
+            <button type="submit" class="btn btn-primary btn-lg" style="width:100%;margin-top:4px;">Sign In</button>
         </form>
 
-        <p class="login-link">
-            Don't have an account? <a href="/register">Create Account</a>
-        </p>
-
+        <p class="auth-link">Don't have an account? <a href="/register">Create Account</a></p>
     </div>
-
 </div>
 
 <script>
-function togglePassword(inputId, btn) {
-    const input = document.getElementById(inputId);
-    if (input.type === 'password') { input.type = 'text'; btn.textContent = 'Hide'; }
-    else { input.type = 'password'; btn.textContent = 'Show'; }
+function togglePwd(id, btn) {
+    var inp = document.getElementById(id);
+    if (inp.type === 'password') { inp.type = 'text'; btn.textContent = 'Hide'; }
+    else { inp.type = 'password'; btn.textContent = 'Show'; }
 }
 </script>
 </body>

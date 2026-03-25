@@ -1,5 +1,4 @@
 {% extends "base.html" %}
-
 {% block content %}
 
 {% set safe_calories = calories if calories is defined else 0 %}
@@ -9,147 +8,94 @@
 {% set safe_goal     = goal     if goal     is defined else '' %}
 {% set safe_bmi      = bmi      if bmi      is defined else '' %}
 {% set safe_bmi_cat  = bmi_category if bmi_category is defined else '' %}
-{% set safe_bmi_col  = bmi_color    if bmi_color    is defined else '#3a8a62' %}
 
 <h1 class="page-title">Your Nutrition Plan</h1>
-<p class="page-subtitle">Based on your inputs, here are your personalised daily macro targets.</p>
+<p class="page-subtitle">Personalised daily macro targets based on your inputs.</p>
 
-<!-- GOAL + BMI ROW -->
-<div class="result-top">
-    {% if safe_goal %}
-    <span class="goal-badge">🎯 Goal: {{ safe_goal }}</span>
-    {% endif %}
-
+<div class="result-bar">
+    {% if safe_goal %}<span class="goal-tag">Goal: {{ safe_goal }}</span>{% endif %}
     {% if safe_bmi %}
-    <span class="bmi-badge 
-    {% if safe_bmi < 18.5 %}underweight
-    {% elif safe_bmi < 25 %}normal
-    {% elif safe_bmi < 30 %}overweight
-    {% else %}obese{% endif %}">
-        BMI {{ safe_bmi }} — {{ safe_bmi_cat }}
-    </span>
+    <span class="bmi-tag" style="
+        {% if safe_bmi < 18.5 %}background:var(--gold-bg);color:var(--gold);border-color:rgba(240,192,96,0.3);
+        {% elif safe_bmi < 25  %}background:var(--accent-muted);color:var(--accent);border-color:rgba(0,232,122,0.3);
+        {% elif safe_bmi < 30  %}background:var(--gold-bg);color:var(--gold);border-color:rgba(240,192,96,0.3);
+        {% else                %}background:var(--red-bg);color:var(--red);border-color:rgba(255,87,87,0.3);{% endif %}
+    ">BMI {{ safe_bmi }} — {{ safe_bmi_cat }}</span>
     {% endif %}
 </div>
 
-<!-- MACRO CARDS -->
-<div class="nutrition-grid">
-    <div class="nutrition-card">
-        <h3>🔥 Calories</h3>
-        <p>{{ safe_calories }}</p>
-        <span>kcal / day</span>
-    </div>
-    <div class="nutrition-card">
-        <h3>🥩 Protein</h3>
-        <p>{{ safe_protein }}</p>
-        <span>grams / day</span>
-    </div>
-    <div class="nutrition-card">
-        <h3>🍚 Carbohydrates</h3>
-        <p>{{ safe_carbs }}</p>
-        <span>grams / day</span>
-    </div>
-    <div class="nutrition-card">
-        <h3>🥑 Fat</h3>
-        <p>{{ safe_fat }}</p>
-        <span>grams / day</span>
-    </div>
+<div class="macro-grid">
+    <div class="macro-card"><div class="macro-card-label">Calories</div><div class="macro-card-val">{{ safe_calories }}</div><div class="macro-card-unit">kcal / day</div></div>
+    <div class="macro-card"><div class="macro-card-label">Protein</div><div class="macro-card-val">{{ safe_protein }}</div><div class="macro-card-unit">grams / day</div></div>
+    <div class="macro-card"><div class="macro-card-label">Carbohydrates</div><div class="macro-card-val">{{ safe_carbs }}</div><div class="macro-card-unit">grams / day</div></div>
+    <div class="macro-card"><div class="macro-card-label">Fat</div><div class="macro-card-val">{{ safe_fat }}</div><div class="macro-card-unit">grams / day</div></div>
 </div>
 
-<!-- CHARTS ROW -->
-<div class="result-chart-row">
-
+<div class="result-charts">
     <div class="result-chart-card">
-        <h2>Macro Distribution</h2>
-        <div style="display:flex;align-items:center;gap:28px;">
-            <div style="position:relative;width:160px;height:160px;flex-shrink:0;">
-                <canvas id="macroChart" width="160" height="160"></canvas>
-                <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;">
-                    <span style="font-size:11px;color:var(--muted);font-weight:700;">TOTAL</span>
-                    <span style="font-family:'Fraunces',serif;font-size:18px;font-weight:700;color:var(--forest);">{{ safe_calories }}</span>
-                    <span style="font-size:10px;color:var(--muted);">kcal</span>
+        <h3>Macro Distribution</h3>
+        <div style="display:flex;align-items:center;gap:24px;">
+            <div style="position:relative;width:150px;height:150px;flex-shrink:0;">
+                <canvas id="macroChart" width="150" height="150"></canvas>
+                <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;pointer-events:none;">
+                    <span style="font-size:10px;color:var(--text-muted);font-weight:700;text-transform:uppercase;letter-spacing:.5px;">TOTAL</span>
+                    <span style="font-family:'Fraunces',serif;font-size:17px;font-weight:700;color:var(--text-primary);">{{ safe_calories }}</span>
+                    <span style="font-size:9px;color:var(--text-muted);">kcal</span>
                 </div>
             </div>
-            <div style="display:flex;flex-direction:column;gap:13px;font-size:13px;color:var(--muted);">
-                <div style="display:flex;align-items:center;gap:9px;">
-                    <span style="width:12px;height:12px;border-radius:50%;background:#3a8a62;display:inline-block;flex-shrink:0;"></span>
-                    <div>
-                        <div style="font-weight:700;color:var(--ink);">{{ safe_protein }}g Protein</div>
-                        <div style="font-size:11px;">{{ (safe_protein * 4) }} kcal ({{ ((safe_protein * 4 / safe_calories * 100)|round|int) if safe_calories else 0 }}%)</div>
-                    </div>
+            <div style="display:flex;flex-direction:column;gap:11px;">
+                {% set tc = (safe_protein*4 + safe_carbs*4 + safe_fat*9) if (safe_protein*4 + safe_carbs*4 + safe_fat*9) > 0 else 1 %}
+                <div style="font-size:13px;color:var(--text-secondary);display:flex;align-items:center;gap:8px;">
+                    <span style="width:10px;height:10px;border-radius:50%;background:var(--accent);display:inline-block;flex-shrink:0;box-shadow:var(--accent-glow-sm);"></span>
+                    <div><div style="font-weight:700;color:var(--text-primary);">{{ safe_protein }}g Protein</div><div style="font-size:11px;">{{ ((safe_protein*4/tc*100)|round|int) }}% of calories</div></div>
                 </div>
-                <div style="display:flex;align-items:center;gap:9px;">
-                    <span style="width:12px;height:12px;border-radius:50%;background:#4dab7e;display:inline-block;flex-shrink:0;"></span>
-                    <div>
-                        <div style="font-weight:700;color:var(--ink);">{{ safe_carbs }}g Carbs</div>
-                        <div style="font-size:11px;">{{ (safe_carbs * 4) }} kcal ({{ ((safe_carbs * 4 / safe_calories * 100)|round|int) if safe_calories else 0 }}%)</div>
-                    </div>
+                <div style="font-size:13px;color:var(--text-secondary);display:flex;align-items:center;gap:8px;">
+                    <span style="width:10px;height:10px;border-radius:50%;background:rgba(0,232,122,0.5);display:inline-block;flex-shrink:0;"></span>
+                    <div><div style="font-weight:700;color:var(--text-primary);">{{ safe_carbs }}g Carbs</div><div style="font-size:11px;">{{ ((safe_carbs*4/tc*100)|round|int) }}% of calories</div></div>
                 </div>
-                <div style="display:flex;align-items:center;gap:9px;">
-                    <span style="width:12px;height:12px;border-radius:50%;background:#7ecaa4;display:inline-block;flex-shrink:0;"></span>
-                    <div>
-                        <div style="font-weight:700;color:var(--ink);">{{ safe_fat }}g Fat</div>
-                        <div style="font-size:11px;">{{ (safe_fat * 9) }} kcal ({{ ((safe_fat * 9 / safe_calories * 100)|round|int) if safe_calories else 0 }}%)</div>
-                    </div>
+                <div style="font-size:13px;color:var(--text-secondary);display:flex;align-items:center;gap:8px;">
+                    <span style="width:10px;height:10px;border-radius:50%;background:rgba(0,232,122,0.25);display:inline-block;flex-shrink:0;"></span>
+                    <div><div style="font-weight:700;color:var(--text-primary);">{{ safe_fat }}g Fat</div><div style="font-size:11px;">{{ ((safe_fat*9/tc*100)|round|int) }}% of calories</div></div>
                 </div>
             </div>
         </div>
     </div>
 
     <div class="result-chart-card">
-        <h2>What this means for you</h2>
-        <div style="display:flex;flex-direction:column;gap:16px;margin-top:6px;">
-            <div style="font-size:14px;color:var(--ink-light);line-height:1.6;padding-left:12px;border-left:3px solid var(--green-bright);">
-                <span style="font-weight:700;color:var(--green);display:block;margin-bottom:2px;">🔥 Calories</span>
-                Total energy to consume each day to reach your {{ safe_goal }} goal.
-            </div>
-            <div style="font-size:14px;color:var(--ink-light);line-height:1.6;padding-left:12px;border-left:3px solid var(--sage);">
-                <span style="font-weight:700;color:var(--green);display:block;margin-bottom:2px;">🥩 Protein</span>
-                Builds and repairs muscle — especially important for {{ safe_goal }}.
-            </div>
-            <div style="font-size:14px;color:var(--ink-light);line-height:1.6;padding-left:12px;border-left:3px solid var(--mint);">
-                <span style="font-weight:700;color:var(--green);display:block;margin-bottom:2px;">🍚 Carbs</span>
-                Your primary energy source for daily activity and exercise.
-            </div>
-            <div style="font-size:14px;color:var(--ink-light);line-height:1.6;padding-left:12px;border-left:3px solid var(--border);">
-                <span style="font-weight:700;color:var(--green);display:block;margin-bottom:2px;">🥑 Fat</span>
-                Supports hormones, brain health, and nutrient absorption.
-            </div>
+        <h3>What this means</h3>
+        <div style="display:flex;flex-direction:column;gap:14px;margin-top:4px;">
+            <div class="macro-insight"><div class="macro-insight-title">Calories</div>Total energy to consume daily to reach your {{ safe_goal }} goal.</div>
+            <div class="macro-insight"><div class="macro-insight-title">Protein</div>Builds and repairs muscle — critical for {{ safe_goal }}.</div>
+            <div class="macro-insight"><div class="macro-insight-title">Carbohydrates</div>Your primary energy source for daily activity and workouts.</div>
+            <div class="macro-insight"><div class="macro-insight-title">Fat</div>Supports hormones, brain health and nutrient absorption.</div>
         </div>
     </div>
-
 </div>
 
-<!-- CTA -->
-<div class="plan-button-container">
-    <a href="/dietselect" class="plan-btn">🥗 Generate My Diet Plan</a>
-    <a href="/quiz" class="plan-btn plan-btn-secondary">↩ Recalculate</a>
+<div style="display:flex;justify-content:center;gap:12px;padding-top:4px;">
+    <a href="/dietselect" class="btn btn-primary btn-lg">Generate My Diet Plan</a>
+    <a href="/quiz" class="btn btn-ghost btn-lg">Recalculate</a>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-(function () {
-    const canvas = document.getElementById('macroChart');
-    if (!canvas) return;
-    const p = parseFloat("{{ safe_protein }}") || 0;
-    const c = parseFloat("{{ safe_carbs }}")   || 0;
-    const f = parseFloat("{{ safe_fat }}")     || 0;
-    if (p + c + f === 0) return;
-
-    new Chart(canvas, {
+(function(){
+    var c = document.getElementById('macroChart');
+    if (!c) return;
+    var p = parseFloat("{{ safe_protein }}") || 0;
+    var ca = parseFloat("{{ safe_carbs }}")  || 0;
+    var f = parseFloat("{{ safe_fat }}")     || 0;
+    if (p+ca+f === 0) return;
+    new Chart(c, {
         type: 'doughnut',
         data: {
-            labels: ['Protein', 'Carbs', 'Fat'],
             datasets: [{
-                data: [p * 4, c * 4, f * 9],
-                backgroundColor: ['#3a8a62', '#4dab7e', '#7ecaa4'],
+                data: [p*4, ca*4, f*9],
+                backgroundColor: ['rgba(0,232,122,0.9)','rgba(0,232,122,0.45)','rgba(0,232,122,0.20)'],
                 borderWidth: 0
             }]
         },
-        options: {
-            responsive: false,
-            cutout: '70%',
-            plugins: { legend: { display: false }, tooltip: { enabled: true } }
-        }
+        options: { responsive:false, cutout:'70%', plugins:{ legend:{display:false}, tooltip:{enabled:true} } }
     });
 })();
 </script>

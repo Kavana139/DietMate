@@ -1,132 +1,179 @@
 {% extends "base.html" %}
-
 {% block content %}
 
-<div class="dashboard-welcome">
-    <div>
-        <h1>Good to see you 👋</h1>
-        <p>Here's your nutrition overview for today.</p>
+<!-- RE-ENGAGEMENT BANNER (shown if user was away 2+ days) -->
+{% if days_away >= 2 %}
+<div class="reengagement-banner" id="reBanner">
+    <button class="close-btn" onclick="document.getElementById('reBanner').remove()">×</button>
+    <div class="re-icon">
+        {% if days_away >= 7 %}🌑{% elif days_away >= 3 %}🌒{% else %}🌓{% endif %}
     </div>
-    <span class="welcome-date" id="todayDate"></span>
+    <div class="re-body">
+        <div class="re-title">
+            {% if days_away >= 7 %}You've been away for {{ days_away }} days!
+            {% elif days_away >= 3 %}It's been a few days since your last visit
+            {% else %}Welcome back! You missed a day
+            {% endif %}
+        </div>
+        <div class="re-text">
+            {% if streak.current > 0 %}Your {{ streak.current }}-day streak is still alive — log a meal to keep it going!
+            {% else %}No worries — every day is a fresh start. Log your first meal to begin a new streak!
+            {% endif %}
+        </div>
+    </div>
+    <a href="/dietselect" class="btn btn-primary btn-sm">Log a Meal</a>
+</div>
+{% endif %}
+
+<div class="dash-welcome">
+    <div>
+        <h1 style="font-family:'Fraunces',Georgia,serif;font-size:30px;font-weight:700;color:var(--text-primary);letter-spacing:-0.4px;">
+            Good to see you, {{ user_name }}
+        </h1>
+        <p class="page-subtitle" style="margin-bottom:0;">Here is your nutrition overview for today.</p>
+    </div>
+    <span class="date-badge" id="todayDate"></span>
+</div>
+
+<!-- STREAK CARD -->
+{% set s = streak %}
+<div class="streak-card {% if s.streak_broken %}streak-broken{% endif %}" style="margin-bottom:20px;">
+    <div class="streak-flame">
+        {% if s.current == 0 or s.streak_broken %}🔥{% else %}🔥{% endif %}
+    </div>
+    <div class="streak-info">
+        <div class="streak-number">{{ s.current }}</div>
+        <div class="streak-label">Day Streak</div>
+        <div class="streak-sub">
+            {% if s.streak_broken %}Streak reset — log today to start fresh!
+            {% elif s.active_today %}Active today — keep it up!
+            {% elif s.current == 0 %}Log your first meal to start a streak!
+            {% else %}Log a meal today to keep your streak!
+            {% endif %}
+        </div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:10px;">
+        <div class="streak-stats">
+            <div class="streak-stat">
+                <div class="streak-stat-val">{{ s.longest }}</div>
+                <div class="streak-stat-lbl">Best</div>
+            </div>
+            <div class="streak-stat">
+                <div class="streak-stat-val">{{ s.total }}</div>
+                <div class="streak-stat-lbl">Total Days</div>
+            </div>
+            {% if s.freeze_available and not s.streak_broken %}
+            <div class="streak-stat" style="border-color:rgba(91,184,255,0.3);background:var(--blue-bg);">
+                <div class="streak-stat-val" style="color:var(--blue);">❄</div>
+                <div class="streak-stat-lbl" style="color:var(--blue);">Freeze</div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
 </div>
 
 <!-- STAT CARDS -->
-<div class="dashboard-grid">
-
-    <div class="dashboard-card">
-        <div class="card-icon-row">
-            <div class="card-icon-circle">📖</div>
-            <span class="card-trend">Library</span>
+<div class="stat-grid">
+    <div class="stat-card card-glow" style="animation:cardIn .4s ease both;animation-delay:0s;">
+        <div class="stat-icon">
+            <svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg>
         </div>
-        <h3>Total Recipes</h3>
-        <div class="card-label">{{ total_recipes }}</div>
+        <div class="stat-label">Total Recipes</div>
+        <div class="stat-value">{{ total_recipes }}</div>
+        <div class="stat-sub">In the library</div>
     </div>
-
-    <div class="dashboard-card">
-        <div class="card-icon-row">
-            <div class="card-icon-circle">🍽️</div>
-            <span class="card-trend">Daily</span>
+    <div class="stat-card card-glow" style="animation:cardIn .4s ease both;animation-delay:.07s;">
+        <div class="stat-icon">
+            <svg viewBox="0 0 24 24"><path d="M3 6h18M3 12h18M3 18h11"/></svg>
         </div>
-        <h3>Meal Types</h3>
-        <div class="card-label">{{ meal_types }}</div>
+        <div class="stat-label">Meal Types</div>
+        <div class="stat-value">{{ meal_types }}</div>
+        <div class="stat-sub">Distinct meal slots</div>
     </div>
-
-    <div class="dashboard-card">
-        <div class="card-icon-row">
-            <div class="card-icon-circle">🥗</div>
-            <span class="card-trend">Plans</span>
+    <div class="stat-card card-glow" style="animation:cardIn .4s ease both;animation-delay:.14s;">
+        <div class="stat-icon">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
         </div>
-        <h3>Diet Plans</h3>
-        <div class="card-label">{{ diet_plans }}</div>
+        <div class="stat-label">Diet Plans</div>
+        <div class="stat-value">{{ diet_plans }}</div>
+        <div class="stat-sub">Available plans</div>
     </div>
-
-    <div class="dashboard-card tip-card">
-        <div class="card-icon-row">
-            <div class="card-icon-circle">💡</div>
-            <span class="card-trend">Tip</span>
+    <div class="stat-card tip-card" style="animation:cardIn .4s ease both;animation-delay:.21s;">
+        <div class="stat-icon">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
         </div>
-        <h3>Today's Tip</h3>
-        <div class="card-label">{{ healthy_tips }}</div>
+        <div class="stat-label">Today's Tip</div>
+        <div class="stat-value">{{ healthy_tips }}</div>
     </div>
-
 </div>
 
-<!-- BOTTOM SECTION -->
-<div class="dashboard-bottom">
+<style>
+@keyframes cardIn { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:translateY(0)} }
+</style>
 
+<div class="dash-bottom">
     <!-- Calorie Ring -->
     <div class="dash-section">
-        <h2>🔥 Today's Calories</h2>
-        <div class="calorie-ring-wrapper">
-            <div style="position:relative; width:120px; height:120px; flex-shrink:0;">
-                <canvas id="calorieRing" width="120" height="120"></canvas>
-                <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;">
-                    <span style="font-family:'Fraunces',serif;font-size:20px;font-weight:700;color:var(--forest);">{{ calories_today }}</span>
-                    <span style="font-size:10px;color:var(--muted);font-weight:600;">kcal</span>
+        <div class="section-title">Calories Today</div>
+        <div class="calorie-ring-wrap">
+            <div style="position:relative;width:110px;height:110px;flex-shrink:0;">
+                <canvas id="calorieRing" width="110" height="110"></canvas>
+                <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;pointer-events:none;">
+                    <span style="font-family:'Fraunces',serif;font-size:19px;font-weight:700;color:var(--text-primary);">{{ calories_today }}</span>
+                    <span style="font-size:10px;color:var(--text-muted);font-weight:600;">kcal</span>
                 </div>
             </div>
-            <div class="calorie-ring-labels">
-                <div class="ring-label">
+            <div class="ring-labels">
+                <div class="ring-row">
                     <span class="ring-dot consumed"></span>
                     <span>Consumed: <strong>{{ calories_today }} kcal</strong></span>
                 </div>
-                <div class="ring-label">
+                <div class="ring-row">
                     <span class="ring-dot remaining"></span>
                     <span>Remaining: <strong>{{ remaining_calories }} kcal</strong></span>
                 </div>
-                <div class="ring-label" style="margin-top:2px;">
-                    <span class="ring-dot" style="background:transparent;border:1.5px solid var(--border);"></span>
-                    <span style="font-size:12px;color:var(--muted);">Goal: 2000 kcal/day</span>
+                <div class="ring-row" style="font-size:11px;color:var(--text-muted);margin-top:2px;">
+                    Goal: 2000 kcal / day
+                </div>
+                <!-- Water quick view -->
+                <div class="ring-row" style="margin-top:8px;padding-top:8px;border-top:1px solid var(--border);">
+                    <span class="ring-dot" style="background:var(--blue);box-shadow:0 0 6px rgba(91,184,255,0.4);"></span>
+                    <span style="color:var(--blue);font-weight:600;">Water: <strong>{{ water_today }}/8 glasses</strong></span>
                 </div>
                 {% if calories_today >= 2000 %}
-                <div style="background:var(--foam);border:1px solid var(--border);border-radius:6px;padding:8px 12px;font-size:12px;font-weight:600;color:var(--green);margin-top:4px;">
-                    🎉 Daily goal reached!
-                </div>
+                <span class="badge badge-accent" style="margin-top:6px;">Goal reached</span>
                 {% elif calories_today >= 1500 %}
-                <div style="background:var(--gold-light);border:1px solid #e5c47a;border-radius:6px;padding:8px 12px;font-size:12px;font-weight:600;color:#7a5500;margin-top:4px;">
-                    🌟 Almost there — keep going!
-                </div>
+                <span class="badge badge-gold" style="margin-top:6px;">Almost there</span>
                 {% endif %}
             </div>
         </div>
     </div>
 
-    <!-- Quick Links -->
+    <!-- Quick Actions -->
     <div class="dash-section">
-        <h2>⚡ Quick Actions</h2>
-        <div class="quick-links">
-            <a href="/quiz" class="quick-link-btn"><span>🧬</span> Health Quiz</a>
-            <a href="/dietselect" class="quick-link-btn"><span>🥗</span> Diet Plan</a>
-            <a href="/recipes" class="quick-link-btn"><span>📖</span> Browse Recipes</a>
-            <a href="/progress" class="quick-link-btn"><span>📊</span> My Progress</a>
+        <div class="section-title">Quick Actions</div>
+        <div class="quick-grid">
+            <a href="/quiz"         class="quick-btn">Health Quiz</a>
+            <a href="/dietselect"   class="quick-btn">Diet Plan</a>
+            <a href="/recipes"      class="quick-btn">Browse Recipes</a>
+            <a href="/progress"     class="quick-btn">My Progress</a>
+            <a href="/food_scanner" class="quick-btn" style="grid-column:span 2;">AI Food Scanner</a>
         </div>
     </div>
-
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-// Date display
-const d = new Date();
-document.getElementById('todayDate').textContent = d.toLocaleDateString('en-IN', { weekday:'long', day:'numeric', month:'long' });
+document.getElementById('todayDate').textContent = new Date().toLocaleDateString('en-IN',{weekday:'long',day:'numeric',month:'long'});
 
-const consumed  = parseInt("{{ calories_today }}") || 0;
-const remaining = Math.max(0, parseInt("{{ remaining_calories }}") || 2000);
+var isDark = document.documentElement.getAttribute('data-theme') !== 'light';
+var accentColor = isDark ? '#00e87a' : '#00a855';
+var bgFill      = isDark ? 'rgba(255,255,255,0.07)' : 'rgba(0,0,0,0.07)';
 
 new Chart(document.getElementById('calorieRing'), {
-    type: 'doughnut',
-    data: {
-        datasets: [{
-            data: [consumed || 0.01, remaining],
-            backgroundColor: ['#3a8a62', '#e6f3ea'],
-            borderWidth: 0,
-        }]
-    },
-    options: {
-        responsive: false,
-        cutout: '78%',
-        plugins: { legend: { display: false }, tooltip: { enabled: false } }
-    }
+    type:'doughnut',
+    data:{ datasets:[{ data:[Math.max(parseInt("{{ calories_today }}")||0.01,0), Math.max(parseInt("{{ remaining_calories }}")||0,0)], backgroundColor:[accentColor,bgFill], borderWidth:0 }] },
+    options:{ responsive:false, cutout:'80%', plugins:{legend:{display:false},tooltip:{enabled:false}} }
 });
 </script>
 

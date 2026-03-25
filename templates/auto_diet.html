@@ -1,103 +1,61 @@
 {% extends "base.html" %}
-
 {% block content %}
 
 <h1 class="page-title">Your Auto-Generated Diet Plan</h1>
 <p class="page-subtitle">Mark meals as done to track your daily calorie intake.</p>
 
-<!-- CALORIE PROGRESS BAR -->
-<div class="calorie-progress-section">
-    <div class="calorie-progress-header">
-        <h3>🔥 Daily Calorie Target — {{ total }} kcal</h3>
-        <span id="calorieCountDisplay">Loading…</span>
+<div class="cal-tracker">
+    <div class="cal-track-header">
+        <h3>Daily Calorie Target — {{ total }} kcal</h3>
+        <span id="calDisplay">0 / {{ total }} kcal consumed today</span>
     </div>
-    <div class="calorie-bar-track">
-        <div class="calorie-bar-fill" id="calorieBar" style="width: 0%;"></div>
+    <div class="cal-bar-track">
+        <div class="cal-bar-fill" id="calBar" style="width:0%;"></div>
     </div>
-    <div style="display:flex;justify-content:space-between;margin-top:8px;">
-        <span style="font-size:12px;color:var(--muted);font-weight:600;">0 kcal</span>
-        <span style="font-size:12px;color:var(--muted);font-weight:600;">{{ total }} kcal goal</span>
+    <div style="display:flex;justify-content:space-between;margin-top:7px;">
+        <span style="font-size:11px;color:var(--text-muted);font-weight:600;">0</span>
+        <span style="font-size:11px;color:var(--text-muted);font-weight:600;">{{ total }} kcal</span>
     </div>
 </div>
 
-{% set meal_icons = {
-    'Early Morning': '🌅',
-    'Breakfast':     '☀️',
-    'Mid Snack':     '🍎',
-    'Lunch':         '🍛',
-    'Evening Snack': '🌤️',
-    'Dinner':        '🌙'
-} %}
+{% set time_icons = {'Early Morning':'◑','Breakfast':'◕','Mid Snack':'◎','Lunch':'◉','Evening Snack':'◐','Dinner':'◑'} %}
+{% set time_labels = {'Early Morning':'Morning Kickstart','Breakfast':'Breakfast','Mid Snack':'Morning Snack','Lunch':'Lunch','Evening Snack':'Evening Snack','Dinner':'Dinner'} %}
 
-{% set meal_labels = {
-    'Early Morning': 'Morning Kickstart',
-    'Breakfast':     'Breakfast',
-    'Mid Snack':     'Morning Snack',
-    'Lunch':         'Lunch',
-    'Evening Snack': 'Evening Snack',
-    'Dinner':        'Dinner'
-} %}
-
-<!-- MEAL CARDS -->
-<div class="diet-container">
-
+<div class="meal-list">
 {% for time, foods in meals.items() %}
-
 <div class="meal-card">
-
-    <div class="meal-card-header">
-        <span class="meal-time-icon">{{ meal_icons.get(time, '🍽️') }}</span>
-        <h3>{{ meal_labels.get(time, time) }}</h3>
-        <span class="meal-time-badge" style="margin-left:auto;">{{ time }}</span>
+    <div class="meal-card-head">
+        <div class="meal-time-icon">{{ time_icons.get(time,'◌') }}</div>
+        <span class="meal-time-label">{{ time_labels.get(time,time) }}</span>
+        <span class="meal-time-badge">{{ time }}</span>
     </div>
-
-    <div class="meal-card-body">
-
-    {% if foods %}
-        {% for food in foods %}
-        <div class="meal-item" id="meal-row-{{ food[2] }}">
-            <div class="meal-info">
-                <span class="meal-name">{{ food[0] }}</span>
-                <span class="meal-cal">🔥 {{ food[1] }} kcal</span>
+    <div class="meal-body">
+        {% if foods %}
+            {% for food in foods %}
+            <div class="meal-item">
+                <div>
+                    <div class="meal-name">{{ food[0] }}</div>
+                    <div class="meal-kcal">{{ food[1] }} kcal</div>
+                </div>
+                <form method="POST" action="/complete_meal" style="margin:0;">
+                    <input type="hidden" name="meal_id"   value="{{ food[2] }}">
+                    <input type="hidden" name="meal_name" value="{{ food[0] }}">
+                    <input type="hidden" name="calories"  value="{{ food[1] }}">
+                    <input type="hidden" name="meal_time" value="{{ time }}">
+                    <button class="mark-done-btn" type="submit">Mark Done</button>
+                </form>
             </div>
-            <form method="POST" action="/complete_meal" style="margin:0;">
-                <input type="hidden" name="meal_id"   value="{{ food[2] }}">
-                <input type="hidden" name="meal_name" value="{{ food[0] }}">
-                <input type="hidden" name="calories"  value="{{ food[1] }}">
-                <input type="hidden" name="meal_time" value="{{ time }}">
-                <button class="complete-btn" type="submit">✓ Mark Done</button>
-            </form>
-        </div>
-        {% endfor %}
-    {% else %}
-        <div class="fasting">
-            💧 Stay hydrated — drink water or herbal tea during this window.
-        </div>
-    {% endif %}
-
+            {% endfor %}
+        {% else %}
+            <div class="fasting-note">Stay hydrated — drink water or herbal tea during this window.</div>
+        {% endif %}
     </div>
-
 </div>
-
 {% endfor %}
-
 </div>
 
-<!-- Regenerate -->
-<div style="margin-top:28px;text-align:center;">
-    <a href="/dietselect" style="display:inline-flex;align-items:center;gap:8px;color:var(--muted);font-size:14px;font-weight:600;text-decoration:none;padding:10px 20px;border-radius:var(--r-pill);border:1.5px solid var(--border);background:white;transition:all 0.2s;">
-        🔄 Generate a new plan
-    </a>
+<div style="margin-top:24px;text-align:center;">
+    <a href="/dietselect" class="btn btn-ghost">Generate a new plan</a>
 </div>
-
-<script>
-// Animate the calorie bar on load (placeholder — real value fetched from progress)
-document.addEventListener('DOMContentLoaded', function() {
-    // We don't know current consumed here without a fetch, so show 0
-    const total = parseInt("{{ total }}") || 2000;
-    document.getElementById('calorieCountDisplay').textContent = '0 / ' + total + ' kcal consumed today';
-    document.getElementById('calorieBar').style.width = '0%';
-});
-</script>
 
 {% endblock %}

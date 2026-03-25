@@ -1,276 +1,186 @@
 {% extends "base.html" %}
-
 {% block content %}
 
-<div class="mp-header">
+<div style="display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px;">
     <div>
         <h1 class="page-title">Weekly Meal Planner</h1>
-        <p class="page-subtitle">Browse your full 7-day meal schedule. Filter by goal and diet type.</p>
+        <p class="page-subtitle" style="margin-bottom:0;">Browse your 7-day schedule. Filter by goal and diet type.</p>
     </div>
-    <button class="mp-print-btn" onclick="window.print()">🖨️ Print Plan</button>
+    <button class="btn btn-ghost btn-sm" onclick="window.print()">Print Plan</button>
 </div>
 
-<!-- FILTER BAR -->
-<div class="mp-filters">
-    <div class="mp-filter-group">
-        <label class="mp-filter-label">Goal</label>
-        <div class="mp-filter-pills">
-            <button class="mp-pill active" data-filter="goal" onclick="setGoal(this,'all')">All</button>
-            <button class="mp-pill" data-filter="goal" onclick="setGoal(this,'Weight Loss')">🎯 Weight Loss</button>
-            <button class="mp-pill" data-filter="goal" onclick="setGoal(this,'Weight Gain')">💪 Weight Gain</button>
-            <button class="mp-pill" data-filter="goal" onclick="setGoal(this,'Muscle Gain')">🏋️ Muscle Gain</button>
+<div class="planner-filters">
+    <div class="planner-filter-group">
+        <span class="planner-filter-label">Goal</span>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;">
+            <button class="filter-chip active" data-filter="goal" onclick="setGoal(this,'all')">All</button>
+            <button class="filter-chip" data-filter="goal" onclick="setGoal(this,'Weight Loss')">Weight Loss</button>
+            <button class="filter-chip" data-filter="goal" onclick="setGoal(this,'Weight Gain')">Weight Gain</button>
+            <button class="filter-chip" data-filter="goal" onclick="setGoal(this,'Muscle Gain')">Muscle Gain</button>
         </div>
     </div>
-    <div class="mp-filter-group">
-        <label class="mp-filter-label">Diet Type</label>
-        <div class="mp-filter-pills">
-            <button class="mp-pill active" data-filter="diet" onclick="setDiet(this,'all')">All</button>
-            <button class="mp-pill" data-filter="diet" onclick="setDiet(this,'Veg')">🥦 Vegetarian</button>
-            <button class="mp-pill" data-filter="diet" onclick="setDiet(this,'Non Veg')">🍗 Non-Veg</button>
+    <div class="planner-filter-group">
+        <span class="planner-filter-label">Diet Type</span>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;">
+            <button class="filter-chip active" data-filter="diet" onclick="setDiet(this,'all')">All</button>
+            <button class="filter-chip" data-filter="diet" onclick="setDiet(this,'Veg')">Vegetarian</button>
+            <button class="filter-chip" data-filter="diet" onclick="setDiet(this,'Non Veg')">Non-Veg</button>
         </div>
     </div>
 </div>
 
-<!-- DAY TABS -->
-<div class="mp-day-tabs">
+<div class="day-tabs" id="dayTabs">
     {% for day in ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'] %}
-    <button class="mp-day-tab {% if loop.first %}active{% endif %}"
-            data-day="{{ day }}" onclick="setDay(this)">
-        <span class="mp-tab-day">{{ day[:3] }}</span>
-        <span class="mp-tab-cal" id="tab-cal-{{ day }}">—</span>
+    <button class="day-tab {% if loop.first %}active{% endif %}" data-day="{{ day }}" onclick="setDay(this)">
+        <span class="tab-name">{{ day[:3] }}</span>
+        <span class="tab-cal" id="tcal-{{ day }}">—</span>
     </button>
     {% endfor %}
 </div>
 
-<!-- All meal data passed as JSON from Flask -->
 <script id="mealData" type="application/json">{{ meals_json | safe }}</script>
 
 {% set days  = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'] %}
 {% set times = ['Early Morning','Breakfast','Mid Snack','Lunch','Evening Snack','Dinner'] %}
-{% set time_icons = {'Early Morning':'🌅','Breakfast':'☀️','Mid Snack':'🍎','Lunch':'🍛','Evening Snack':'🌤️','Dinner':'🌙'} %}
-{% set time_clock = {'Early Morning':'6:30 AM','Breakfast':'8:30 AM','Mid Snack':'11:00 AM','Lunch':'1:00 PM','Evening Snack':'5:00 PM','Dinner':'8:30 PM'} %}
+{% set icons = {'Early Morning':'🌅','Breakfast':'☀️','Mid Snack':'🍃','Lunch':'🥘','Evening Snack':'🌤','Dinner':'🌙'} %}
+{% set clocks = {'Early Morning':'6:30 AM','Breakfast':'8:30 AM','Mid Snack':'11:00 AM','Lunch':'1:00 PM','Evening Snack':'5:00 PM','Dinner':'8:30 PM'} %}
 
-<!-- PANELS -->
 <div id="plannerPanels">
 {% for day in days %}
-<div class="mp-panel {% if loop.first %}active{% endif %}" data-day="{{ day }}">
+<div class="planner-panel {% if loop.first %}active{% endif %}" data-day="{{ day }}">
 
-    <div class="mp-panel-header">
-        <div class="mp-panel-title">
+    <div class="planner-head">
+        <div style="display:flex;align-items:center;gap:12px;">
             <h2>{{ day }}</h2>
-            <span class="mp-total-badge" id="total-{{ day }}">—</span>
+            <span style="background:var(--accent-muted);border:1px solid var(--border-hover);color:var(--accent);font-size:11px;font-weight:700;padding:4px 13px;border-radius:var(--r-pill);" id="ptotal-{{ day }}">—</span>
         </div>
-        <div class="mp-panel-stats">
-            <div class="mp-stat">
-                <span class="mp-stat-val" id="s-cal-{{ day }}">—</span>
-                <span class="mp-stat-lbl">kcal</span>
-            </div>
-            <div class="mp-stat">
-                <span class="mp-stat-val" id="s-meals-{{ day }}">—</span>
-                <span class="mp-stat-lbl">meals</span>
-            </div>
+        <div class="planner-stat">
+            <div class="planner-stat-pill"><span class="psp-val" id="pcal-{{ day }}">—</span><span class="psp-lbl">kcal</span></div>
+            <div class="planner-stat-pill"><span class="psp-val" id="pmeals-{{ day }}">—</span><span class="psp-lbl">meals</span></div>
         </div>
     </div>
 
-    <div class="mp-slots">
+    <div class="planner-slots">
     {% for time in times %}
-    <div class="mp-slot">
-        <div class="mp-slot-time">
-            <span class="mp-slot-icon">{{ time_icons[time] }}</span>
-            <span class="mp-slot-name">{{ time }}</span>
-            <span class="mp-slot-clock">{{ time_clock[time] }}</span>
+    <div class="planner-slot">
+        <div class="slot-time">
+            <span class="slot-time-icon">{{ icons[time] }}</span>
+            <span class="slot-time-name">{{ time }}</span>
+            <span class="slot-time-clock">{{ clocks[time] }}</span>
         </div>
-        <div class="mp-slot-meals" id="slot-{{ day }}-{{ time|replace(' ','-') }}">
-            <span class="mp-slot-loading">Loading…</span>
+        <div class="slot-meals" id="slot-{{ day }}-{{ time|replace(' ','-') }}">
+            <span class="slot-loading">Loading…</span>
         </div>
     </div>
     {% endfor %}
     </div>
-
 </div>
 {% endfor %}
 </div>
 
-<!-- EMPTY STATE -->
-<div id="emptyState" style="display:none;" class="mp-empty">
-    <div style="font-size:48px;">🥗</div>
+<div id="plannerEmpty" style="display:none;" class="planner-empty">
+    <p style="font-size:28px;opacity:.3;">◎</p>
     <h3>No meals match your filters</h3>
     <p>Try a different goal or diet type combination.</p>
 </div>
 
 <style>
 @media print {
-    .sidebar,.mp-filters,.mp-day-tabs,.mp-print-btn,.page-subtitle,.mp-header button{display:none!important}
+    .sidebar,.planner-filters,.day-tabs,.btn,.page-subtitle{display:none!important}
     .main-content{margin-left:0!important;padding:20px!important}
-    .mp-panel{display:block!important;page-break-after:always}
+    .planner-panel{display:block!important;page-break-after:always}
 }
-
-.mp-header{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:22px;flex-wrap:wrap;gap:12px}
-.mp-print-btn{padding:10px 22px;border-radius:var(--r-pill);border:1.5px solid var(--border);background:white;color:var(--ink-light);font-size:13px;font-weight:700;font-family:'Plus Jakarta Sans',sans-serif;cursor:pointer;transition:all .2s}
-.mp-print-btn:hover{background:var(--forest);border-color:var(--forest);color:white}
-
-.mp-filters{display:flex;gap:28px;background:white;border:1px solid var(--border-light);border-radius:var(--r-lg);padding:16px 22px;margin-bottom:20px;flex-wrap:wrap;box-shadow:var(--shadow-xs)}
-.mp-filter-group{display:flex;flex-direction:column;gap:8px}
-.mp-filter-label{font-size:10px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:1px}
-.mp-filter-pills{display:flex;gap:7px;flex-wrap:wrap}
-.mp-pill{padding:7px 16px;border-radius:var(--r-pill);border:1.5px solid var(--border);background:var(--parchment);color:var(--ink-light);font-size:12px;font-weight:700;font-family:'Plus Jakarta Sans',sans-serif;cursor:pointer;transition:all .18s}
-.mp-pill:hover{border-color:var(--sage);color:var(--green);background:var(--foam-light)}
-.mp-pill.active{background:var(--green-bright);border-color:var(--green-bright);color:white;box-shadow:var(--shadow-green)}
-
-.mp-day-tabs{display:flex;gap:6px;margin-bottom:20px;overflow-x:auto;padding-bottom:2px}
-.mp-day-tab{display:flex;flex-direction:column;align-items:center;gap:3px;padding:10px 20px;border:1.5px solid var(--border);background:white;border-radius:var(--r-md);cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif;transition:all .18s;flex-shrink:0;min-width:72px}
-.mp-day-tab:hover{border-color:var(--sage);background:var(--foam-light)}
-.mp-day-tab.active{border-color:var(--green-bright);background:var(--green-bright);color:white;box-shadow:var(--shadow-green)}
-.mp-tab-day{font-size:13px;font-weight:800;text-transform:uppercase;letter-spacing:.5px}
-.mp-tab-cal{font-size:11px;font-weight:600;opacity:.8}
-
-.mp-panel{display:none;animation:fadeIn .25s ease}
-.mp-panel.active{display:block}
-@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
-
-.mp-panel-header{display:flex;align-items:center;justify-content:space-between;background:white;border:1px solid var(--border-light);border-radius:var(--r-lg);padding:18px 24px;margin-bottom:14px;box-shadow:var(--shadow-xs);flex-wrap:wrap;gap:12px}
-.mp-panel-title{display:flex;align-items:center;gap:14px}
-.mp-panel-title h2{font-family:'Fraunces',Georgia,serif;font-size:22px;font-weight:700;color:var(--forest)}
-.mp-total-badge{background:var(--foam);border:1px solid var(--border);color:var(--green);font-size:13px;font-weight:700;padding:5px 16px;border-radius:var(--r-pill)}
-.mp-panel-stats{display:flex;gap:12px}
-.mp-stat{display:flex;flex-direction:column;align-items:center;gap:1px;background:var(--parchment);border:1px solid var(--border-light);border-radius:var(--r-sm);padding:8px 18px;min-width:64px;text-align:center}
-.mp-stat-val{font-family:'Fraunces',Georgia,serif;font-size:18px;font-weight:700;color:var(--forest);line-height:1}
-.mp-stat-lbl{font-size:10px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.5px}
-
-.mp-slots{display:flex;flex-direction:column;gap:10px}
-.mp-slot{display:grid;grid-template-columns:192px 1fr;background:white;border-radius:var(--r-md);border:1px solid var(--border-light);border-left:4px solid var(--green-bright);overflow:hidden;min-height:80px;transition:box-shadow .18s}
-.mp-slot:hover{box-shadow:var(--shadow-sm)}
-.mp-slot-time{padding:16px 18px;background:var(--foam-light);display:flex;flex-direction:column;justify-content:center;gap:3px;border-right:1px solid var(--border-light)}
-.mp-slot-icon{font-size:20px;margin-bottom:2px}
-.mp-slot-name{font-size:13px;font-weight:700;color:var(--forest)}
-.mp-slot-clock{font-size:11px;color:var(--muted);font-weight:600}
-.mp-slot-meals{padding:12px 16px;display:flex;flex-direction:column;gap:7px;justify-content:center}
-
-.mp-meal-item{display:flex;align-items:center;justify-content:space-between;padding:9px 13px;background:var(--parchment);border-radius:var(--r-sm);border:1px solid var(--border-light);transition:background .15s;gap:12px}
-.mp-meal-item:hover{background:var(--foam-light)}
-.mp-meal-name{font-size:14px;font-weight:600;color:var(--ink)}
-.mp-meal-cal{font-size:12px;font-weight:700;color:var(--green-bright);white-space:nowrap}
-.mp-meal-macros{font-size:11px;color:var(--muted);margin-top:2px}
-.mp-cal-bar-track{height:3px;background:var(--border-light);border-radius:3px;overflow:hidden;margin-top:4px}
-.mp-cal-bar-fill{height:100%;background:linear-gradient(90deg,var(--green-bright),var(--sage));border-radius:3px}
-
-.mp-slot-empty{font-size:13px;color:var(--muted);font-style:italic;padding:6px 0}
-.mp-slot-loading{font-size:13px;color:var(--muted);animation:pulse 1.2s infinite}
-@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
-
-.mp-empty{text-align:center;padding:60px 20px;background:white;border-radius:var(--r-xl);border:1px solid var(--border-light);display:flex;flex-direction:column;align-items:center;gap:12px}
-.mp-empty h3{font-family:'Fraunces',serif;font-size:20px;color:var(--forest)}
-.mp-empty p{font-size:14px;color:var(--muted)}
 </style>
 
 <script>
-const RAW = JSON.parse(document.getElementById('mealData').textContent);
-// RAW: [[day, meal_time, meal_name, calories, protein, carbs, fat, goal, diet_type], ...]
-
-const DAYS  = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
-const TIMES = ['Early Morning','Breakfast','Mid Snack','Lunch','Evening Snack','Dinner'];
-
-let activeGoal = 'all';
-let activeDiet = 'all';
+var RAW = JSON.parse(document.getElementById('mealData').textContent);
+var DAYS  = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
+var TIMES = ['Early Morning','Breakfast','Mid Snack','Lunch','Evening Snack','Dinner'];
+var activeGoal = 'all';
+var activeDiet = 'all';
 
 function setGoal(btn, val) {
     document.querySelectorAll('[data-filter="goal"]').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    activeGoal = val;
-    renderAll();
+    btn.classList.add('active'); activeGoal = val; renderAll();
 }
-
 function setDiet(btn, val) {
     document.querySelectorAll('[data-filter="diet"]').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    activeDiet = val;
-    renderAll();
+    btn.classList.add('active'); activeDiet = val; renderAll();
 }
-
 function setDay(btn) {
-    document.querySelectorAll('.mp-day-tab').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.day-tab').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
-    document.querySelectorAll('.mp-panel').forEach(p => p.classList.remove('active'));
-    const panel = document.querySelector(`.mp-panel[data-day="${btn.dataset.day}"]`);
+    document.querySelectorAll('.planner-panel').forEach(p => p.classList.remove('active'));
+    var panel = document.querySelector('.planner-panel[data-day="' + btn.dataset.day + '"]');
     if (panel) panel.classList.add('active');
 }
 
 function renderAll() {
-    const filtered = RAW.filter(row => {
-        const rGoal = (row[7] || '').trim().toLowerCase();
-        const rDiet = (row[8] || '').trim().toLowerCase();
-        const goalOk = activeGoal === 'all' || rGoal === activeGoal.toLowerCase();
-        const dietOk = activeDiet === 'all' || rDiet === activeDiet.toLowerCase();
-        return goalOk && dietOk;
+    var filtered = RAW.filter(function(r) {
+        var rg = (r[7]||'').trim().toLowerCase();
+        var rd = (r[8]||'').trim().toLowerCase();
+        return (activeGoal==='all' || rg===activeGoal.toLowerCase()) &&
+               (activeDiet==='all' || rd===activeDiet.toLowerCase());
     });
 
-    // Build lookup: day → time → [{name,cal,prot,carbs,fat}]
-    const lookup = {};
-    DAYS.forEach(d => { lookup[d] = {}; TIMES.forEach(t => { lookup[d][t] = []; }); });
-    filtered.forEach(row => {
-        const [day, time, name, cal, prot, carbs, fat] = row;
-        if (lookup[day] && lookup[day][time] !== undefined) {
-            lookup[day][time].push({ name, cal: parseInt(cal)||0, prot: prot||0, carbs: carbs||0, fat: fat||0 });
-        }
+    var lookup = {};
+    DAYS.forEach(function(d) { lookup[d]={}; TIMES.forEach(function(t){ lookup[d][t]=[]; }); });
+
+    // Deduplicate in JS too (in case SQL GROUP BY misses some edge cases)
+    var seen = {};
+    filtered.forEach(function(r) {
+        var key = r[0]+'|'+r[1]+'|'+r[2]+'|'+r[7]+'|'+r[8];
+        if (seen[key]) return;
+        seen[key] = true;
+        var d=r[0],t=r[1],name=r[2],cal=parseInt(r[3])||0,prot=r[4]||0,carbs=r[5]||0,fat=r[6]||0;
+        if (lookup[d] && lookup[d][t]!==undefined) lookup[d][t].push({name,cal,prot,carbs,fat});
     });
 
-    let anyData = false;
+    var anyData = false;
 
-    DAYS.forEach(day => {
-        let dayTotal  = 0;
-        let mealCount = 0;
-
-        TIMES.forEach(time => {
-            const el = document.getElementById(`slot-${day}-${time.replace(/ /g,'-')}`);
+    DAYS.forEach(function(day) {
+        var dayTotal=0, mealCount=0;
+        TIMES.forEach(function(time) {
+            var el = document.getElementById('slot-'+day+'-'+time.replace(/ /g,'-'));
             if (!el) return;
-
-            const meals = lookup[day][time];
-            if (meals.length === 0) {
-                el.innerHTML = '<span class="mp-slot-empty">No meal assigned</span>';
+            var meals = lookup[day][time];
+            if (meals.length===0) {
+                el.innerHTML='<span class="slot-empty">No meal assigned</span>';
             } else {
-                const maxCal = Math.max(...meals.map(m => m.cal), 1);
-                el.innerHTML = meals.map(m => `
-                    <div class="mp-meal-item">
-                        <div style="flex:1;min-width:0;">
-                            <div class="mp-meal-name">${escHtml(m.name)}</div>
-                            <div class="mp-meal-macros">P: ${m.prot}g &nbsp;C: ${m.carbs}g &nbsp;F: ${m.fat}g</div>
-                            <div class="mp-cal-bar-track">
-                                <div class="mp-cal-bar-fill" style="width:${Math.round(m.cal/maxCal*100)}%"></div>
-                            </div>
-                        </div>
-                        <div style="text-align:right;flex-shrink:0;">
-                            <div class="mp-meal-cal">🔥 ${m.cal} kcal</div>
-                        </div>
-                    </div>
-                `).join('');
-                dayTotal  += meals.reduce((s, m) => s + m.cal, 0);
+                var maxCal = Math.max.apply(null, meals.map(function(m){return m.cal;})) || 1;
+                el.innerHTML = meals.map(function(m) {
+                    return '<div class="slot-meal-row">'
+                        +'<div style="flex:1;min-width:0;">'
+                        +'<div class="slot-meal-name">'+esc(m.name)+'</div>'
+                        +'<div class="slot-meal-macros">P: '+m.prot+'g  C: '+m.carbs+'g  F: '+m.fat+'g</div>'
+                        +'<div class="slot-cal-bar"><div class="slot-cal-fill" style="width:'+Math.round(m.cal/maxCal*100)+'%"></div></div>'
+                        +'</div>'
+                        +'<div class="slot-meal-kcal">'+m.cal+' kcal</div>'
+                        +'</div>';
+                }).join('');
+                dayTotal  += meals.reduce(function(s,m){return s+m.cal;},0);
                 mealCount += meals.length;
                 anyData = true;
             }
         });
 
-        // Update header
-        const totalEl  = document.getElementById(`total-${day}`);
-        const calEl    = document.getElementById(`s-cal-${day}`);
-        const mealsEl  = document.getElementById(`s-meals-${day}`);
-        const tabCalEl = document.getElementById(`tab-cal-${day}`);
-
-        if (totalEl)  totalEl.textContent  = dayTotal  > 0 ? `🔥 ${dayTotal} kcal` : '—';
-        if (calEl)    calEl.textContent    = dayTotal  > 0 ? dayTotal : '—';
-        if (mealsEl)  mealsEl.textContent  = mealCount > 0 ? mealCount : '—';
-        if (tabCalEl) tabCalEl.textContent = dayTotal  > 0 ? `${dayTotal} cal` : '—';
+        var ptEl = document.getElementById('ptotal-'+day);
+        var pcEl = document.getElementById('pcal-'+day);
+        var pmEl = document.getElementById('pmeals-'+day);
+        var tcEl = document.getElementById('tcal-'+day);
+        if (ptEl) ptEl.textContent = dayTotal>0 ? dayTotal+' kcal' : '—';
+        if (pcEl) pcEl.textContent = dayTotal>0 ? dayTotal : '—';
+        if (pmEl) pmEl.textContent = mealCount>0 ? mealCount : '—';
+        if (tcEl) tcEl.textContent = dayTotal>0 ? dayTotal+' cal' : '—';
     });
 
-    const empty  = document.getElementById('emptyState');
-    const panels = document.getElementById('plannerPanels');
-    if (!anyData) { empty.style.display = 'flex'; panels.style.display = 'none'; }
-    else          { empty.style.display = 'none';  panels.style.display = 'block'; }
+    var empty  = document.getElementById('plannerEmpty');
+    var panels = document.getElementById('plannerPanels');
+    if (!anyData) { empty.style.display='flex'; panels.style.display='none'; }
+    else          { empty.style.display='none'; panels.style.display='block'; }
 }
 
-function escHtml(s) {
-    return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-}
-
+function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 renderAll();
 </script>
 
