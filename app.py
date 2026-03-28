@@ -128,10 +128,13 @@ def update_streak(user_id):
 
     cur.execute("""
         UPDATE user_streaks
-        SET current_streak=%, longest_streak=%, last_active_date=%, total_days=%
+        SET current_streak=%s,
+            longest_streak=%s,
+            last_active_date=%s,
+            total_days=%s
         WHERE user_id=%s
-    """.replace('%,', '%s,').replace('=%', '=%s') , (new_current, new_longest, today, new_total, user_id))
-
+    """, (new_current, new_longest, today, new_total, user_id))
+    
     mysql.connection.commit()
     cur.close()
 
