@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Verify Email — DietMate</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+<script>(function(){ var t=localStorage.getItem('dm_theme')||'dark'; document.documentElement.setAttribute('data-theme',t); })();</script>
+<style>
+body { display:flex; align-items:center; justify-content:center; min-height:100vh; background:var(--bg); padding:20px; margin:0; }
+.verify-card {
+  width:100%; max-width:400px;
+  background:var(--surface); border:1px solid var(--border-ui);
+  border-radius:var(--r-2xl); padding:36px 32px;
+  box-shadow:var(--sh-lg);
+}
+.otp-inputs { display:flex; gap:8px; justify-content:center; margin:20px 0; }
+.otp-box {
+  width:44px; height:52px;
+  background:var(--raised); border:2px solid var(--border-ui);
+  border-radius:var(--r-md); text-align:center;
+  font-family:'Syne',sans-serif; font-size:22px; font-weight:800;
+  color:var(--text); outline:none;
+  transition:border-color 0.2s, box-shadow 0.2s;
+}
+.otp-box:focus { border-color:var(--accent); box-shadow:0 0 0 3px rgba(124,252,154,0.15); }
+.otp-box.filled { border-color:var(--accent); background:var(--accent-mute); color:var(--accent); }
+</style>
+</head>
+<body>
+<div class="verify-card">
+  <div style="text-align:center;margin-bottom:22px;">
+    <div style="font-family:'Syne',sans-serif;font-size:20px;font-weight:800;
+         background:linear-gradient(135deg,var(--accent),var(--accent2));
+         -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+         background-clip:text;margin-bottom:12px;">DietMate</div>
+    <div style="width:52px;height:52px;border-radius:50%;background:var(--accent-mute);
+         border:2px solid var(--border-h);display:flex;align-items:center;
+         justify-content:center;margin:0 auto 14px;">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="1.8">
+        <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+        <polyline points="22,6 12,13 2,6"/>
+      </svg>
+    </div>
+    <h2 style="font-family:'Syne',sans-serif;font-size:20px;font-weight:800;color:var(--text);margin-bottom:6px;">Check your email</h2>
+    <p style="font-size:13px;color:var(--text-sec);line-height:1.6;">
+      We sent a 6-digit code to <strong style="color:var(--text);">{{ email }}</strong>.<br>
+      Enter it below to verify your account.
+    </p>
+  </div>
+
+  {% if error %}
+  <div class="error-box" style="margin-bottom:14px;">{{ error }}</div>
+  {% endif %}
+
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}{% for cat,msg in messages %}
+    <div class="flash-message flash-{{cat}}" style="margin-bottom:12px;font-size:13px;">{{msg}}</div>
+    {% endfor %}{% endif %}
+  {% endwith %}
+
+  <form method="POST" id="otpForm">
+    <input type="hidden" name="step" value="verify">
+    <input type="hidden" name="otp" id="otpHidden">
+
+    <div class="otp-inputs">
+      {% for i in range(6) %}
+      <input type="text" class="otp-box" maxlength="1" id="otp{{ i }}"
+             inputmode="numeric" pattern="[0-9]" autocomplete="{% if i==0 %}one-time-code{% endif %}">
+      {% endfor %}
+    </div>
+
+    <div style="text-align:center;margin-bottom:18px;">
+      <span style="font-size:12.5px;color:var(--text-mute);font-weight:600;">Code expires in </span>
+      <span id="timer" style="font-size:12.5px;font-weight:800;color:var(--accent);">10:00</span>
+    </div>
+
+    <button type="submit" class="btn btn-primary btn-lg" style="width:100%;margin-bottom:10px;" onclick="return collectOTP()">
+      Verify Email
+    </button>
+  </form>
+
+  <form method="POST">
+    <input type="hidden" name="step" value="resend">
+    <button type="submit" class="btn btn-ghost" style="width:100%;font-size:13px;">Resend Code</button>
+  </form>
+
+  <p style="text-align:center;margin-top:18px;font-size:12px;color:var(--text-mute);">
+    Wrong email? <a href="/register" style="color:var(--accent);font-weight:700;text-decoration:none;">Go back</a>
+  </p>
+</div>
+
+<script>
+var boxes = document.querySelectorAll('.otp-box');
+boxes.forEach(function(box, i) {
+  box.addEventListener('input', function() {
+    var v = this.value.replace(/[^0-9]/g,'');
+    this.value = v ? v[0] : '';
+    this.classList.toggle('filled', !!v);
+    if (v && i < boxes.length-1) boxes[i+1].focus();
+  });
+  box.addEventListener('keydown', function(e) {
+    if (e.key==='Backspace' && !this.value && i>0) { boxes[i-1].value=''; boxes[i-1].classList.remove('filled'); boxes[i-1].focus(); }
+  });
+  box.addEventListener('paste', function(e) {
+    var p = (e.clipboardData||window.clipboardData).getData('text').replace(/[^0-9]/g,'');
+    if (p.length===6) { boxes.forEach(function(b,j){ b.value=p[j]||''; b.classList.toggle('filled',!!p[j]); }); boxes[5].focus(); }
+    e.preventDefault();
+  });
+});
+if (boxes[0]) boxes[0].focus();
+
+function collectOTP() {
+  var otp = Array.from(boxes).map(function(b){ return b.value; }).join('');
+  if (otp.length < 6) { alert('Please enter all 6 digits.'); return false; }
+  document.getElementById('otpHidden').value = otp;
+  return true;
+}
+
+var secs = 600;
+var t = setInterval(function(){
+  secs--;
+  var m=Math.floor(secs/60), s=secs%60;
+  var el=document.getElementById('timer');
+  if (el) el.textContent = m+':'+(s<10?'0':'')+s;
+  if (secs<=0) { clearInterval(t); if(el){el.textContent='Expired';el.style.color='var(--red)';} }
+},1000);
+</script>
+</body>
+</html>

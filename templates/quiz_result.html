@@ -1,103 +1,125 @@
 {% extends "base.html" %}
 {% block content %}
-
-{% set safe_calories = calories if calories is defined else 0 %}
-{% set safe_protein  = protein  if protein  is defined else 0 %}
-{% set safe_carbs    = carbs    if carbs    is defined else 0 %}
-{% set safe_fat      = fat      if fat      is defined else 0 %}
-{% set safe_goal     = goal     if goal     is defined else '' %}
-{% set safe_bmi      = bmi      if bmi      is defined else '' %}
-{% set safe_bmi_cat  = bmi_category if bmi_category is defined else '' %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <h1 class="page-title">Your Nutrition Plan</h1>
 <p class="page-subtitle">Personalised daily macro targets based on your inputs.</p>
 
-<div class="result-bar">
-    {% if safe_goal %}<span class="goal-tag">Goal: {{ safe_goal }}</span>{% endif %}
-    {% if safe_bmi %}
-    <span class="bmi-tag" style="
-        {% if safe_bmi < 18.5 %}background:var(--gold-bg);color:var(--gold);border-color:rgba(240,192,96,0.3);
-        {% elif safe_bmi < 25  %}background:var(--accent-muted);color:var(--accent);border-color:rgba(0,232,122,0.3);
-        {% elif safe_bmi < 30  %}background:var(--gold-bg);color:var(--gold);border-color:rgba(240,192,96,0.3);
-        {% else                %}background:var(--red-bg);color:var(--red);border-color:rgba(255,87,87,0.3);{% endif %}
-    ">BMI {{ safe_bmi }} — {{ safe_bmi_cat }}</span>
-    {% endif %}
-</div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:22px;">
 
-<div class="macro-grid">
-    <div class="macro-card"><div class="macro-card-label">Calories</div><div class="macro-card-val">{{ safe_calories }}</div><div class="macro-card-unit">kcal / day</div></div>
-    <div class="macro-card"><div class="macro-card-label">Protein</div><div class="macro-card-val">{{ safe_protein }}</div><div class="macro-card-unit">grams / day</div></div>
-    <div class="macro-card"><div class="macro-card-label">Carbohydrates</div><div class="macro-card-val">{{ safe_carbs }}</div><div class="macro-card-unit">grams / day</div></div>
-    <div class="macro-card"><div class="macro-card-label">Fat</div><div class="macro-card-val">{{ safe_fat }}</div><div class="macro-card-unit">grams / day</div></div>
-</div>
-
-<div class="result-charts">
-    <div class="result-chart-card">
-        <h3>Macro Distribution</h3>
-        <div style="display:flex;align-items:center;gap:24px;">
-            <div style="position:relative;width:150px;height:150px;flex-shrink:0;">
-                <canvas id="macroChart" width="150" height="150"></canvas>
-                <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;pointer-events:none;">
-                    <span style="font-size:10px;color:var(--text-muted);font-weight:700;text-transform:uppercase;letter-spacing:.5px;">TOTAL</span>
-                    <span style="font-family:'Fraunces',serif;font-size:17px;font-weight:700;color:var(--text-primary);">{{ safe_calories }}</span>
-                    <span style="font-size:9px;color:var(--text-muted);">kcal</span>
-                </div>
-            </div>
-            <div style="display:flex;flex-direction:column;gap:11px;">
-                {% set tc = (safe_protein*4 + safe_carbs*4 + safe_fat*9) if (safe_protein*4 + safe_carbs*4 + safe_fat*9) > 0 else 1 %}
-                <div style="font-size:13px;color:var(--text-secondary);display:flex;align-items:center;gap:8px;">
-                    <span style="width:10px;height:10px;border-radius:50%;background:var(--accent);display:inline-block;flex-shrink:0;box-shadow:var(--accent-glow-sm);"></span>
-                    <div><div style="font-weight:700;color:var(--text-primary);">{{ safe_protein }}g Protein</div><div style="font-size:11px;">{{ ((safe_protein*4/tc*100)|round|int) }}% of calories</div></div>
-                </div>
-                <div style="font-size:13px;color:var(--text-secondary);display:flex;align-items:center;gap:8px;">
-                    <span style="width:10px;height:10px;border-radius:50%;background:rgba(0,232,122,0.5);display:inline-block;flex-shrink:0;"></span>
-                    <div><div style="font-weight:700;color:var(--text-primary);">{{ safe_carbs }}g Carbs</div><div style="font-size:11px;">{{ ((safe_carbs*4/tc*100)|round|int) }}% of calories</div></div>
-                </div>
-                <div style="font-size:13px;color:var(--text-secondary);display:flex;align-items:center;gap:8px;">
-                    <span style="width:10px;height:10px;border-radius:50%;background:rgba(0,232,122,0.25);display:inline-block;flex-shrink:0;"></span>
-                    <div><div style="font-weight:700;color:var(--text-primary);">{{ safe_fat }}g Fat</div><div style="font-size:11px;">{{ ((safe_fat*9/tc*100)|round|int) }}% of calories</div></div>
-                </div>
-            </div>
-        </div>
+  <!-- Goal + Macros -->
+  <div style="background:var(--surface);border:1px solid var(--border-ui);border-radius:var(--r-lg);padding:26px;box-shadow:var(--sh-card);">
+    <div style="font-size:13px;font-weight:700;color:var(--text-sec);margin-bottom:4px;">Goal</div>
+    <div style="font-family:'Syne',sans-serif;font-size:22px;font-weight:800;color:var(--text);margin-bottom:6px;">{{ goal }}</div>
+    <div style="display:inline-flex;align-items:center;gap:8px;padding:5px 14px;border-radius:var(--r-pill);font-size:12px;font-weight:800;
+         background:{% if bmi_category=='Normal' %}var(--accent-mute){% elif bmi_category=='Underweight' %}var(--gold-bg){% else %}var(--red-bg){% endif %};
+         color:{% if bmi_category=='Normal' %}var(--accent){% elif bmi_category=='Underweight' %}var(--gold){% else %}var(--red){% endif %};
+         border:1px solid {% if bmi_category=='Normal' %}rgba(124,252,154,0.3){% elif bmi_category=='Underweight' %}rgba(240,192,96,0.3){% else %}rgba(255,87,87,0.3){% endif %};">
+      BMI {{ bmi }} &mdash; {{ bmi_category }}
     </div>
 
-    <div class="result-chart-card">
-        <h3>What this means</h3>
-        <div style="display:flex;flex-direction:column;gap:14px;margin-top:4px;">
-            <div class="macro-insight"><div class="macro-insight-title">Calories</div>Total energy to consume daily to reach your {{ safe_goal }} goal.</div>
-            <div class="macro-insight"><div class="macro-insight-title">Protein</div>Builds and repairs muscle — critical for {{ safe_goal }}.</div>
-            <div class="macro-insight"><div class="macro-insight-title">Carbohydrates</div>Your primary energy source for daily activity and workouts.</div>
-            <div class="macro-insight"><div class="macro-insight-title">Fat</div>Supports hormones, brain health and nutrient absorption.</div>
+    <div style="margin-top:24px;display:flex;flex-direction:column;gap:14px;">
+      {% for label, val, unit, color in [
+        ('Calories',      calories, 'kcal / day', 'var(--accent)'),
+        ('Protein',       protein,  'grams / day','var(--macro-p)'),
+        ('Carbohydrates', carbs,    'grams / day','var(--macro-c)'),
+        ('Fat',           fat,      'grams / day','var(--macro-f)'),
+      ] %}
+      <div style="padding:14px 16px;background:var(--raised);border:1px solid var(--border-ui);border-radius:var(--r-md);">
+        <div style="font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:0.7px;color:var(--text-mute);margin-bottom:6px;">{{ label }}</div>
+        <div style="display:flex;align-items:baseline;gap:6px;">
+          <span style="font-family:'Syne',sans-serif;font-size:30px;font-weight:800;color:'{{ color }}';"> {{ val }}</span>
+          <span style="font-size:13px;color:var(--text-mute);font-weight:600;">{{ unit }}</span>
         </div>
+      </div>
+      {% endfor %}
     </div>
+  </div>
+
+  <!-- Macro chart + breakdown -->
+  <div style="background:var(--surface);border:1px solid var(--border-ui);border-radius:var(--r-lg);padding:26px;box-shadow:var(--sh-card);">
+    <div class="section-title" style="margin-bottom:18px;">Macro Distribution</div>
+    <div style="display:flex;align-items:center;gap:24px;flex-wrap:wrap;">
+      <div style="position:relative;width:140px;height:140px;flex-shrink:0;">
+        <canvas id="macroChart" width="140" height="140"></canvas>
+        <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;pointer-events:none;">
+          <span style="font-family:'Syne',sans-serif;font-size:20px;font-weight:800;color:var(--text);">{{ calories }}</span>
+          <span style="font-size:10px;color:var(--text-mute);font-weight:700;">kcal</span>
+          <span style="font-size:9px;color:var(--text-mute);font-weight:600;margin-top:1px;">TOTAL</span>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:12px;flex:1;">
+        {% set p_pct = (protein * 4 / calories * 100)|round|int if calories > 0 else 0 %}
+        {% set c_pct = (carbs   * 4 / calories * 100)|round|int if calories > 0 else 0 %}
+        {% set f_pct = (100 - p_pct - c_pct) %}
+        {% for label, val, pct, color in [
+          ('Protein', protein|string + 'g', p_pct, '#a78bfa'),
+          ('Carbs',   carbs|string   + 'g', c_pct, '#fb923c'),
+          ('Fat',     fat|string     + 'g', f_pct, '#facc15'),
+        ] %}
+        <div style="display:flex;align-items:center;gap:10px;">
+          <div style="width:10px;height:10px;border-radius:50%;background:'{{ color }}';flex-shrink:0;box-shadow:0 0 8px '{{ color }}'80;"></div>
+          <div style="flex:1;">
+            <div style="font-size:13.5px;font-weight:800;color:var(--text);">{{ val }} {{ label }}</div>
+            <div style="font-size:11px;color:var(--text-mute);font-weight:600;">{{ pct }}% of calories</div>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+
+    <!-- What this means -->
+    <div style="margin-top:22px;padding-top:18px;border-top:1px solid var(--border-ui);">
+      <div class="section-title" style="margin-bottom:12px;">What this means</div>
+      <div style="display:flex;flex-direction:column;gap:8px;">
+        <div style="font-size:13px;color:var(--text-sec);font-weight:500;line-height:1.6;">
+          <strong style="color:var(--accent);">Calories:</strong>
+          Eat {{ calories }} kcal daily to support your {{ goal }} goal.
+        </div>
+        <div style="font-size:13px;color:var(--text-sec);font-weight:500;line-height:1.6;">
+          <strong style="color:var(--macro-p);">Protein:</strong>
+          {{ protein }}g keeps you full and preserves muscle.
+        </div>
+        <div style="font-size:13px;color:var(--text-sec);font-weight:500;line-height:1.6;">
+          <strong style="color:var(--macro-c);">Carbs:</strong>
+          {{ carbs }}g fuels your daily energy and workouts.
+        </div>
+        <div style="font-size:13px;color:var(--text-sec);font-weight:500;line-height:1.6;">
+          <strong style="color:var(--macro-f);">Fat:</strong>
+          {{ fat }}g supports hormones and vitamin absorption.
+        </div>
+      </div>
+    </div>
+  </div>
+
 </div>
 
-<div style="display:flex;justify-content:center;gap:12px;padding-top:4px;">
-    <a href="/dietselect" class="btn btn-primary btn-lg">Generate My Diet Plan</a>
-    <a href="/quiz" class="btn btn-ghost btn-lg">Recalculate</a>
+<!-- Action buttons -->
+<div style="display:flex;gap:12px;flex-wrap:wrap;">
+  <a href="/dietselect" class="btn btn-primary btn-lg">Get My Diet Plan</a>
+  <a href="/dashboard"  class="btn btn-ghost  btn-lg">Go to Dashboard</a>
+  <a href="/quiz"       class="btn btn-ghost  btn-sm" style="align-self:center;">Retake Quiz</a>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-(function(){
-    var c = document.getElementById('macroChart');
-    if (!c) return;
-    var p = parseFloat("{{ safe_protein }}") || 0;
-    var ca = parseFloat("{{ safe_carbs }}")  || 0;
-    var f = parseFloat("{{ safe_fat }}")     || 0;
-    if (p+ca+f === 0) return;
-    new Chart(c, {
-        type: 'doughnut',
-        data: {
-            datasets: [{
-                data: [p*4, ca*4, f*9],
-                backgroundColor: ['rgba(0,232,122,0.9)','rgba(0,232,122,0.45)','rgba(0,232,122,0.20)'],
-                borderWidth: 0
-            }]
-        },
-        options: { responsive:false, cutout:'70%', plugins:{ legend:{display:false}, tooltip:{enabled:true} } }
-    });
-})();
+var isDark = document.documentElement.getAttribute('data-theme') !== 'light';
+var ctx = document.getElementById('macroChart').getContext('2d');
+new Chart(ctx, {
+  type: 'doughnut',
+  data: {
+    datasets: [{
+      data: ['{{ protein * 4 }}', '{{ carbs * 4 }}', '{{ fat * 9 }}'],
+      backgroundColor: ['#a78bfa','#fb923c','#facc15'],
+      borderWidth: 0,
+      hoverOffset: 4
+    }]
+  },
+  options: {
+    responsive: false,
+    cutout: '75%',
+    plugins: { legend: { display: false }, tooltip: { enabled: false } },
+    animation: { duration: 1200, easing: 'easeOutQuart' }
+  }
+});
 </script>
-
 {% endblock %}

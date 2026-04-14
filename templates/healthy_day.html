@@ -1,0 +1,281 @@
+{% extends "base.html" %}
+{% block content %}
+<style>
+.healthy-day-hero {
+  background: linear-gradient(135deg, #0a2e1a 0%, #0d1f3c 100%);
+  border-radius: var(--r-xl);
+  padding: 36px 40px;
+  margin-bottom: 24px;
+  position: relative;
+  overflow: hidden;
+  border: 1px solid rgba(110,232,154,0.2);
+}
+.healthy-day-hero::before {
+  content: '';
+  position: absolute;
+  top: -40px; right: -40px;
+  width: 220px; height: 220px;
+  background: radial-gradient(circle, rgba(110,232,154,0.15) 0%, transparent 70%);
+  border-radius: 50%;
+}
+.hero-activate-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 16px 32px;
+  background: var(--accent);
+  color: var(--on-accent);
+  border: none;
+  border-radius: var(--r-pill);
+  font-size: 15px;
+  font-weight: 800;
+  cursor: pointer;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  box-shadow: 0 6px 24px rgba(110,232,154,0.4);
+  transition: all 0.3s var(--spring);
+}
+.hero-activate-btn:hover {
+  transform: scale(1.05) translateY(-2px);
+  box-shadow: 0 12px 32px rgba(110,232,154,0.5);
+}
+.hero-activate-btn:active { transform: scale(0.97); }
+.hero-activate-btn.activated {
+  background: var(--gold);
+  box-shadow: 0 6px 24px rgba(240,180,41,0.4);
+}
+.day-meal-slot {
+  background: var(--surface);
+  border: 1px solid var(--border-ui);
+  border-radius: var(--r-lg);
+  overflow: hidden;
+  transition: all 0.25s ease;
+}
+.day-meal-slot.active-slot { border-color: var(--accent); box-shadow: 0 0 0 2px rgba(110,232,154,0.12); }
+.slot-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 18px;
+  background: var(--raised);
+  border-bottom: 1px solid var(--border-ui);
+}
+.slot-badge {
+  font-size: 10px; font-weight: 800;
+  text-transform: uppercase; letter-spacing: 0.7px;
+  padding: 3px 10px; border-radius: var(--r-pill);
+  background: var(--accent-mute); color: var(--accent);
+  border: 1px solid rgba(110,232,154,0.2);
+}
+.meal-chosen {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 18px;
+}
+.meal-img-circle {
+  width: 52px; height: 52px;
+  border-radius: 50%;
+  background: var(--accent-mute);
+  border: 2px solid var(--border-h);
+  display: flex; align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  flex-shrink: 0;
+}
+.swap-btn {
+  background: var(--raised);
+  border: 1px solid var(--border-ui);
+  border-radius: var(--r-pill);
+  font-size: 12px; font-weight: 700;
+  color: var(--text-mute);
+  padding: 5px 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+}
+.swap-btn:hover { background: var(--accent-mute); border-color: var(--border-h); color: var(--accent); }
+.log-all-btn {
+  width: 100%;
+  padding: 14px;
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  color: var(--on-accent);
+  border: none;
+  border-radius: var(--r-md);
+  font-size: 14px;
+  font-weight: 800;
+  cursor: pointer;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  box-shadow: 0 4px 18px rgba(110,232,154,0.3);
+  transition: all 0.25s var(--spring);
+  margin-top: 18px;
+}
+.log-all-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 28px rgba(110,232,154,0.4); }
+.macro-summary {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  margin: 16px 0;
+}
+.macro-pill {
+  background: var(--raised);
+  border: 1px solid var(--border-ui);
+  border-radius: var(--r-md);
+  padding: 12px;
+  text-align: center;
+}
+</style>
+
+<div style="display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px;">
+  <div>
+    <h1 class="page-title">Healthy Day Mode</h1>
+    <p class="page-subtitle" style="margin-bottom:0;">One tap — we auto-select your optimal meals for a perfect calorie day.</p>
+  </div>
+  <div style="display:flex;gap:8px;">
+    <a href="/auto_diet" class="btn btn-ghost btn-sm">Manual Plan</a>
+  </div>
+</div>
+
+<!-- Hero -->
+<div class="healthy-day-hero">
+  <div style="position:relative;z-index:2;">
+    <div style="font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:1.2px;color:rgba(110,232,154,0.8);margin-bottom:10px;">Smart Meal Selection</div>
+    <h2 style="font-family:'Syne',sans-serif;font-size:28px;font-weight:800;color:#fff;margin-bottom:8px;line-height:1.2;">
+      Let AI pick your<br>perfect <span style="color:var(--accent);">{{ goal_cal }} kcal day</span>
+    </h2>
+    <p style="font-size:14px;color:rgba(255,255,255,0.65);margin-bottom:22px;max-width:420px;line-height:1.65;">
+      Our algorithm selects the 6 best meals from your {{ food_type }} diet plan — balanced macros, perfect calories, zero thinking required.
+    </p>
+    <div style="display:flex;gap:14px;flex-wrap:wrap;align-items:center;">
+      {% if not activated %}
+      <button class="hero-activate-btn" id="activateBtn" onclick="activateHealthyDay()">
+        ⚡ Activate Healthy Day Mode
+      </button>
+      {% else %}
+      <button class="hero-activate-btn activated">
+        ✅ Healthy Day Mode Active!
+      </button>
+      {% endif %}
+      <div style="font-size:13px;color:rgba(255,255,255,0.5);font-weight:600;">
+        {{ food_type|capitalize }} &middot; {{ goal }} plan &middot; {{ goal_cal }} kcal target
+      </div>
+    </div>
+  </div>
+</div>
+
+{% if meals %}
+<!-- Macro Summary -->
+<div class="macro-summary">
+  {% set tc = namespace(val=0) %}
+  {% set tp = namespace(val=0) %}
+  {% set tcarbs = namespace(val=0) %}
+  {% set tf = namespace(val=0) %}
+  {% for slot, food in meals %}
+    {% set tc.val = tc.val + food.cal %}
+    {% set tp.val = tp.val + food.protein %}
+    {% set tcarbs.val = tcarbs.val + food.carbs %}
+    {% set tf.val = tf.val + food.fat %}
+  {% endfor %}
+  <div class="macro-pill">
+    <div style="font-family:'Syne',sans-serif;font-size:22px;font-weight:800;color:var(--accent);">{{ tc.val }}</div>
+    <div style="font-size:10px;font-weight:700;color:var(--text-mute);text-transform:uppercase;margin-top:3px;">Calories</div>
+    {% set diff = tc.val - goal_cal %}
+    <div style="font-size:11px;font-weight:700;color:{% if diff|abs <= 100 %}var(--accent){% else %}var(--gold){% endif %};margin-top:2px;">
+      {% if diff > 0 %}+{{ diff }}{% elif diff < 0 %}{{ diff }}{% else %}Perfect!{% endif %} vs goal
+    </div>
+  </div>
+  <div class="macro-pill">
+    <div style="font-family:'Syne',sans-serif;font-size:22px;font-weight:800;color:var(--macro-p);">{{ tp.val|round(1) }}g</div>
+    <div style="font-size:10px;font-weight:700;color:var(--text-mute);text-transform:uppercase;margin-top:3px;">Protein</div>
+    <div style="font-size:11px;color:var(--text-mute);margin-top:2px;">goal {{ protein_goal }}g</div>
+  </div>
+  <div class="macro-pill">
+    <div style="font-family:'Syne',sans-serif;font-size:22px;font-weight:800;color:var(--macro-c);">{{ tcarbs.val|round(1) }}g</div>
+    <div style="font-size:10px;font-weight:700;color:var(--text-mute);text-transform:uppercase;margin-top:3px;">Carbs</div>
+    <div style="font-size:11px;color:var(--text-mute);margin-top:2px;">goal {{ carbs_goal }}g</div>
+  </div>
+  <div class="macro-pill">
+    <div style="font-family:'Syne',sans-serif;font-size:22px;font-weight:800;color:var(--macro-f);">{{ tf.val|round(1) }}g</div>
+    <div style="font-size:10px;font-weight:700;color:var(--text-mute);text-transform:uppercase;margin-top:3px;">Fat</div>
+    <div style="font-size:11px;color:var(--text-mute);margin-top:2px;">goal {{ fat_goal }}g</div>
+  </div>
+</div>
+
+<!-- Meal Slots -->
+{% set slot_icons = {'Early Morning':'🌅','Breakfast':'☀️','Mid Snack':'🍎','Lunch':'🍛','Evening Snack':'🌤️','Dinner':'🌙'} %}
+{% set slot_times = {'Early Morning':'6:30 AM','Breakfast':'8:30 AM','Mid Snack':'11:00 AM','Lunch':'1:00 PM','Evening Snack':'5:00 PM','Dinner':'8:30 PM'} %}
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:18px;">
+{% for slot, food in meals %}
+<div class="day-meal-slot {% if activated %}active-slot{% endif %}">
+  <div class="slot-header">
+    <span style="font-size:20px;">{{ slot_icons.get(slot, '🍽️') }}</span>
+    <div style="flex:1;">
+      <div style="font-size:13px;font-weight:800;color:var(--text);">{{ slot }}</div>
+      <div style="font-size:11px;color:var(--text-mute);font-weight:600;">{{ slot_times.get(slot, '') }}</div>
+    </div>
+    <span class="slot-badge">{{ food.cal }} kcal</span>
+  </div>
+  <div class="meal-chosen">
+    <div class="meal-img-circle">{{ slot_icons.get(slot, '🍽️') }}</div>
+    <div style="flex:1;">
+      <div style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:3px;">{{ food.name }}</div>
+      <div style="font-size:11.5px;color:var(--text-mute);font-family:'JetBrains Mono',monospace;">P:{{ food.protein }}g C:{{ food.carbs }}g F:{{ food.fat }}g</div>
+    </div>
+    <a href="/healthy-day/swap?slot={{ slot|urlencode }}" class="swap-btn">↻ Swap</a>
+  </div>
+</div>
+{% endfor %}
+</div>
+
+<!-- Log All -->
+<form method="POST" action="/healthy-day/log-all">
+  {% for slot, food in meals %}
+  <input type="hidden" name="meal_{{ loop.index }}_name" value="{{ food.name }}">
+  <input type="hidden" name="meal_{{ loop.index }}_cal" value="{{ food.cal }}">
+  <input type="hidden" name="meal_{{ loop.index }}_slot" value="{{ slot }}">
+  <input type="hidden" name="meal_{{ loop.index }}_id" value="{{ food.meal_id }}">
+  {% endfor %}
+  <input type="hidden" name="count" value="{{ meals|length }}">
+  <button type="submit" class="log-all-btn">
+    ⚡ Log All {{ meals|length }} Meals to Today's Diary
+  </button>
+</form>
+
+{% else %}
+<!-- Not activated yet -->
+<div style="background:var(--surface);border:1px solid var(--border-ui);border-radius:var(--r-lg);padding:40px;text-align:center;box-shadow:var(--sh-card);">
+  <div style="font-size:56px;margin-bottom:16px;">⚡</div>
+  <div style="font-family:'Syne',sans-serif;font-size:20px;font-weight:800;color:var(--text);margin-bottom:8px;">Tap to Activate</div>
+  <p style="font-size:14px;color:var(--text-sec);max-width:400px;margin:0 auto 20px;line-height:1.7;">
+    Click "Activate Healthy Day Mode" above and we'll instantly select your best 6 meals for a perfectly balanced day.
+  </p>
+  <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
+    <div style="background:var(--raised);border:1px solid var(--border-ui);border-radius:var(--r-md);padding:12px 20px;text-align:center;min-width:100px;">
+      <div style="font-size:18px;font-weight:800;color:var(--accent);">{{ goal_cal }}</div>
+      <div style="font-size:11px;color:var(--text-mute);font-weight:700;">kcal target</div>
+    </div>
+    <div style="background:var(--raised);border:1px solid var(--border-ui);border-radius:var(--r-md);padding:12px 20px;text-align:center;min-width:100px;">
+      <div style="font-size:18px;font-weight:800;color:var(--blue);">6</div>
+      <div style="font-size:11px;color:var(--text-mute);font-weight:700;">meals chosen</div>
+    </div>
+    <div style="background:var(--raised);border:1px solid var(--border-ui);border-radius:var(--r-md);padding:12px 20px;text-align:center;min-width:100px;">
+      <div style="font-size:18px;font-weight:800;color:var(--gold);">0</div>
+      <div style="font-size:11px;color:var(--text-mute);font-weight:700;">decisions needed</div>
+    </div>
+  </div>
+</div>
+{% endif %}
+
+<script>
+function activateHealthyDay() {
+  var btn = document.getElementById('activateBtn');
+  if (btn) {
+    btn.textContent = '⏳ Selecting best meals...';
+    btn.style.opacity = '0.7';
+    btn.disabled = true;
+  }
+  setTimeout(function() {
+    window.location.href = '/healthy-day?activate=1';
+  }, 600);
+}
+</script>
+{% endblock %}

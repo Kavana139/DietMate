@@ -28,17 +28,17 @@
             <h3>Macro Split</h3>
             {% set tc = (recipe[5]*4 + recipe[6]*4 + recipe[7]*9) if (recipe[5]*4 + recipe[6]*4 + recipe[7]*9) > 0 else 1 %}
             <div style="display:flex;gap:10px;margin-top:10px;">
-                <div style="flex:1;background:var(--bg-raised);border:1px solid var(--border);border-radius:var(--r-sm);padding:12px;text-align:center;">
-                    <div style="font-family:'Fraunces',serif;font-size:18px;font-weight:700;color:var(--accent);">{{ ((recipe[5]*4/tc*100)|round|int) }}%</div>
-                    <div style="font-size:10px;color:var(--text-muted);font-weight:700;text-transform:uppercase;letter-spacing:.4px;margin-top:2px;">Protein</div>
+                <div style="flex:1;background:var(--raised);border:1px solid var(--border);border-radius:var(--r-sm);padding:12px;text-align:center;">
+                    <div style="font-family:'Syne',sans-serif;font-size:18px;font-weight:700;color:var(--accent);">{{ ((recipe[5]*4/tc*100)|round|int) }}%</div>
+                    <div style="font-size:10px;color:var(--text-mute);font-weight:700;text-transform:uppercase;letter-spacing:.4px;margin-top:2px;">Protein</div>
                 </div>
-                <div style="flex:1;background:var(--bg-raised);border:1px solid var(--border);border-radius:var(--r-sm);padding:12px;text-align:center;">
-                    <div style="font-family:'Fraunces',serif;font-size:18px;font-weight:700;color:var(--text-primary);">{{ ((recipe[6]*4/tc*100)|round|int) }}%</div>
-                    <div style="font-size:10px;color:var(--text-muted);font-weight:700;text-transform:uppercase;letter-spacing:.4px;margin-top:2px;">Carbs</div>
+                <div style="flex:1;background:var(--raised);border:1px solid var(--border);border-radius:var(--r-sm);padding:12px;text-align:center;">
+                    <div style="font-family:'Syne',sans-serif;font-size:18px;font-weight:700;color:var(--text);">{{ ((recipe[6]*4/tc*100)|round|int) }}%</div>
+                    <div style="font-size:10px;color:var(--text-mute);font-weight:700;text-transform:uppercase;letter-spacing:.4px;margin-top:2px;">Carbs</div>
                 </div>
-                <div style="flex:1;background:var(--bg-raised);border:1px solid var(--border);border-radius:var(--r-sm);padding:12px;text-align:center;">
-                    <div style="font-family:'Fraunces',serif;font-size:18px;font-weight:700;color:var(--text-secondary);">{{ ((recipe[7]*9/tc*100)|round|int) }}%</div>
-                    <div style="font-size:10px;color:var(--text-muted);font-weight:700;text-transform:uppercase;letter-spacing:.4px;margin-top:2px;">Fat</div>
+                <div style="flex:1;background:var(--raised);border:1px solid var(--border);border-radius:var(--r-sm);padding:12px;text-align:center;">
+                    <div style="font-family:'Syne',sans-serif;font-size:18px;font-weight:700;color:var(--text-sec);">{{ ((recipe[7]*9/tc*100)|round|int) }}%</div>
+                    <div style="font-size:10px;color:var(--text-mute);font-weight:700;text-transform:uppercase;letter-spacing:.4px;margin-top:2px;">Fat</div>
                 </div>
             </div>
         </div>
@@ -58,13 +58,13 @@
             {% endif %}
 
             <div style="padding:14px 6px 6px;display:grid;grid-template-columns:repeat(2,1fr);gap:8px;">
-                <div style="background:var(--bg-raised);border:1px solid var(--border);border-radius:var(--r-sm);padding:10px;text-align:center;">
-                    <div style="font-family:'Fraunces',serif;font-size:15px;font-weight:700;color:var(--accent);">{{ recipe[4] }}</div>
-                    <div style="font-size:9px;color:var(--text-muted);font-weight:700;text-transform:uppercase;letter-spacing:.4px;">Calories</div>
+                <div style="background:var(--raised);border:1px solid var(--border);border-radius:var(--r-sm);padding:10px;text-align:center;">
+                    <div style="font-family:'Syne',sans-serif;font-size:15px;font-weight:700;color:var(--accent);">{{ recipe[4] }}</div>
+                    <div style="font-size:9px;color:var(--text-mute);font-weight:700;text-transform:uppercase;letter-spacing:.4px;">Calories</div>
                 </div>
-                <div style="background:var(--bg-raised);border:1px solid var(--border);border-radius:var(--r-sm);padding:10px;text-align:center;">
-                    <div style="font-family:'Fraunces',serif;font-size:15px;font-weight:700;color:var(--text-primary);">{{ recipe[5] }}g</div>
-                    <div style="font-size:9px;color:var(--text-muted);font-weight:700;text-transform:uppercase;letter-spacing:.4px;">Protein</div>
+                <div style="background:var(--raised);border:1px solid var(--border);border-radius:var(--r-sm);padding:10px;text-align:center;">
+                    <div style="font-family:'Syne',sans-serif;font-size:15px;font-weight:700;color:var(--text);">{{ recipe[5] }}g</div>
+                    <div style="font-size:9px;color:var(--text-mute);font-weight:700;text-transform:uppercase;letter-spacing:.4px;">Protein</div>
                 </div>
             </div>
         </div>

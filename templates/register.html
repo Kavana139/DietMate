@@ -6,99 +6,544 @@
 <title>Create Account — DietMate</title>
 <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 <script>(function(){ var t=localStorage.getItem('dm_theme')||'dark'; document.documentElement.setAttribute('data-theme',t); })();</script>
+<style>
+/* ── Page layout ── */
+.auth-page {
+  display: flex;
+  align-items: stretch;
+  min-height: 100vh;
+  background: var(--bg);
+}
+
+/* ── Left hero panel ── */
+.auth-left {
+  flex: 1;
+  padding: 56px 48px;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  gap: 20px;
+}
+.auth-bg {
+  position: absolute; inset: 0; z-index: 0;
+  background: url('/static/images/ui/register_food.jpg') center/cover no-repeat;
+  filter: blur(2px) brightness(0.4) saturate(0.8);
+  transform: scale(1.04);
+}
+.auth-bg-overlay {
+  position: absolute; inset: 0; z-index: 1;
+  background: linear-gradient(135deg,
+    rgba(9,9,15,0.65) 0%,
+    rgba(9,9,15,0.28) 50%,
+    rgba(9,9,15,0.72) 100%);
+}
+.auth-left > * { position: relative; z-index: 2; }
+
+.auth-brand      { font-family:'Syne',sans-serif; font-size:36px; font-weight:800; line-height:1; }
+.auth-brand-text { background:linear-gradient(135deg,#7cfc9a,#00e5ff); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+.auth-tagline    { font-size:15px; color:rgba(238,240,248,0.72); line-height:1.7; font-weight:500; max-width:360px; }
+
+.auth-features   { list-style:none; display:flex; flex-direction:column; gap:12px; }
+.auth-features li{ display:flex; align-items:center; gap:12px; font-size:13.5px; color:rgba(238,240,248,0.62); font-weight:500; }
+.feature-dot     { width:8px; height:8px; border-radius:50%; flex-shrink:0; background:#7cfc9a; box-shadow:0 0 10px rgba(124,252,154,0.6); }
+
+.auth-stat-row { display:flex; gap:12px; margin-top:6px; flex-wrap:wrap; }
+.auth-stat     { background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.13); backdrop-filter:blur(16px); border-radius:14px; padding:13px 18px; }
+.auth-stat-val { font-family:'Syne',sans-serif; font-size:21px; font-weight:800; color:#7cfc9a; }
+.auth-stat-lbl { font-size:10.5px; color:rgba(238,240,248,0.5); font-weight:600; text-transform:uppercase; letter-spacing:0.7px; margin-top:2px; }
+
+/* ── Right form panel ── */
+.auth-right {
+  width: 460px;
+  flex-shrink: 0;
+  padding: 40px 48px;
+  background: var(--surface);
+  border-left: 1px solid var(--border-ui);
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  overflow-y: auto;
+  min-height: 100vh;
+}
+
+.auth-right h2 {
+  font-family: 'Syne', sans-serif;
+  font-size: 26px; font-weight: 800;
+  color: var(--text); margin-bottom: 4px;
+  animation: fadeUp 0.4s var(--spring) both;
+}
+.auth-sub {
+  font-size: 13.5px; color: var(--text-sec);
+  margin-bottom: 24px;
+  animation: fadeUp 0.4s 0.05s var(--spring) both;
+}
+
+/* 2-column grid for some fields */
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+
+/* Password strength bar */
+.pw-strength-wrap { margin-top: 6px; }
+.pw-strength-bar  {
+  height: 4px; background: var(--raised);
+  border-radius: var(--r-pill); overflow: hidden; margin-bottom: 4px;
+}
+.pw-strength-fill {
+  height: 100%; border-radius: var(--r-pill);
+  width: 0%; transition: width 0.4s ease, background 0.4s;
+}
+.pw-strength-label { font-size: 11px; font-weight: 700; color: var(--text-mute); }
+
+/* Step indicator */
+.step-dots {
+  display: flex; gap: 6px; align-items: center; margin-bottom: 20px;
+}
+.step-dot {
+  width: 8px; height: 8px; border-radius: 50%;
+  background: var(--border-ui); transition: all 0.3s var(--spring);
+}
+.step-dot.active {
+  background: var(--accent);
+  width: 22px; border-radius: var(--r-pill);
+  box-shadow: 0 0 8px rgba(124,252,154,0.5);
+}
+
+/* Select styling */
+select.form-input {
+  appearance: none;
+  background-image: url('data:image/svg+xml;utf8,<svg fill="%237cfc9a" height="16" viewBox="0 0 24 24" width="16" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/></svg>');
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+  padding-right: 36px;
+  cursor: pointer;
+}
+select.form-input option { background: var(--surface); color: var(--text); }
+
+/* Divider */
+.auth-divider { display:flex; align-items:center; gap:14px; margin:16px 0; }
+.auth-divider span { font-size:12px; color:var(--text-mute); font-weight:600; white-space:nowrap; }
+.auth-divider::before,.auth-divider::after { content:''; flex:1; height:1px; background:var(--border-ui); }
+
+/* Checkbox */
+.check-row {
+  display: flex; align-items: flex-start; gap: 10px;
+  margin-bottom: 20px; font-size: 12.5px; color: var(--text-mute); font-weight: 500;
+}
+.check-row input[type="checkbox"] {
+  width: 16px; height: 16px; flex-shrink: 0; margin-top: 1px;
+  accent-color: var(--accent); cursor: pointer;
+}
+.check-row a { color: var(--accent); text-decoration: none; font-weight: 700; }
+.check-row a:hover { text-decoration: underline; }
+
+/* Floating label animation on focus */
+.form-group { position: relative; margin-bottom: 14px; }
+
+@media (max-width: 860px) {
+  .auth-left  { display: none; }
+  .auth-right { width: 100%; border-left: none; min-height: 100vh; }
+}
+@media (max-width: 480px) {
+  .auth-right { padding: 32px 20px; }
+  .form-row   { grid-template-columns: 1fr; }
+}
+</style>
 </head>
 <body class="auth-page">
 
-<div class="auth-card" style="max-width:1000px;">
-    <div class="auth-left">
-        <div class="auth-brand">DietMate</div>
-        <p class="auth-tagline">Start your nutrition journey today.</p>
-        <ul class="auth-features">
-            <li><span class="feature-dot"></span> Personalised plans based on your goals</li>
-            <li><span class="feature-dot"></span> Full weekly meal planner with variety</li>
-            <li><span class="feature-dot"></span> Complete nutrition information per meal</li>
-            <li><span class="feature-dot"></span> Track your weekly calorie progress</li>
-        </ul>
+<!-- ── Left hero ─────────────────────────────────────────── -->
+<div class="auth-left">
+  <div class="auth-bg"></div>
+  <div class="auth-bg-overlay"></div>
+
+  <div>
+    <div class="auth-brand"><span class="auth-brand-text">DietMate</span></div>
+    <p class="auth-tagline">Start your nutrition journey today. Get a personalised diet plan matched to your body and goals.</p>
+  </div>
+
+  <ul class="auth-features">
+    <li><span class="feature-dot"></span> AI-calculated calorie & macro targets</li>
+    <li><span class="feature-dot"></span> 6-meal-a-day diet plan tailored to you</li>
+    <li><span class="feature-dot"></span> AI food scanner for instant nutrition data</li>
+    <li><span class="feature-dot"></span> Daily streak tracking to keep you consistent</li>
+    <li><span class="feature-dot"></span> 500+ healthy Indian & international recipes</li>
+  </ul>
+
+  <div class="auth-stat-row">
+    <div class="auth-stat">
+      <div class="auth-stat-val">500+</div>
+      <div class="auth-stat-lbl">Healthy Meals</div>
     </div>
-
-    <div class="auth-right">
-        <h2>Create Account</h2>
-        <p class="sub-text">Fill in your details to get started.</p>
-
-        {% if error %}
-        <div class="error-box" style="margin-bottom:16px;">{{ error }}</div>
-        {% endif %}
-
-        <form method="POST" class="auth-form">
-            <div class="form-grid-2">
-                <div class="form-group" style="grid-column:1/-1;">
-                    <label class="form-label">Full Name</label>
-                    <input type="text" name="name" class="form-input" placeholder="Your name" required>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Email</label>
-                    <input type="email" name="email" class="form-input" placeholder="you@email.com" required>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Password</label>
-                    <div class="input-wrap">
-                        <input type="password" name="password" id="regPwd" class="form-input" placeholder="Password" required>
-                        <button type="button" class="input-action-btn" onclick="togglePwd('regPwd',this)">Show</button>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Age</label>
-                    <input type="number" name="age" class="form-input" placeholder="25" min="10" max="100" required>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Gender</label>
-                    <select name="gender" class="form-input form-select" required>
-                        <option value="">Select</option>
-                        <option value="Male">Male</option>
-                        <option value="Female">Female</option>
-                        <option value="Other">Other</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Height (cm)</label>
-                    <input type="number" name="height" class="form-input" placeholder="170" min="100" max="250" required>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Weight (kg)</label>
-                    <input type="number" name="weight" class="form-input" placeholder="70" min="20" max="300" step="0.1" required>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Goal</label>
-                    <select name="goal" class="form-input form-select" required>
-                        <option value="">Select goal</option>
-                        <option value="Weight Loss">Weight Loss</option>
-                        <option value="Weight Gain">Weight Gain</option>
-                        <option value="Muscle Gain">Muscle Gain</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Food Preference</label>
-                    <select name="food_type" class="form-input form-select" required>
-                        <option value="">Select</option>
-                        <option value="veg">Vegetarian</option>
-                        <option value="nonveg">Non-Vegetarian</option>
-                    </select>
-                </div>
-            </div>
-
-            <button type="submit" class="btn btn-primary btn-lg" style="width:100%;margin-top:16px;">Create Account</button>
-        </form>
-
-        <p class="auth-link">Already have an account? <a href="/">Sign In</a></p>
+    <div class="auth-stat">
+      <div class="auth-stat-val">3</div>
+      <div class="auth-stat-lbl">Diet Goals</div>
     </div>
+    <div class="auth-stat">
+      <div class="auth-stat-val">AI</div>
+      <div class="auth-stat-lbl">Food Scanner</div>
+    </div>
+    <div class="auth-stat">
+      <div class="auth-stat-val">Free</div>
+      <div class="auth-stat-lbl">Forever</div>
+    </div>
+  </div>
 </div>
 
-<script>
-function togglePwd(id, btn) {
-    var inp = document.getElementById(id);
-    if (inp.type === 'password') { inp.type = 'text'; btn.textContent = 'Hide'; }
-    else { inp.type = 'password'; btn.textContent = 'Show'; }
+<!-- ── Right form ─────────────────────────────────────────── -->
+<div class="auth-right">
+
+  <!-- Logo (mobile only / top) -->
+  <div style="margin-bottom:28px;">
+    <div style="font-family:'Syne',sans-serif;font-size:22px;font-weight:800;
+         background:linear-gradient(135deg,var(--accent),var(--accent2));
+         -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+         margin-bottom:4px;">DietMate</div>
+    <h2>Create your account</h2>
+    <p class="auth-sub">Fill in your details to get a personalised nutrition plan.</p>
+  </div>
+
+  <!-- Step dots -->
+  <div class="step-dots">
+    <div class="step-dot active" id="dot1"></div>
+    <div class="step-dot" id="dot2"></div>
+    <div class="step-dot" id="dot3"></div>
+  </div>
+
+  {% if error %}
+  <div class="error-box" style="margin-bottom:18px;">&#9888; {{ error }}</div>
+  {% endif %}
+
+  <form method="POST" id="regForm" novalidate>
+
+    <!-- ── Step 1: Account ── -->
+    <div id="step1">
+      <div style="font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:0.8px;
+           color:var(--text-mute);margin-bottom:16px;">Step 1 of 3 — Account Details</div>
+
+      <div class="form-group">
+        <label class="form-label">Full Name</label>
+        <input type="text" name="name" id="nameInp" class="form-input"
+               placeholder="Your name" autocomplete="name"
+               value="{{ request.form.get('name','') }}">
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Email Address</label>
+        <input type="email" name="email" id="emailInp" class="form-input"
+               placeholder="you@email.com" autocomplete="email"
+               value="{{ request.form.get('email','') }}">
+      </div>
+
+      <div class="form-group" style="margin-bottom:6px;">
+        <label class="form-label">Password</label>
+        <div class="input-wrap">
+          <input type="password" name="password" id="pwInp" class="form-input"
+                 placeholder="Min 8 chars, 1 uppercase, 1 number"
+                 autocomplete="new-password"
+                 oninput="checkStrength(this.value)">
+          <button type="button" class="input-action-btn" onclick="togglePwd('pwInp',this)">Show</button>
+        </div>
+      </div>
+
+      <!-- Strength bar -->
+      <div class="pw-strength-wrap" style="margin-bottom:14px;">
+        <div class="pw-strength-bar">
+          <div class="pw-strength-fill" id="pwFill"></div>
+        </div>
+        <span class="pw-strength-label" id="pwLabel">Enter a password</span>
+      </div>
+
+      <button type="button" class="btn btn-primary btn-lg" style="width:100%;margin-top:4px;"
+              onclick="goStep(1,2)">Continue →</button>
+
+      <div class="auth-divider"><span>Already have an account?</span></div>
+      <a href="/" class="btn btn-ghost btn-lg" style="width:100%;text-align:center;">Sign In</a>
+    </div>
+
+    <!-- ── Step 2: Body stats ── -->
+    <div id="step2" style="display:none;">
+      <div style="font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:0.8px;
+           color:var(--text-mute);margin-bottom:16px;">Step 2 of 3 — Your Body Stats</div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Age</label>
+          <input type="number" name="age" class="form-input" placeholder="25" min="10" max="100"
+                 value="{{ request.form.get('age','') }}">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Gender</label>
+          <select name="gender" class="form-input">
+            <option value="" disabled selected>Select gender</option>
+            <option value="Male"   {% if request.form.get('gender')=='Male'   %}selected{% endif %}>Male</option>
+            <option value="Female" {% if request.form.get('gender')=='Female' %}selected{% endif %}>Female</option>
+            <option value="Other"  {% if request.form.get('gender')=='Other'  %}selected{% endif %}>Other</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Height (cm)</label>
+          <input type="number" name="height" class="form-input" placeholder="170" min="100" max="250"
+                 value="{{ request.form.get('height','') }}">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Weight (kg)</label>
+          <input type="number" name="weight" class="form-input" placeholder="70" min="20" max="300" step="0.1"
+                 value="{{ request.form.get('weight','') }}">
+        </div>
+      </div>
+
+      <!-- Live BMI preview -->
+      <div id="bmiBox" style="display:none;background:var(--raised);border:1px solid var(--border-ui);
+           border-radius:var(--r-md);padding:14px 16px;margin-bottom:14px;display:flex;align-items:center;gap:14px;">
+        <div>
+          <div style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:0.7px;color:var(--text-mute);margin-bottom:3px;">Your BMI</div>
+          <div style="font-family:'Syne',sans-serif;font-size:26px;font-weight:800;color:var(--text);" id="bmiVal">—</div>
+        </div>
+        <div id="bmiCat" style="font-size:12px;font-weight:800;padding:5px 14px;border-radius:var(--r-pill);border:1px solid;"></div>
+      </div>
+
+      <div style="display:flex;gap:10px;margin-top:8px;">
+        <button type="button" class="btn btn-ghost" style="flex:1;" onclick="goStep(2,1)">← Back</button>
+        <button type="button" class="btn btn-primary" style="flex:1;" onclick="goStep(2,3)">Continue →</button>
+      </div>
+    </div>
+
+    <!-- ── Step 3: Goal ── -->
+    <div id="step3" style="display:none;">
+      <div style="font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:0.8px;
+           color:var(--text-mute);margin-bottom:16px;">Step 3 of 3 — Your Goal</div>
+
+      <div style="font-size:13.5px;color:var(--text-sec);margin-bottom:16px;font-weight:500;">
+        What do you want to achieve? We'll build your diet plan around it.
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:20px;" id="goalCards">
+        <div class="goal-card" onclick="selectGoal(this,'Weight Loss')">
+          <div class="goal-card-inner">
+            <span style="font-size:22px;"></span>
+            <div>
+              <div class="goal-card-title">Weight Loss</div>
+              <div class="goal-card-desc">Calorie deficit with high-protein meals</div>
+            </div>
+          </div>
+          <div class="goal-tick">✓</div>
+        </div>
+        <div class="goal-card" onclick="selectGoal(this,'Weight Gain')">
+          <div class="goal-card-inner">
+            <span style="font-size:22px;"></span>
+            <div>
+              <div class="goal-card-title">Weight Gain</div>
+              <div class="goal-card-desc">Calorie surplus with balanced nutrition</div>
+            </div>
+          </div>
+          <div class="goal-tick">✓</div>
+        </div>
+        <div class="goal-card" onclick="selectGoal(this,'Muscle Gain')">
+          <div class="goal-card-inner">
+            <span style="font-size:22px;"></span>
+            <div>
+              <div class="goal-card-title">Muscle Gain</div>
+              <div class="goal-card-desc">High protein to build lean muscle mass</div>
+            </div>
+          </div>
+          <div class="goal-tick">✓</div>
+        </div>
+      </div>
+
+      <input type="hidden" name="goal" id="goalInput" value="">
+
+      <div class="check-row">
+        <input type="checkbox" id="agreeCheck" required>
+        <label for="agreeCheck">I agree to the <a href="/terms" target="_blank" style="color:var(--accent);font-weight:700;text-decoration:none;">Terms of Service</a> and <a href="/privacy" target="_blank" style="color:var(--accent);font-weight:700;text-decoration:none;">Privacy Policy</a>. My data is stored securely and never sold.</label>
+      </div>
+
+      <div style="display:flex;gap:10px;">
+        <button type="button" class="btn btn-ghost" style="flex:1;" onclick="goStep(3,2)">← Back</button>
+        <button type="submit" class="btn btn-primary" style="flex:1;" onclick="return validateStep3()">
+          Create Account
+        </button>
+      </div>
+    </div>
+
+  </form>
+
+  <p style="text-align:center;font-size:11.5px;color:var(--text-mute);margin-top:24px;line-height:1.7;">
+    By creating an account you agree that DietMate stores your nutrition data securely.
+  </p>
+</div>
+
+<!-- Goal card styles -->
+<style>
+.goal-card {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 14px 16px;
+  background: var(--raised); border: 2px solid var(--border-ui);
+  border-radius: var(--r-lg); cursor: pointer;
+  transition: all 0.28s var(--spring);
 }
+.goal-card:hover {
+  border-color: var(--border-h);
+  transform: translateX(4px);
+  box-shadow: 3px 4px 18px rgba(0,0,0,0.3);
+}
+.goal-card.selected {
+  background: var(--accent-mute); border-color: var(--accent);
+  transform: translateX(5px);
+  box-shadow: 4px 6px 20px rgba(124,252,154,0.18);
+}
+.goal-card-inner { display: flex; align-items: center; gap: 14px; }
+.goal-card-title { font-size: 14px; font-weight: 800; color: var(--text); margin-bottom: 2px; }
+.goal-card-desc  { font-size: 12px; color: var(--text-mute); font-weight: 500; }
+.goal-tick {
+  width: 24px; height: 24px; border-radius: 50%;
+  background: var(--accent); color: var(--on-accent);
+  font-size: 13px; font-weight: 900;
+  display: none; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  animation: bounce 0.35s var(--spring);
+}
+.goal-card.selected .goal-tick { display: flex; }
+</style>
+
+<script>
+/* ── Step navigation ── */
+function goStep(from, to) {
+  if (!validateStep(from)) return;
+  document.getElementById('step'+from).style.display = 'none';
+  document.getElementById('step'+to).style.display   = 'block';
+  document.getElementById('step'+to).style.animation = 'fadeUp 0.38s var(--spring) both';
+  // Update dots
+  for (var i=1; i<=3; i++) {
+    var d = document.getElementById('dot'+i);
+    d.classList.remove('active');
+    if (i === to) d.classList.add('active');
+  }
+}
+
+function validateStep(n) {
+  if (n === 1) {
+    var name  = document.getElementById('nameInp').value.trim();
+    var email = document.getElementById('emailInp').value.trim();
+    var pw    = document.getElementById('pwInp').value;
+    if (!name)  { shake('nameInp');  return false; }
+    if (!email || !email.includes('@')) { shake('emailInp'); return false; }
+    if (pw.length < 8) {
+      shake('pwInp');
+      document.getElementById('pwLabel').textContent = 'Password too short (min 8 characters)';
+      document.getElementById('pwLabel').style.color = 'var(--red)';
+      return false;
+    }
+    if (!/[A-Z]/.test(pw)) {
+      shake('pwInp');
+      document.getElementById('pwLabel').textContent = 'Need at least 1 uppercase letter';
+      document.getElementById('pwLabel').style.color = 'var(--red)';
+      return false;
+    }
+    if (!/[0-9]/.test(pw)) {
+      shake('pwInp');
+      document.getElementById('pwLabel').textContent = 'Need at least 1 number';
+      document.getElementById('pwLabel').style.color = 'var(--red)';
+      return false;
+    }
+  }
+  if (n === 2) {
+    calcBMI(); // recalc before proceeding
+  }
+  return true;
+}
+
+function validateStep3() {
+  var goal  = document.getElementById('goalInput').value;
+  var agree = document.getElementById('agreeCheck').checked;
+  if (!goal) {
+    document.getElementById('goalCards').style.animation = 'none';
+    setTimeout(function(){ document.getElementById('goalCards').style.animation=''; }, 10);
+    return false;
+  }
+  if (!agree) {
+    document.getElementById('agreeCheck').style.outline = '2px solid var(--red)';
+    setTimeout(function(){ document.getElementById('agreeCheck').style.outline=''; }, 1600);
+    return false;
+  }
+  return true;
+}
+
+/* ── Password strength ── */
+function checkStrength(pw) {
+  var fill  = document.getElementById('pwFill');
+  var label = document.getElementById('pwLabel');
+  var score = 0;
+  if (pw.length >= 8)           score++;
+  if (/[A-Z]/.test(pw))         score++;
+  if (/[0-9]/.test(pw))         score++;
+  if (/[^A-Za-z0-9]/.test(pw))  score++;
+  var pct    = ['0%','30%','55%','78%','100%'][score];
+  var colors = ['','var(--red)','var(--gold)','var(--accent2)','var(--accent)'];
+  var labels = ['Enter a password','Too weak','Could be stronger','Almost there','Strong password ✓'];
+  fill.style.width      = pct;
+  fill.style.background = colors[score] || 'var(--red)';
+  label.textContent     = labels[score];
+  label.style.color     = colors[score] || 'var(--text-mute)';
+}
+
+/* ── Show/hide password ── */
+function togglePwd(id, btn) {
+  var inp = document.getElementById(id);
+  if (inp.type === 'password') { inp.type='text';     btn.textContent='Hide'; }
+  else                          { inp.type='password'; btn.textContent='Show'; }
+}
+
+/* ── Goal selection ── */
+function selectGoal(card, val) {
+  document.querySelectorAll('.goal-card').forEach(function(c){ c.classList.remove('selected'); });
+  card.classList.add('selected');
+  document.getElementById('goalInput').value = val;
+}
+
+/* ── Live BMI ── */
+function calcBMI() {
+  var h = parseFloat(document.querySelector('[name=height]').value);
+  var w = parseFloat(document.querySelector('[name=weight]').value);
+  if (!h || !w) return;
+  var bmi = (w / Math.pow(h/100, 2)).toFixed(1);
+  var box = document.getElementById('bmiBox');
+  box.style.display = 'flex';
+  document.getElementById('bmiVal').textContent = bmi;
+  var cat = document.getElementById('bmiCat');
+  if      (bmi < 18.5) { cat.textContent='Underweight'; cat.style.background='var(--gold-bg)';   cat.style.color='var(--gold)';   cat.style.borderColor='rgba(240,192,96,0.3)'; }
+  else if (bmi < 25)   { cat.textContent='Normal';      cat.style.background='var(--accent-mute)'; cat.style.color='var(--accent)'; cat.style.borderColor='rgba(124,252,154,0.3)'; }
+  else if (bmi < 30)   { cat.textContent='Overweight';  cat.style.background='var(--gold-bg)';   cat.style.color='var(--gold)';   cat.style.borderColor='rgba(240,192,96,0.3)'; }
+  else                 { cat.textContent='Obese';        cat.style.background='var(--red-bg)';    cat.style.color='var(--red)';    cat.style.borderColor='rgba(255,87,87,0.3)'; }
+}
+document.querySelector('[name=height]') && document.querySelector('[name=height]').addEventListener('input', calcBMI);
+document.querySelector('[name=weight]') && document.querySelector('[name=weight]').addEventListener('input', calcBMI);
+
+/* ── Shake animation for invalid fields ── */
+function shake(id) {
+  var el = document.getElementById(id);
+  if (!el) return;
+  el.style.borderColor = 'var(--red)';
+  el.style.boxShadow   = '0 0 0 3px var(--red-bg)';
+  el.animate([
+    {transform:'translateX(0)'},  {transform:'translateX(-6px)'},
+    {transform:'translateX(6px)'},{transform:'translateX(-4px)'},
+    {transform:'translateX(4px)'},{transform:'translateX(0)'}
+  ], {duration:380, easing:'ease'});
+  setTimeout(function(){ el.style.borderColor=''; el.style.boxShadow=''; }, 1600);
+}
+
+/* ── If server returned error, show step 1 ── */
+'{% if error %}'
+document.getElementById('step1').style.display = 'block';
+'{% endif %}'
 </script>
 </body>
 </html>

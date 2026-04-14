@@ -3,108 +3,548 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>DietMate</title>
+<title>DietMate — Your AI Nutrition Companion</title>
 <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-<script>(function(){ var t=localStorage.getItem('dm_theme')||'dark'; document.documentElement.setAttribute('data-theme',t); })();</script>
+<script>(function(){var t=localStorage.getItem('dm_theme')||'dark';document.documentElement.setAttribute('data-theme',t);})();</script>
+<style>
+/* ── Icon-only Sidebar ────────────────────────────────────── */
+:root { --sidebar-w: 64px; }
+
+.sidebar {
+  position: fixed;
+  top: 0; left: 0; bottom: 0;
+  width: var(--sidebar-w);
+  background: var(--sidebar-bg);
+  border-right: 1px solid var(--border-ui);
+  display: flex;
+  flex-direction: column;
+  z-index: 200;
+  overflow: visible;
+}
+
+.sidebar-top { flex: 1; padding: 10px 0 0; overflow: visible; }
+.sidebar-bottom { padding: 8px 0; border-top: 1px solid var(--border-ui); flex-shrink: 0; }
+
+.sidebar-logo {
+  display: flex; align-items: center; justify-content: center;
+  padding: 10px 0 16px;
+  text-decoration: none;
+}
+.logo-icon {
+  width: 36px; height: 36px;
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Syne', sans-serif; font-size: 18px; font-weight: 800;
+  color: var(--on-accent);
+  box-shadow: 0 3px 12px rgba(110,232,154,0.3);
+  transition: transform 0.3s var(--spring);
+  flex-shrink: 0;
+}
+.sidebar-logo:hover .logo-icon { transform: scale(1.1) rotate(-3deg); }
+.logo-text { display: none; }
+
+/* Dropdown group */
+.nav-group {
+  position: relative;
+  margin-bottom: 2px;
+}
+
+.nav-group-trigger {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 64px;
+  padding: 10px 0;
+  cursor: pointer;
+  color: var(--text-mute);
+  text-decoration: none;
+  border: none;
+  background: none;
+  font-family: inherit;
+  position: relative;
+  transition: color 0.18s;
+  border-radius: 0;
+}
+
+.nav-group-trigger:hover { color: var(--text-sec); }
+.nav-group-trigger.has-active { color: var(--accent); }
+
+.nav-group-trigger .ng-icon {
+  width: 20px; height: 20px;
+  display: flex; align-items: center; justify-content: center;
+}
+.nav-group-trigger .ng-icon svg {
+  width: 18px; height: 18px;
+  stroke: currentColor; fill: none;
+  stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round;
+}
+.ng-label {
+  font-size: 9px; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 0.5px;
+  margin-top: 3px; color: currentColor;
+}
+.ng-chevron {
+  font-size: 8px;
+  margin-top: 1px;
+  opacity: 0.5;
+  transition: transform 0.25s;
+}
+.nav-group.open .ng-chevron { transform: rotate(180deg); }
+
+/* Active indicator on left edge */
+.nav-group-trigger.has-active::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 20%; bottom: 20%;
+  width: 3px;
+  background: var(--accent);
+  border-radius: 0 3px 3px 0;
+}
+
+/* Dropdown panel */
+.nav-dropdown {
+  display: none;
+  position: absolute;
+  left: 64px;
+  top: 0;
+  min-width: 200px;
+  background: var(--surface);
+  border: 1px solid var(--border-ui);
+  border-radius: 0 var(--r-lg) var(--r-lg) 0;
+  box-shadow: 8px 4px 32px rgba(0,0,0,0.6);
+  z-index: 9999;
+  overflow: hidden;
+  animation: slideRight 0.18s var(--spring) both;
+}
+@keyframes slideRight {
+  from { opacity: 0; transform: translateX(-8px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+.nav-group.open .nav-dropdown { display: block; }
+
+.dropdown-header {
+  padding: 10px 16px 6px;
+  font-size: 9px; font-weight: 800;
+  text-transform: uppercase; letter-spacing: 1px;
+  color: var(--text-mute);
+  border-bottom: 1px solid var(--border-ui);
+}
+
+.nav-link {
+  display: flex; align-items: center; gap: 10px;
+  padding: 9px 16px;
+  text-decoration: none;
+  color: var(--text-mute);
+  font-size: 13px; font-weight: 600;
+  transition: all 0.15s;
+  white-space: nowrap;
+}
+.nav-link:hover { background: var(--raised); color: var(--text-sec); }
+.nav-link.active {
+  background: var(--accent-mute);
+  color: var(--accent);
+}
+.nav-link .nav-icon-wrap {
+  width: 16px; height: 16px; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+}
+.nav-link .nav-icon-wrap svg {
+  width: 14px; height: 14px;
+  stroke: currentColor; fill: none;
+  stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round;
+}
+.nav-badge {
+  font-size: 8px; font-weight: 800;
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  color: var(--on-accent);
+  padding: 1px 5px; border-radius: var(--r-pill);
+  margin-left: auto;
+}
+
+/* Bottom icon buttons */
+.sidebar-icon-btn {
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  width: 64px; padding: 9px 0;
+  cursor: pointer; color: var(--text-mute);
+  border: none; background: none;
+  font-family: inherit;
+  transition: color 0.18s;
+  text-decoration: none;
+  position: relative;
+}
+.sidebar-icon-btn:hover { color: var(--text-sec); }
+.sidebar-icon-btn .ng-icon svg { width: 18px; height: 18px; stroke: currentColor; fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.sidebar-icon-btn .ng-label { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 3px; }
+
+/* Notif badge on bell */
+.notif-dot {
+  position: absolute; top: 6px; right: 10px;
+  width: 8px; height: 8px;
+  background: var(--red); border-radius: 50%;
+  border: 2px solid var(--sidebar-bg);
+  display: none;
+}
+.notif-dot.show { display: block; }
+
+/* Notif panel */
+#notifPanel {
+  display: none;
+  position: fixed;
+  bottom: 60px; left: 68px;
+  width: 260px;
+  background: var(--surface);
+  border: 1px solid var(--border-ui);
+  border-radius: var(--r-lg);
+  box-shadow: 0 8px 40px rgba(0,0,0,0.5);
+  z-index: 9999;
+  overflow: hidden;
+  animation: slideRight 0.2s var(--spring) both;
+}
+
+/* Theme toggle (icon only) */
+.theme-toggle {
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  width: 64px; padding: 9px 0;
+  cursor: pointer; color: var(--text-mute);
+  transition: color 0.18s;
+}
+.theme-toggle:hover { color: var(--text-sec); }
+.toggle-track {
+  width: 28px; height: 16px;
+  background: var(--raised); border: 1px solid var(--border-ui);
+  border-radius: var(--r-pill); position: relative;
+  transition: background 0.3s;
+}
+[data-theme="light"] .toggle-track { background: var(--accent); }
+.toggle-thumb {
+  width: 10px; height: 10px; background: var(--text-mute);
+  border-radius: 50%; position: absolute; top: 2px; left: 2px;
+  transition: transform 0.3s var(--spring), background 0.3s;
+}
+[data-theme="light"] .toggle-thumb { transform: translateX(12px); background: #fff; }
+
+/* Main content offset */
+.main-content {
+  margin-left: var(--sidebar-w);
+  flex: 1; padding: 24px 28px; min-height: 100vh;
+}
+
+/* Close dropdowns when clicking outside */
+</style>
 </head>
 <body>
 
 <div class="sidebar" id="sidebar">
-    <div class="sidebar-top">
-        <a href="/dashboard" class="sidebar-logo">
-            <img src="{{ url_for('static', filename='images/logo.png') }}" alt="" class="logo-img" onerror="this.style.display='none'">
-            <span class="logo-text">DietMate</span>
-        </a>
+  <div class="sidebar-top">
+    <!-- Logo -->
+    <a href="/dashboard" class="sidebar-logo" title="DietMate Dashboard">
+      <div class="logo-icon">D</div>
+    </a>
 
-        <nav class="sidebar-nav">
-            <a href="/dashboard" class="nav-link {% if request.path == '/dashboard' %}active{% endif %}">
-                <span class="nav-icon-wrap">
-                    <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
-                </span>
-                <span class="nav-label">Dashboard</span>
-            </a>
-            <a href="/quiz" class="nav-link {% if request.path in ['/quiz','/quiz_result'] %}active{% endif %}">
-                <span class="nav-icon-wrap">
-                    <svg viewBox="0 0 24 24"><path d="M9 12l2 2 4-4"/><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"/></svg>
-                </span>
-                <span class="nav-label">Health Quiz</span>
-            </a>
-            <a href="/dietselect" class="nav-link {% if request.path in ['/dietselect','/auto_diet'] %}active{% endif %}">
-                <span class="nav-icon-wrap">
-                    <svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 100 20 10 10 0 000-20z"/><path d="M12 6v6l4 2"/></svg>
-                </span>
-                <span class="nav-label">Generate Diet Plan</span>
-            </a>
-            <a href="/mealplanner" class="nav-link {% if request.path == '/mealplanner' %}active{% endif %}">
-                <span class="nav-icon-wrap">
-                    <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
-                </span>
-                <span class="nav-label">Meal Planner</span>
-            </a>
-            <a href="/recipes" class="nav-link {% if request.path.startswith('/recipe') %}active{% endif %}">
-                <span class="nav-icon-wrap">
-                    <svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg>
-                </span>
-                <span class="nav-label">Recipes</span>
-            </a>
-            <a href="/food_scanner" class="nav-link {% if request.path == '/food_scanner' %}active{% endif %}">
-                <span class="nav-icon-wrap">
-                    <svg viewBox="0 0 24 24"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/></svg>
-                </span>
-                <span class="nav-label">AI Food Scanner</span>
-                <span class="nav-badge">NEW</span>
-            </a>
-            <a href="/progress" class="nav-link {% if request.path == '/progress' %}active{% endif %}">
-                <span class="nav-icon-wrap">
-                    <svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
-                </span>
-                <span class="nav-label">My Progress</span>
-            </a>
-        </nav>
+    <!-- ── MAIN group ── -->
+    <div class="nav-group" id="grp-main">
+      <button class="nav-group-trigger {% if request.path in ['/dashboard','/quiz','/progress'] %}has-active{% endif %}"
+              onclick="toggleGroup('grp-main')" title="Main">
+        <span class="ng-icon">
+          <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>
+        </span>
+        <span class="ng-label">Main</span>
+        <span class="ng-chevron">▾</span>
+      </button>
+      <div class="nav-dropdown">
+        <div class="dropdown-header">Main</div>
+        <a href="/dashboard" class="nav-link {% if request.path=='/dashboard' %}active{% endif %}">
+          <span class="nav-icon-wrap"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg></span>
+          Dashboard
+        </a>
+        <a href="/quiz" class="nav-link {% if request.path in ['/quiz','/quiz_result'] %}active{% endif %}">
+          <span class="nav-icon-wrap"><svg viewBox="0 0 24 24"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="10"/></svg></span>
+          Health Quiz
+        </a>
+        <a href="/progress" class="nav-link {% if request.path=='/progress' %}active{% endif %}">
+          <span class="nav-icon-wrap"><svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></span>
+          Progress
+        </a>
+        <a href="/account" class="nav-link {% if request.path=='/account' %}active{% endif %}">
+          <span class="nav-icon-wrap"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span>
+          Account
+        </a>
+      </div>
     </div>
 
-    <div class="sidebar-bottom">
-        <div class="theme-toggle" onclick="toggleTheme()">
-            <div class="toggle-track"><div class="toggle-thumb"></div></div>
-            <span class="toggle-label" id="themeLabel">Light mode</span>
-        </div>
-        <a href="/logout" class="nav-link logout-link">
-            <span class="nav-icon-wrap">
-                <svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
-            </span>
-            <span class="nav-label">Logout</span>
+    <!-- ── NUTRITION group ── -->
+    <div class="nav-group" id="grp-nutrition">
+      <button class="nav-group-trigger {% if request.path in ['/dietselect','/auto_diet','/mealplanner'] or request.path.startswith('/recipe') or request.path.startswith('/smoothie') or request.path=='/food_scanner' %}has-active{% endif %}"
+              onclick="toggleGroup('grp-nutrition')" title="Nutrition">
+        <span class="ng-icon">
+          <svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg>
+        </span>
+        <span class="ng-label">Food</span>
+        <span class="ng-chevron">▾</span>
+      </button>
+      <div class="nav-dropdown">
+        <div class="dropdown-header">Nutrition</div>
+        <a href="/dietselect" class="nav-link {% if request.path in ['/dietselect','/auto_diet'] %}active{% endif %}">
+          <span class="nav-icon-wrap"><svg viewBox="0 0 24 24"><path d="M3 6h18M3 12h12M3 18h8"/><circle cx="19" cy="18" r="3"/><path d="M19 15v6M16 18h6"/></svg></span>
+          Diet Plan
         </a>
+        <a href="/mealplanner" class="nav-link {% if request.path=='/mealplanner' %}active{% endif %}">
+          <span class="nav-icon-wrap"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg></span>
+          Meal Planner
+        </a>
+        <a href="/recipes" class="nav-link {% if request.path.startswith('/recipe') %}active{% endif %}">
+          <span class="nav-icon-wrap"><svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg></span>
+          Recipes
+        </a>
+        <a href="/smoothies" class="nav-link {% if request.path.startswith('/smoothie') %}active{% endif %}">
+          <span class="nav-icon-wrap"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M8 2h8l1 7H7L8 2z"/><path d="M7 9c0 7 2 11 5 11s5-4 5-11"/></svg></span>
+          Smoothies
+        </a>
+        <a href="/food_scanner" class="nav-link {% if request.path=='/food_scanner' %}active{% endif %}">
+          <span class="nav-icon-wrap"><svg viewBox="0 0 24 24"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/></svg></span>
+          AI Scanner <span class="nav-badge">AI</span>
+        </a>
+        <a href="/calorie-search" class="nav-link {% if request.path=='/calorie-search' %}active{% endif %}">
+          <span class="nav-icon-wrap"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></span>
+          Calorie Search
+        </a>
+        <a href="/favorites" class="nav-link {% if request.path=='/favorites' %}active{% endif %}">
+          <span class="nav-icon-wrap"><svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg></span>
+          Favourites
+        </a>
+      </div>
     </div>
+
+    <!-- ── TOOLS group ── -->
+    <div class="nav-group" id="grp-tools">
+      <button class="nav-group-trigger {% if request.path in ['/fasting','/calendar','/diary'] or request.path.startswith('/challenge') or request.path.startswith('/cheat') %}has-active{% endif %}"
+              onclick="toggleGroup('grp-tools')" title="Tools">
+        <span class="ng-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 010 14.14M4.93 4.93a10 10 0 000 14.14"/></svg>
+        </span>
+        <span class="ng-label">Tools</span>
+        <span class="ng-chevron">▾</span>
+      </button>
+      <div class="nav-dropdown">
+        <div class="dropdown-header">Tools</div>
+        <a href="/fasting" class="nav-link {% if request.path=='/fasting' %}active{% endif %}">
+          <span class="nav-icon-wrap"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg></span>
+          Fasting
+        </a>
+        <a href="/challenges" class="nav-link {% if request.path.startswith('/challenge') %}active{% endif %}">
+          <span class="nav-icon-wrap"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M18 2H6v7a6 6 0 0012 0V2z"/><path d="M6 9H4.5a2.5 2.5 0 010-5H6"/><path d="M18 9h1.5a2.5 2.5 0 000-5H18"/></svg></span>
+          Challenges
+        </a>
+        <a href="/calendar" class="nav-link {% if request.path=='/calendar' %}active{% endif %}">
+          <span class="nav-icon-wrap"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg></span>
+          Calendar
+        </a>
+        <a href="/diary" class="nav-link {% if request.path=='/diary' %}active{% endif %}">
+          <span class="nav-icon-wrap"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></span>
+          Food Diary
+        </a>
+        <a href="/cheat-meal" class="nav-link {% if request.path.startswith('/cheat') %}active{% endif %}">
+          <span class="nav-icon-wrap"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M18 8h1a4 4 0 010 8h-1"/><path d="M2 8h16v9a4 4 0 01-4 4H6a4 4 0 01-4-4V8z"/><line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/></svg></span>
+          Cheat Meals
+        </a>
+        <a href="/body-metrics" class="nav-link {% if request.path=='/body-metrics' %}active{% endif %}">
+          <span class="nav-icon-wrap"><svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg></span>
+          Body Metrics
+        </a>
+      </div>
+    </div>
+
+    <!-- ── INSIGHTS group ── -->
+    <div class="nav-group" id="grp-insights">
+      <button class="nav-group-trigger {% if request.path in ['/best-day-analysis','/healthy-day','/export/progress'] or request.path.startswith('/knowledge') %}has-active{% endif %}"
+              onclick="toggleGroup('grp-insights')" title="Insights">
+        <span class="ng-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+        </span>
+        <span class="ng-label">Stats</span>
+        <span class="ng-chevron">▾</span>
+      </button>
+      <div class="nav-dropdown">
+        <div class="dropdown-header">Insights</div>
+        <a href="/best-day-analysis" class="nav-link {% if request.path=='/best-day-analysis' %}active{% endif %}">
+          <span class="nav-icon-wrap"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></span>
+          Day Analysis
+        </a>
+        <a href="/healthy-day" class="nav-link {% if request.path.startswith('/healthy-day') %}active{% endif %}">
+          <span class="nav-icon-wrap"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></span>
+          Healthy Day <span class="nav-badge">⚡</span>
+        </a>
+        <a href="/knowledge" class="nav-link {% if request.path.startswith('/knowledge') %}active{% endif %}">
+          <span class="nav-icon-wrap"><svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg></span>
+          Knowledge
+        </a>
+        <a href="/export/progress" class="nav-link {% if request.path=='/export/progress' %}active{% endif %}">
+          <span class="nav-icon-wrap"><svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></span>
+          Export Report
+        </a>
+      </div>
+    </div>
+
+  </div><!-- end sidebar-top -->
+
+  <div class="sidebar-bottom">
+    <!-- Notification Bell -->
+    <button class="sidebar-icon-btn" id="notifBtn" onclick="toggleNotifications(event)" title="Notifications">
+      <span class="ng-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
+      </span>
+      <div class="notif-dot" id="notifDot"></div>
+    </button>
+
+    <!-- Notification Panel -->
+    <div id="notifPanel">
+      <div style="padding:12px 16px;border-bottom:1px solid var(--border-ui);display:flex;justify-content:space-between;align-items:center;">
+        <span style="font-size:13px;font-weight:800;color:var(--text);">Notifications</span>
+        <button onclick="markAllRead()" style="font-size:11px;color:var(--accent);background:none;border:none;cursor:pointer;font-weight:700;font-family:inherit;">Mark all read</button>
+      </div>
+      <div id="notifList" style="max-height:280px;overflow-y:auto;">
+        <div style="padding:20px;text-align:center;font-size:13px;color:var(--text-mute);">Loading...</div>
+      </div>
+    </div>
+
+    <!-- Theme Toggle -->
+    <div class="theme-toggle" onclick="toggleTheme()" title="Toggle theme">
+      <div class="toggle-track"><div class="toggle-thumb" id="toggleThumb"></div></div>
+    </div>
+
+    <!-- Logout -->
+    <a href="/logout" class="sidebar-icon-btn" title="Logout" style="color:var(--text-mute);"
+       onmouseover="this.style.color='var(--red)'" onmouseout="this.style.color='var(--text-mute)'">
+      <span class="ng-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+      </span>
+    </a>
+  </div>
 </div>
 
 <div class="main-content">
-
-    {% with messages = get_flashed_messages(with_categories=true) %}
-        {% if messages %}
-            {% for category, message in messages %}
-            <div class="flash-message flash-{{ category }}">{{ message }}</div>
-            {% endfor %}
-        {% endif %}
-    {% endwith %}
-
-    {% block content %}{% endblock %}
-
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}{% for cat,msg in messages %}
+    <div class="flash-message flash-{{cat}}">
+      {% if cat=='success' %}&#10003;{% elif cat=='error' %}&#10005;{% else %}&#8505;{% endif %} {{msg}}
+    </div>
+    {% endfor %}{% endif %}
+  {% endwith %}
+  {% block content %}{% endblock %}
 </div>
 
 <script>
-function toggleTheme() {
-    var html = document.documentElement;
-    var next = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
-    html.setAttribute('data-theme', next);
-    localStorage.setItem('dm_theme', next);
-    var lbl = document.getElementById('themeLabel');
-    if (lbl) lbl.textContent = next === 'dark' ? 'Light mode' : 'Dark mode';
+/* ── Dropdown group toggle ────────────────────────────────── */
+function toggleGroup(id) {
+  var grp = document.getElementById(id);
+  var isOpen = grp.classList.contains('open');
+  // Close all
+  document.querySelectorAll('.nav-group').forEach(function(g) { g.classList.remove('open'); });
+  // Open this one if it was closed
+  if (!isOpen) grp.classList.add('open');
 }
-(function(){
-    var t = document.documentElement.getAttribute('data-theme') || 'dark';
-    var lbl = document.getElementById('themeLabel');
-    if (lbl) lbl.textContent = t === 'dark' ? 'Light mode' : 'Dark mode';
-})();
+
+// Close on outside click
+document.addEventListener('click', function(e) {
+  if (!e.target.closest('.nav-group') && !e.target.closest('#notifPanel')) {
+    document.querySelectorAll('.nav-group').forEach(function(g) { g.classList.remove('open'); });
+    closeNotif();
+  }
+});
+
+// Do not auto-open sidebar nav groups on refresh to avoid popup behavior
+// document.addEventListener('DOMContentLoaded', function() {
+//   document.querySelectorAll('.nav-group').forEach(function(grp) {
+//     if (grp.querySelector('.nav-link.active')) {
+//       grp.classList.add('open');
+//     }
+//   });
+// });
+
+/* ── Theme ─────────────────────────────────────────────────── */
+function toggleTheme() {
+  var h = document.documentElement;
+  var n = h.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+  h.setAttribute('data-theme', n);
+  localStorage.setItem('dm_theme', n);
+}
+
+/* ── Notifications ─────────────────────────────────────────── */
+var _notifOpen = false;
+
+function toggleNotifications(e) {
+  if (e) e.stopPropagation();
+  _notifOpen = !_notifOpen;
+  var p = document.getElementById('notifPanel');
+  if (p) p.style.display = _notifOpen ? 'block' : 'none';
+  if (_notifOpen) _fetchNotifs();
+}
+
+function _fetchNotifs() {
+  fetch('/notifications/list')
+    .then(function(r) { return r.json(); })
+    .then(function(items) {
+      var list  = document.getElementById('notifList');
+      var dot   = document.getElementById('notifDot');
+      if (!list) return;
+      if (!items || !items.length) {
+        list.innerHTML = '<div style="padding:24px;text-align:center;font-size:13px;color:var(--text-mute);">No new notifications</div>';
+        if (dot) dot.classList.remove('show');
+        return;
+      }
+      if (dot) dot.classList.add('show');
+      var colors = { success:'var(--accent)', info:'var(--blue)', error:'var(--red)', warning:'var(--gold)' };
+      list.innerHTML = items.map(function(n) {
+        return '<a href="'+(n.link||'#')+'" onclick="closeNotif()" style="display:block;padding:11px 16px;border-bottom:1px solid var(--border-ui);text-decoration:none;">'
+          + '<div style="display:flex;gap:8px;align-items:flex-start;">'
+          + '<div style="width:7px;height:7px;border-radius:50%;background:'+(colors[n.type]||'var(--accent)')+';margin-top:5px;flex-shrink:0;"></div>'
+          + '<div><div style="font-size:12.5px;font-weight:600;color:var(--text);line-height:1.4;">'+(n.message||'')+'</div>'
+          + '<div style="font-size:10.5px;color:var(--text-mute);margin-top:2px;">'+(n.time||'')+'</div></div></div></a>';
+      }).join('');
+    }).catch(function() {});
+}
+
+function closeNotif() {
+  _notifOpen = false;
+  var p = document.getElementById('notifPanel');
+  if (p) p.style.display = 'none';
+}
+
+function markAllRead() {
+  fetch('/notifications/read', { method: 'POST' })
+    .then(function() {
+      var dot = document.getElementById('notifDot');
+      if (dot) dot.classList.remove('show');
+      _fetchNotifs();
+    });
+}
+
+// Load badge on page load
+setTimeout(function() {
+  fetch('/notifications/list').then(function(r){return r.json();}).then(function(items){
+    var dot = document.getElementById('notifDot');
+    if (dot && items && items.length) dot.classList.add('show');
+  }).catch(function(){});
+}, 800);
+
+/* ── Flash auto-dismiss ────────────────────────────────────── */
+setTimeout(function(){
+  document.querySelectorAll('.flash-message').forEach(function(el){
+    el.style.transition='opacity 0.5s,transform 0.5s';
+    el.style.opacity='0'; el.style.transform='translateY(-8px)';
+    setTimeout(function(){if(el.parentNode)el.parentNode.removeChild(el);},500);
+  });
+},4500);
+
+/* ── Card animations ───────────────────────────────────────── */
+document.querySelectorAll('.stat-card,.meal-card,.recipe-card,.prog-stat,.streak-card,.cal-tracker').forEach(function(el,i){
+  el.style.animationDelay=(i*0.055)+'s';
+});
 </script>
 </body>
 </html>

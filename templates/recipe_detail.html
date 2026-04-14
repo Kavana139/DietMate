@@ -1,0 +1,275 @@
+{% extends "base.html" %}
+{% block content %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<div style="margin-bottom:14px;">
+  <a href="/recipes" style="font-size:13px;font-weight:700;color:var(--text-sec);text-decoration:none;display:inline-flex;align-items:center;gap:6px;">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
+    Back to Recipes
+  </a>
+</div>
+
+<div style="display:grid;grid-template-columns:1fr 320px;gap:20px;align-items:start;">
+
+  <!-- LEFT COLUMN -->
+  <div>
+    <!-- Hero image -->
+    <div style="border-radius:var(--r-lg);overflow:hidden;background:var(--raised);margin-bottom:20px;height:300px;position:relative;">
+      {% if recipe.image %}
+      <img src="{{ url_for('static', filename=recipe.image) }}"
+           alt="{{ recipe.name }}"
+           style="width:100%;height:100%;object-fit:cover;display:block;pointer-events:none;"
+           onerror="this.style.display='none';">
+      {% endif %}
+      <div style="position:absolute;top:14px;left:14px;display:flex;gap:8px;flex-wrap:wrap;">
+        <span style="background:{{ 'var(--accent)' if recipe.category=='veg' else '#ef4444' }};
+                     color:#fff;font-size:11px;font-weight:800;padding:4px 12px;border-radius:20px;">
+          {{ 'Vegetarian' if recipe.category=='veg' else 'Non-Vegetarian' }}
+        </span>
+        <span style="background:rgba(0,0,0,0.55);backdrop-filter:blur(8px);color:#fff;font-size:11px;font-weight:800;padding:4px 12px;border-radius:20px;">
+          {{ recipe.difficulty or 'Easy' }}
+        </span>
+      </div>
+      <button type="button" id="favBtn" onclick="toggleRecipeFav(event)"
+              style="position:absolute;top:14px;right:14px;background:#000;border:2px solid #fff;
+                     border-radius:50%;width:42px;height:42px;cursor:pointer;font-size:22px;z-index:10;
+                     display:flex;align-items:center;justify-content:center;
+                     color:{{ '#ff4757' if recipe.is_fav else '#fff' }};">
+        {{ '♥' if recipe.is_fav else '♡' }}
+      </button>
+    </div>
+
+    <!-- Title -->
+    <h1 style="font-family:'Syne',sans-serif;font-size:26px;font-weight:800;color:var(--text);margin-bottom:8px;line-height:1.2;">{{ recipe.name }}</h1>
+    <div style="display:flex;gap:16px;flex-wrap:wrap;font-size:13px;color:var(--text-sec);font-weight:600;margin-bottom:20px;">
+      {% if recipe.prep_time %}<span>{{ recipe.prep_time }} min prep</span>{% endif %}
+      <span>{{ recipe.cuisine or 'Indian' }}</span>
+      <span>{{ (recipe.meal_type or 'lunch')|capitalize }}</span>
+      {% if recipe.rating and recipe.rating > 0 %}
+      <span style="color:var(--gold);">&#9733; {{ recipe.rating }} ({{ recipe.rating_count }} ratings)</span>
+      {% endif %}
+    </div>
+
+    <!-- Macro quick stats -->
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:22px;">
+      {% for label, val, unit, color in [
+        ('Calories', recipe.calories, 'kcal', 'var(--accent)'),
+        ('Protein',  recipe.protein,  'g',    '#a78bfa'),
+        ('Carbs',    recipe.carbs,    'g',    '#fb923c'),
+        ('Fat',      recipe.fat,      'g',    '#facc15'),
+      ] %}
+      <div style="background:var(--surface);border:1px solid var(--border-ui);border-radius:12px;padding:14px;text-align:center;">
+        <div style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:0.6px;color:var(--text-mute);margin-bottom:4px;">{{ label }}</div>
+        <div style="font-family:'Syne',sans-serif;font-size:22px;font-weight:800;color:{{ color }};">{{ val }}</div>
+        <div style="font-size:11px;color:var(--text-mute);font-weight:600;">{{ unit }}</div>
+      </div>
+      {% endfor %}
+    </div>
+
+    <!-- Instructions -->
+    <div style="background:var(--surface);border:1px solid var(--border-ui);border-radius:var(--r-lg);padding:22px;margin-bottom:20px;">
+      <div style="font-family:'Syne',sans-serif;font-size:16px;font-weight:800;color:var(--text);margin-bottom:16px;">Instructions</div>
+      {% if steps and steps|length > 1 %}
+      <ol style="list-style:none;display:flex;flex-direction:column;gap:12px;padding:0;margin:0;">
+        {% for step in steps %}{% if step|trim %}
+        <li style="display:flex;gap:14px;align-items:flex-start;">
+          <div style="width:28px;height:28px;border-radius:50%;background:var(--accent-mute);border:1px solid var(--border-h);
+               display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;
+               color:var(--accent);flex-shrink:0;margin-top:2px;">{{ loop.index }}</div>
+          <div style="flex:1;font-size:14px;color:var(--text-sec);line-height:1.7;">{{ step|trim }}</div>
+        </li>
+        {% endif %}{% endfor %}
+      </ol>
+      {% else %}
+      <p style="font-size:14px;color:var(--text-sec);line-height:1.7;">{{ recipe.instructions or 'No instructions available.' }}</p>
+      {% endif %}
+    </div>
+
+    <!-- Tags -->
+    {% if recipe.tags %}
+    <div style="margin-bottom:20px;display:flex;gap:8px;flex-wrap:wrap;">
+      {% for tag in recipe.tags.split(',') %}{% if tag|trim %}
+      <span style="background:var(--raised);border:1px solid var(--border-ui);border-radius:20px;font-size:12px;font-weight:600;color:var(--text-sec);padding:4px 12px;">{{ tag|trim }}</span>
+      {% endif %}{% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- Reviews -->
+    {% if reviews %}
+    <div style="background:var(--surface);border:1px solid var(--border-ui);border-radius:var(--r-lg);padding:22px;">
+      <div style="font-family:'Syne',sans-serif;font-size:16px;font-weight:800;color:var(--text);margin-bottom:16px;">Reviews</div>
+      {% for rev in reviews %}
+      <div style="padding:12px 0;border-bottom:1px solid var(--border-ui);">
+        <div style="display:flex;justify-content:space-between;margin-bottom:5px;">
+          <span style="font-size:13px;font-weight:700;color:var(--text);">{{ rev[0] }}</span>
+          <span style="color:var(--gold);font-size:13px;">{% for i in range(rev[1]|int) %}&#9733;{% endfor %}</span>
+        </div>
+        {% if rev[2] %}<p style="font-size:13px;color:var(--text-sec);margin:0;">{{ rev[2] }}</p>{% endif %}
+      </div>
+      {% endfor %}
+    </div>
+    {% endif %}
+  </div>
+
+  <!-- RIGHT COLUMN -->
+  <div style="display:flex;flex-direction:column;gap:16px;position:sticky;top:20px;">
+
+    <!-- Macro chart -->
+    <div style="background:var(--surface);border:1px solid var(--border-ui);border-radius:var(--r-lg);padding:20px;">
+      <div style="font-family:'Syne',sans-serif;font-size:14px;font-weight:800;color:var(--text);margin-bottom:14px;">Macro Split</div>
+      <div style="position:relative;width:140px;height:140px;margin:0 auto 14px;">
+        <canvas id="macroChart" width="140" height="140"></canvas>
+        <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;pointer-events:none;">
+          <span style="font-family:'Syne',sans-serif;font-size:18px;font-weight:800;color:var(--text);">{{ recipe.calories }}</span>
+          <span style="font-size:10px;color:var(--text-mute);font-weight:700;">kcal</span>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:8px;">
+        {% for label, val, color in [('Protein', recipe.protein, '#a78bfa'),('Carbs', recipe.carbs, '#fb923c'),('Fat', recipe.fat, '#facc15')] %}
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+          <div style="display:flex;align-items:center;gap:7px;">
+            <div style="width:9px;height:9px;border-radius:50%;background:{{ color }};"></div>
+            <span style="font-size:12px;font-weight:600;color:var(--text-sec);">{{ label }}</span>
+          </div>
+          <span style="font-size:12px;font-weight:800;color:var(--text);">{{ val }}g</span>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+
+    <!-- Full nutrition -->
+    <div style="background:var(--surface);border:1px solid var(--border-ui);border-radius:var(--r-lg);padding:20px;">
+      <div style="font-family:'Syne',sans-serif;font-size:14px;font-weight:800;color:var(--text);margin-bottom:12px;">Nutrition Facts</div>
+      {% for label, val, unit in [('Calories',recipe.calories,'kcal'),('Protein',recipe.protein,'g'),('Carbs',recipe.carbs,'g'),('Fat',recipe.fat,'g'),('Fiber',recipe.fiber,'g'),('Sugar',recipe.sugar,'g')] %}
+      <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border-ui);font-size:13px;">
+        <span style="color:var(--text-sec);font-weight:600;">{{ label }}</span>
+        <span style="color:var(--text);font-weight:800;">{{ val }} {{ unit }}</span>
+      </div>
+      {% endfor %}
+    </div>
+
+    <a href="/auto_diet" class="btn btn-primary" style="text-align:center;">Log a Meal</a>
+
+    <!-- Share Recipe -->
+    <div style="background:var(--surface);border:1px solid var(--border-ui);border-radius:var(--r-lg);padding:18px;margin-top:14px;">
+      <div style="font-size:13px;font-weight:800;color:var(--text);margin-bottom:12px;">📤 Share Recipe</div>
+      <div style="display:flex;flex-direction:column;gap:8px;">
+        <a href="https://wa.me/?text={{ ('🍽️ Check out this healthy recipe: ' ~ recipe.name ~ ' — ' ~ recipe.calories|string ~ ' kcal! Find more on DietMate 💪')|urlencode }}"
+           target="_blank"
+           style="display:flex;align-items:center;gap:8px;padding:9px 14px;background:#25D366;color:#fff;border-radius:var(--r-md);text-decoration:none;font-size:12.5px;font-weight:700;transition:opacity 0.2s;"
+           onmouseover="this.style.opacity='0.85'" onmouseout="this.style.opacity='1'">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
+          WhatsApp
+        </a>
+        <a href="https://twitter.com/intent/tweet?text={{ ('🍽️ ' ~ recipe.name ~ ' — ' ~ recipe.calories|string ~ ' kcal healthy recipe! #DietMate #HealthyEating #Nutrition')|urlencode }}"
+           target="_blank"
+           style="display:flex;align-items:center;gap:8px;padding:9px 14px;background:#000;color:#fff;border-radius:var(--r-md);text-decoration:none;font-size:12.5px;font-weight:700;transition:opacity 0.2s;"
+           onmouseover="this.style.opacity='0.8'" onmouseout="this.style.opacity='1'">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+          Share on X
+        </a>
+        <a href="https://www.facebook.com/sharer/sharer.php?u={{ request.url|urlencode }}"
+           target="_blank"
+           style="display:flex;align-items:center;gap:8px;padding:9px 14px;background:#1877F2;color:#fff;border-radius:var(--r-md);text-decoration:none;font-size:12.5px;font-weight:700;transition:opacity 0.2s;"
+           onmouseover="this.style.opacity='0.85'" onmouseout="this.style.opacity='1'">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+          Facebook
+        </a>
+        <button onclick="copyRecipeLink()"
+                id="recCopyBtn"
+                style="display:flex;align-items:center;gap:8px;padding:9px 14px;background:var(--raised);border:1px solid var(--border-ui);color:var(--text-sec);border-radius:var(--r-md);font-size:12.5px;font-weight:700;cursor:pointer;font-family:inherit;transition:all 0.2s;"
+                onmouseover="this.style.borderColor='var(--border-h)';this.style.color='var(--accent)'"
+                onmouseout="this.style.borderColor='var(--border-ui)';this.style.color='var(--text-sec)'">
+          🔗 Copy Link
+        </button>
+      </div>
+    </div>
+    <script>
+    function copyRecipeLink() {
+      navigator.clipboard.writeText(window.location.href).then(function() {
+        var btn = document.getElementById('recCopyBtn');
+        btn.textContent = '✅ Copied!';
+        setTimeout(function(){ btn.textContent = '🔗 Copy Link'; }, 2000);
+      });
+    }
+
+    function toggleRecipeFav(event) {
+      event.preventDefault();
+      event.stopPropagation();
+      console.log('Toggling favorite for recipe detail');
+      var btn = document.getElementById('favBtn');
+      fetch('/favorite/toggle', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ recipe_id: {{ recipe.recipe_id }} })
+      }).then(function(r) { 
+        console.log('Response status:', r.status);
+        if (!r.ok) {
+          console.error('Favorite toggle failed:', r.status);
+          return;
+        }
+        return r.json(); 
+      }).then(function(d) {
+        console.log('Response data:', d);
+        if (d) {
+          btn.textContent = d.status === 'added' ? '♥' : '♡';
+          btn.style.color = d.status === 'added' ? '#ff4757' : '#fff';
+        }
+      }).catch(function(err) {
+        console.error('Favorite toggle error:', err);
+      });
+    }
+    </script>
+
+<!-- Related Recipes -->
+{% if related %}
+<div style="margin-top:32px;">
+  <div style="font-family:'Syne',sans-serif;font-size:18px;font-weight:800;color:var(--text);margin-bottom:16px;">More Recipes</div>
+  <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:14px;">
+    {% for rel in related %}
+    {% set rel_img = rel[2] or '' %}
+    {% set rel_img_path = ('images/recipes/' + rel_img) if rel_img and '/' not in rel_img else (('images/' + rel_img) if rel_img and rel_img.startswith('recipes/') else rel_img) %}
+    <a href="/recipe/{{ rel[0] }}" style="text-decoration:none;background:var(--surface);border:1px solid var(--border-ui);border-radius:var(--r-lg);overflow:hidden;display:block;transition:all 0.2s;">
+      <div style="height:110px;background:var(--raised);overflow:hidden;">
+        {% if rel_img_path %}
+        <img src="{{ url_for('static', filename=rel_img_path) }}" style="width:100%;height:100%;object-fit:cover;" onerror="this.style.display='none';">
+        {% endif %}
+      </div>
+      <div style="padding:12px;">
+        <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:4px;line-height:1.3;">{{ rel[1] }}</div>
+        <div style="font-size:12px;font-weight:800;color:var(--accent);">{{ rel[3] }} kcal</div>
+      </div>
+    </a>
+    {% endfor %}
+  </div>
+</div>
+{% endif %}
+
+<script>
+(function(){
+  var p = {{ recipe.protein|float }};
+  var c = {{ recipe.carbs|float }};
+  var f = {{ recipe.fat|float }};
+  var tot = p*4 + c*4 + f*9;
+  var ctx = document.getElementById('macroChart');
+  if (!ctx || tot <= 0) return;
+  new Chart(ctx.getContext('2d'), {
+    type: 'doughnut',
+    data: {
+      datasets: [{
+        data: [p*4, c*4, f*9],
+        backgroundColor: ['#a78bfa','#fb923c','#facc15'],
+        borderWidth: 0,
+        hoverOffset: 4
+      }]
+    },
+    options: {
+      responsive: false,
+      cutout: '72%',
+      plugins: { legend: { display: false } },
+      animation: { duration: 800 }
+    }
+  });
+})();
+</script>
+{% endblock %}

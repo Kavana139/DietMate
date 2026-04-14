@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+{% block content %}
+<h1 class="page-title">Fasting Tracker</h1>
+<p class="page-subtitle">Track your intermittent fasting sessions and stay on schedule.</p>
+
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:22px;">
+
+  <!-- Timer card -->
+  <div style="background:var(--surface);border:1px solid var(--border-ui);border-radius:var(--r-lg);padding:28px;box-shadow:var(--sh-card);text-align:center;">
+    {% if fast_start %}
+    <div style="font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:0.8px;color:var(--accent);margin-bottom:12px;">Fasting in Progress</div>
+
+    <!-- Circular progress -->
+    <div style="position:relative;width:160px;height:160px;margin:0 auto 20px;">
+      <svg width="160" height="160" viewBox="0 0 160 160">
+        <circle cx="80" cy="80" r="70" fill="none" stroke="var(--raised)" stroke-width="12"/>
+        <circle cx="80" cy="80" r="70" fill="none" stroke="var(--accent)" stroke-width="12"
+                stroke-dasharray="{{ (elapsed_pct / 100 * 439.8)|round }} 439.8"
+                stroke-dashoffset="109.96" stroke-linecap="round"
+                transform="rotate(-90 80 80)"/>
+      </svg>
+      <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;">
+        <div style="font-family:'Syne',sans-serif;font-size:28px;font-weight:800;color:var(--text);" id="timer">
+          {{ '%02d'|format(elapsed_mins // 60) }}:{{ '%02d'|format(elapsed_mins % 60) }}
+        </div>
+        <div style="font-size:11px;color:var(--text-mute);font-weight:700;">hours elapsed</div>
+        <div style="font-size:13px;font-weight:800;color:var(--accent);margin-top:4px;">{{ elapsed_pct }}%</div>
+      </div>
+    </div>
+
+    <div style="font-size:14px;color:var(--text-sec);margin-bottom:20px;">
+      Goal: <strong style="color:var(--text);">{{ fast_goal_hours }}-hour fast</strong> &nbsp;&middot;&nbsp;
+      Remaining: <strong style="color:var(--gold);">{{ fast_goal_hours - elapsed_mins // 60 }}h {{ 60 - elapsed_mins % 60 if elapsed_mins % 60 else 0 }}m</strong>
+    </div>
+
+    <form method="POST">
+      <input type="hidden" name="action" value="stop">
+      <button type="submit" class="btn btn-ghost" style="width:100%;">End Fast</button>
+    </form>
+
+    {% else %}
+    <div style="font-size:48px;margin-bottom:16px;">⏱</div>
+    <div style="font-family:'Syne',sans-serif;font-size:20px;font-weight:800;color:var(--text);margin-bottom:8px;">Start a Fast</div>
+    <p style="font-size:13.5px;color:var(--text-sec);margin-bottom:24px;">Choose your fasting window and begin tracking.</p>
+    <form method="POST">
+      <input type="hidden" name="action" value="start">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px;">
+        {% for h, label in [(12,'12:12'),(14,'14:10'),(16,'16:8'),(18,'18:6'),(20,'20:4'),(24,'24h')] %}
+        <label style="display:flex;align-items:center;gap:8px;padding:12px;background:var(--raised);border:1px solid var(--border-ui);border-radius:var(--r-md);cursor:pointer;transition:all 0.2s;">
+          <input type="radio" name="hours" value="{{ h }}" {% if h==16 %}checked{% endif %} style="accent-color:var(--accent);">
+          <div>
+            <div style="font-size:13px;font-weight:700;color:var(--text);">{{ label }}</div>
+            <div style="font-size:11px;color:var(--text-mute);">{{ h }}h fast</div>
+          </div>
+        </label>
+        {% endfor %}
+      </div>
+      <button type="submit" class="btn btn-primary btn-lg" style="width:100%;">Start Fasting</button>
+    </form>
+    {% endif %}
+  </div>
+
+  <!-- Info card -->
+  <div style="background:var(--surface);border:1px solid var(--border-ui);border-radius:var(--r-lg);padding:24px;box-shadow:var(--sh-card);">
+    <div class="section-title" style="margin-bottom:16px;">Fasting Timeline</div>
+    {% for hours, event, color in [
+      (4,  'Insulin levels drop. Fat burning begins.', 'var(--accent)'),
+      (8,  'Glycogen stores deplete. Body enters fat burn.', 'var(--accent)'),
+      (12, 'Ketosis begins. Growth hormone increases.', 'var(--gold)'),
+      (16, 'Autophagy peaks. Cellular cleanup begins.', 'var(--gold)'),
+      (24, 'Immune system reset. Deep cellular repair.', 'var(--macro-p)'),
+    ] %}
+    {% set done = elapsed_mins >= hours * 60 %}
+    <div style="display:flex;gap:12px;align-items:flex-start;padding:10px 0;border-bottom:1px solid var(--border-ui);">
+      <div style="width:40px;height:40px;border-radius:50%;background:'{% if done %}{{ color }}{% else %}var(--raised){% endif %}';
+           border:2px solid '{% if done %}{{ color }}{% else %}var(--border-ui){% endif %}';
+           display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:11px;font-weight:800;
+           color:'{% if done %}var(--on-accent){% else %}var(--text-mute){% endif %}';">{{ hours }}h</div>
+      <div>
+        <div style="font-size:13px;font-weight:700;color:'{% if done %}{{ color }}{% else %}var(--text-mute){% endif %}';">{{ event }}</div>
+      </div>
+    </div>
+    {% endfor %}
+
+    <div style="margin-top:18px;padding:14px;background:var(--blue-bg);border:1px solid rgba(0,229,255,0.2);border-radius:var(--r-md);font-size:12.5px;color:var(--blue);font-weight:600;">
+      Tip: Break your fast with a light meal. Avoid heavy carbs immediately after fasting.
+    </div>
+  </div>
+</div>
+{% endblock %}

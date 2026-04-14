@@ -1,0 +1,229 @@
+{% extends "base.html" %}
+{% block content %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+.analysis-hero {
+  background: linear-gradient(135deg, rgba(110,232,154,0.08), rgba(0,212,255,0.05));
+  border: 1px solid rgba(110,232,154,0.2);
+  border-radius: var(--r-xl);
+  padding: 28px 32px;
+  margin-bottom: 22px;
+  position: relative;
+  overflow: hidden;
+}
+.best-day-card {
+  background: var(--surface);
+  border: 2px solid var(--accent);
+  border-radius: var(--r-lg);
+  padding: 24px;
+  text-align: center;
+  box-shadow: 0 0 30px rgba(110,232,154,0.12);
+  animation: flipIn 0.5s var(--spring) both;
+  transition: transform 0.3s var(--spring);
+}
+.best-day-card:hover { transform: perspective(400px) rotateX(-4deg) translateY(-3px); }
+.insight-card {
+  background: var(--surface);
+  border: 1px solid var(--border-ui);
+  border-radius: var(--r-lg);
+  padding: 20px;
+  box-shadow: var(--sh-card);
+  animation: flipIn 0.5s var(--spring) both;
+}
+.day-bar-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+.day-bar-name { font-size: 12.5px; font-weight: 700; color: var(--text-sec); width: 36px; flex-shrink: 0; }
+.day-bar-track { flex: 1; height: 8px; background: var(--raised); border-radius: var(--r-pill); overflow: hidden; }
+.day-bar-fill { height: 100%; border-radius: var(--r-pill); transition: width 0.8s cubic-bezier(0.34,1.1,0.64,1); }
+.day-bar-val { font-size: 12px; font-weight: 700; color: var(--text-mute); width: 80px; text-align: right; font-family: 'JetBrains Mono', monospace; }
+.streak-day {
+  width: 36px; height: 36px;
+  border-radius: var(--r-sm);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px; font-weight: 800;
+  transition: transform 0.2s var(--spring);
+  cursor: default;
+}
+.streak-day:hover { transform: scale(1.15); }
+.insight-tip {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border-ui);
+}
+.insight-tip:last-child { border-bottom: none; }
+.tip-icon { font-size: 20px; flex-shrink: 0; }
+</style>
+
+<h1 class="page-title">Best Day Analysis</h1>
+<p class="page-subtitle">Deep insights into your nutrition patterns and best performing days.</p>
+
+<!-- Hero -->
+<div class="analysis-hero">
+  <div style="display:flex;align-items:center;gap:24px;flex-wrap:wrap;">
+    <div style="font-size:60px;">📊</div>
+    <div>
+      <div style="font-size:11px;font-weight:800;color:var(--accent);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:6px;">30-Day Analysis</div>
+      <div style="font-family:'Syne',sans-serif;font-size:26px;font-weight:800;color:var(--text);margin-bottom:4px;">
+        {{ days_logged }} days logged out of {{ days_total }} days
+      </div>
+      <div style="font-size:13.5px;color:var(--text-sec);">Consistency rate: <strong style="color:var(--accent);">{{ consistency_pct }}%</strong></div>
+    </div>
+    <div style="margin-left:auto;text-align:right;">
+      <div style="font-size:11px;color:var(--text-mute);font-weight:700;margin-bottom:6px;">AVG DAILY INTAKE</div>
+      <div style="font-family:'Syne',sans-serif;font-size:36px;font-weight:800;color:var(--text);">{{ avg_daily_cal }}</div>
+      <div style="font-size:12px;color:var(--text-mute);font-weight:600;">kcal / day</div>
+    </div>
+  </div>
+</div>
+
+<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-bottom:20px;">
+  <!-- Best Day -->
+  <div class="best-day-card">
+    <div style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:0.8px;color:var(--accent);margin-bottom:8px;">🏆 Best Day</div>
+    <div style="font-family:'Syne',sans-serif;font-size:28px;font-weight:800;color:var(--text);margin-bottom:4px;">{{ best_day_name }}</div>
+    <div style="font-size:13px;color:var(--text-sec);">{{ best_day_cal }} kcal logged</div>
+    <div style="font-size:12px;color:var(--accent);font-weight:700;margin-top:6px;">Closest to your goal!</div>
+  </div>
+
+  <!-- Worst Day -->
+  <div style="background:var(--surface);border:2px solid rgba(255,85,85,0.4);border-radius:var(--r-lg);padding:24px;text-align:center;box-shadow:0 0 20px rgba(255,85,85,0.08);">
+    <div style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:0.8px;color:var(--red);margin-bottom:8px;">⚠️ Needs Work</div>
+    <div style="font-family:'Syne',sans-serif;font-size:28px;font-weight:800;color:var(--text);margin-bottom:4px;">{{ worst_day_name }}</div>
+    <div style="font-size:13px;color:var(--text-sec);">{{ worst_day_cal }} kcal avg</div>
+    <div style="font-size:12px;color:var(--red);font-weight:700;margin-top:6px;">Most off-target day</div>
+  </div>
+
+  <!-- Best Streak -->
+  <div style="background:var(--surface);border:2px solid rgba(240,180,41,0.4);border-radius:var(--r-lg);padding:24px;text-align:center;box-shadow:0 0 20px rgba(240,180,41,0.08);">
+    <div style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:0.8px;color:var(--gold);margin-bottom:8px;">🔥 Best Streak</div>
+    <div style="font-family:'Syne',sans-serif;font-size:28px;font-weight:800;color:var(--text);margin-bottom:4px;">{{ streak_best }} days</div>
+    <div style="font-size:13px;color:var(--text-sec);">Consecutive logging</div>
+    <div style="font-size:12px;color:var(--gold);font-weight:700;margin-top:6px;">Personal best!</div>
+  </div>
+</div>
+
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:20px;">
+  <!-- Day of Week Analysis -->
+  <div class="insight-card">
+    <div class="section-title" style="margin-bottom:16px;">Calories by Day of Week</div>
+    {% set day_names = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'] %}
+    {% set day_colors = ['var(--accent)','var(--accent2)','var(--macro-p)','var(--macro-c)','var(--macro-f)','var(--gold)','var(--red)'] %}
+    {% set max_cal = day_avg_cals|max if day_avg_cals else 1 %}
+    {% for i in range(7) %}
+    {% set val = day_avg_cals[i] if i < day_avg_cals|length else 0 %}
+    <div class="day-bar-row">
+      <span class="day-bar-name">{{ day_names[i] }}</span>
+      <div class="day-bar-track">
+        <div class="day-bar-fill" style="width:{{ (val / max_cal * 100)|int if max_cal > 0 else 0 }}%;background:{{ day_colors[i] }};"></div>
+      </div>
+      <span class="day-bar-val">{{ val }} kcal</span>
+    </div>
+    {% endfor %}
+  </div>
+
+  <!-- 30-day Heatmap -->
+  <div class="insight-card">
+    <div class="section-title" style="margin-bottom:16px;">30-Day Logging Heatmap</div>
+    <div style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:12px;">
+      {% for i in range(30) %}
+      {% set ds = heatmap_data[i] if i < heatmap_data|length else {'logged': false, 'cal': 0, 'date': ''} %}
+      {% set pct = [[ds.cal / goal_cal * 100, 100]|min, 0]|max|int if goal_cal > 0 else 0 %}
+      <div class="streak-day" title="{{ ds.date }}: {{ ds.cal }} kcal"
+           style="background:{% if not ds.logged %}var(--raised){% elif pct >= 90 %}rgba(110,232,154,0.7){% elif pct >= 60 %}rgba(110,232,154,0.35){% else %}rgba(240,180,41,0.35){% endif %};
+                  border:1px solid {% if not ds.logged %}var(--border-ui){% elif pct >= 90 %}var(--accent){% else %}var(--gold){% endif %};">
+        {{ i + 1 }}
+      </div>
+      {% endfor %}
+    </div>
+    <div style="display:flex;gap:16px;flex-wrap:wrap;">
+      <div style="display:flex;gap:6px;align-items:center;font-size:11.5px;color:var(--text-mute);font-weight:600;">
+        <div style="width:14px;height:14px;background:rgba(110,232,154,0.7);border:1px solid var(--accent);border-radius:3px;"></div> On target
+      </div>
+      <div style="display:flex;gap:6px;align-items:center;font-size:11.5px;color:var(--text-mute);font-weight:600;">
+        <div style="width:14px;height:14px;background:rgba(240,180,41,0.35);border:1px solid var(--gold);border-radius:3px;"></div> Partial
+      </div>
+      <div style="display:flex;gap:6px;align-items:center;font-size:11.5px;color:var(--text-mute);font-weight:600;">
+        <div style="width:14px;height:14px;background:var(--raised);border:1px solid var(--border-ui);border-radius:3px;"></div> Not logged
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Insights & Tips -->
+<div class="insight-card">
+  <div class="section-title" style="margin-bottom:16px;">🧠 Personalised Insights</div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:0;">
+    {% for icon, title, tip in insights %}
+    <div class="insight-tip">
+      <span class="tip-icon">{{ icon }}</span>
+      <div>
+        <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:2px;">{{ title }}</div>
+        <div style="font-size:12.5px;color:var(--text-sec);">{{ tip }}</div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+
+<!-- 30-day Chart -->
+<div style="background:var(--surface);border:1px solid var(--border-ui);border-radius:var(--r-lg);padding:22px;margin-top:18px;box-shadow:var(--sh-card);">
+  <div class="section-title" style="margin-bottom:16px;">30-Day Calorie Trend</div>
+  <canvas id="trendChart" height="100"></canvas>
+</div>
+
+<script>
+var labels = {{ chart_labels | safe }};
+var vals   = {{ chart_vals | safe }};
+var goal   = {{ goal_cal }};
+var ctx = document.getElementById('trendChart').getContext('2d');
+var isDark = document.documentElement.getAttribute('data-theme') !== 'light';
+var ac = isDark ? '#6ee89a' : '#059659';
+var gridC = isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)';
+new Chart(ctx, {
+  type: 'bar',
+  data: {
+    labels: labels,
+    datasets: [
+      {
+        label: 'Calories',
+        data: vals,
+        backgroundColor: vals.map(function(v) {
+          if (!v) return 'rgba(255,255,255,0.05)';
+          var pct = v / goal;
+          if (pct >= 0.9 && pct <= 1.1) return isDark ? 'rgba(110,232,154,0.6)' : 'rgba(5,150,89,0.6)';
+          if (pct > 1.1) return 'rgba(255,85,85,0.5)';
+          return 'rgba(240,180,41,0.5)';
+        }),
+        borderRadius: 4,
+        borderSkipped: false,
+      },
+      {
+        type: 'line',
+        label: 'Goal',
+        data: labels.map(function(){ return goal; }),
+        borderColor: isDark ? 'rgba(240,180,41,0.6)' : 'rgba(180,83,9,0.6)',
+        borderWidth: 2,
+        borderDash: [6,3],
+        pointRadius: 0,
+        fill: false,
+        tension: 0,
+      }
+    ]
+  },
+  options: {
+    responsive: true,
+    plugins: { legend: { display: false } },
+    scales: {
+      x: { grid: { color: gridC }, ticks: { color: isDark ? '#5a5b7a' : '#9094b0', maxTicksLimit: 10, font: { size: 11 } } },
+      y: { grid: { color: gridC }, ticks: { color: isDark ? '#5a5b7a' : '#9094b0', callback: function(v){ return v ? v + ' kcal' : ''; } }, min: 0 }
+    }
+  }
+});
+</script>
+{% endblock %}

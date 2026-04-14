@@ -3,58 +3,159 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Login — DietMate</title>
+<title>DietMate — Sign In</title>
 <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 <script>(function(){ var t=localStorage.getItem('dm_theme')||'dark'; document.documentElement.setAttribute('data-theme',t); })();</script>
+<style>
+.auth-page { display:flex; align-items:stretch; min-height:100vh; padding:0; overflow:hidden; }
+.auth-card { max-width:100%; width:100%; border-radius:0; border:none; box-shadow:none; }
+.auth-left {
+  flex:1; padding:56px 48px; position:relative; overflow:hidden;
+  display:flex; flex-direction:column; justify-content:flex-end; gap:20px;
+}
+/* Force auth-left to always use dark theme regardless of data-theme */
+.auth-left, .auth-left * { color-scheme: normal; }
+.auth-left .auth-tagline { color: rgba(238,240,248,0.75) !important; }
+.auth-left .auth-features li { color: rgba(238,240,248,0.65) !important; }
+.auth-left .auth-stat-lbl { color: rgba(238,240,248,0.5) !important; }
+.auth-right h2, .auth-right p, .auth-right label { color: var(--text) !important; }
+
+.auth-bg {
+  position:absolute; inset:0; z-index:0;
+  background:url('/static/images/ui/login_bg.jpg') center/cover no-repeat;
+  filter:blur(2px) brightness(0.4) saturate(0.8);
+  transform:scale(1.04);
+}
+.auth-bg-overlay {
+  position:absolute; inset:0; z-index:1;
+  background:linear-gradient(135deg,
+    rgba(9,9,15,0.60) 0%,
+    rgba(9,9,15,0.30) 50%,
+    rgba(9,9,15,0.70) 100%
+  );
+}
+.auth-left > * { position:relative; z-index:2; }
+.auth-brand { font-family:'Syne',sans-serif; font-size:38px; font-weight:800; line-height:1; margin-bottom:2px; }
+.auth-brand-text {
+  background:linear-gradient(135deg, #7cfc9a, #00e5ff);
+  -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
+}
+.auth-tagline { font-size:16px; color:rgba(238,240,248,0.7); line-height:1.65; font-weight:500; max-width:380px; margin-bottom:10px; }
+.auth-features { list-style:none; display:flex; flex-direction:column; gap:12px; }
+.auth-features li { display:flex; align-items:center; gap:12px; font-size:14px; color:rgba(238,240,248,0.65); font-weight:500; }
+.feature-dot { width:8px; height:8px; border-radius:50%; flex-shrink:0; background:#7cfc9a; box-shadow:0 0 10px rgba(124,252,154,0.6); }
+.auth-stat-row { display:flex; gap:14px; margin-top:10px; }
+.auth-stat {
+  background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.12);
+  backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px);
+  border-radius:14px; padding:14px 20px;
+}
+.auth-stat-val { font-family:'Syne',sans-serif; font-size:22px; font-weight:800; color:#7cfc9a; }
+.auth-stat-lbl { font-size:11px; color:rgba(238,240,248,0.5); font-weight:600; text-transform:uppercase; letter-spacing:0.7px; margin-top:2px; }
+
+.auth-right {
+  width:440px; flex-shrink:0; padding:56px 48px;
+  background:var(--surface); border-left:1px solid var(--border-ui);
+  display:flex; flex-direction:column; justify-content:center;
+  overflow-y:auto;
+}
+.auth-right h2 { font-family:'Syne',sans-serif; font-size:28px; font-weight:800; color:var(--text); margin-bottom:8px; }
+.form-input { margin-bottom:0; }
+.auth-divider {
+  display:flex; align-items:center; gap:14px; margin:18px 0;
+}
+.auth-divider span { font-size:12px; color:var(--text-mute); font-weight:600; }
+.auth-divider::before, .auth-divider::after {
+  content:''; flex:1; height:1px; background:var(--border-ui);
+}
+
+@media(max-width:860px) {
+  .auth-left { display:none; }
+  .auth-right { width:100%; border-left:none; padding:40px 28px; }
+  .auth-page { background:var(--bg); align-items:center; justify-content:center; padding:20px; }
+  .auth-card { max-width:440px; border-radius:24px; border:1px solid var(--border-ui); box-shadow:var(--sh-lg); }
+}
+</style>
 </head>
 <body class="auth-page">
 
 <div class="auth-card">
-    <div class="auth-left">
-        <div class="auth-brand">DietMate</div>
-        <p class="auth-tagline">Your personal nutrition companion — eat better, live stronger.</p>
-        <ul class="auth-features">
-            <li><span class="feature-dot"></span> Personalised diet plans for your goals</li>
-            <li><span class="feature-dot"></span> AI-powered food scanner</li>
-            <li><span class="feature-dot"></span> Weekly meal scheduling</li>
-            <li><span class="feature-dot"></span> Calorie &amp; macro tracking</li>
-        </ul>
+  <!-- Left: Hero panel with blurred food background -->
+  <div class="auth-left">
+    <div class="auth-bg"></div>
+    <div class="auth-bg-overlay"></div>
+
+    <div>
+      <div class="auth-brand"><span class="auth-brand-text">DietMate</span></div>
+      <p class="auth-tagline">Your personal nutrition companion — track macros, build habits, and hit your goals every single day.</p>
     </div>
 
-    <div class="auth-right">
-        <h2>Welcome back</h2>
-        <p class="sub-text">Sign in to continue your journey.</p>
+    <ul class="auth-features">
+      <li><span class="feature-dot"></span> Personalised calorie & macro targets from your quiz</li>
+      <li><span class="feature-dot"></span> AI-powered food scanner with instant nutrition data</li>
+      <li><span class="feature-dot"></span> Full 7-day meal planner tailored to your goal</li>
+      <li><span class="feature-dot"></span> Daily streak tracking to keep you consistent</li>
+    </ul>
 
-        {% if error %}
-        <div class="error-box" style="margin-bottom:18px;">{{ error }}</div>
-        {% endif %}
-
-        <form method="POST" class="auth-form">
-            <div class="form-group">
-                <label class="form-label">Email address</label>
-                <input type="email" name="email" class="form-input" placeholder="you@email.com" required autocomplete="email">
-            </div>
-
-            <div class="form-group">
-                <label class="form-label">Password</label>
-                <div class="input-wrap">
-                    <input type="password" name="password" id="loginPwd" class="form-input" placeholder="Enter your password" required autocomplete="current-password">
-                    <button type="button" class="input-action-btn" onclick="togglePwd('loginPwd',this)">Show</button>
-                </div>
-            </div>
-
-            <button type="submit" class="btn btn-primary btn-lg" style="width:100%;margin-top:4px;">Sign In</button>
-        </form>
-
-        <p class="auth-link">Don't have an account? <a href="/register">Create Account</a></p>
+    <div class="auth-stat-row">
+      <div class="auth-stat">
+        <div class="auth-stat-val">500+</div>
+        <div class="auth-stat-lbl">Healthy Meals</div>
+      </div>
+      <div class="auth-stat">
+        <div class="auth-stat-val">3</div>
+        <div class="auth-stat-lbl">Diet Goals</div>
+      </div>
+      <div class="auth-stat">
+        <div class="auth-stat-val">AI</div>
+        <div class="auth-stat-lbl">Food Scanner</div>
+      </div>
     </div>
+  </div>
+
+  <!-- Right: Sign in form -->
+  <div class="auth-right">
+    <h2>Welcome back</h2>
+    <p class="sub-text">Sign in to continue your nutrition journey.</p>
+
+    {% if error %}
+    <div class="error-box" style="margin-bottom:18px;">{{ error }}</div>
+    {% endif %}
+
+    <form method="POST" class="auth-form">
+      <div class="form-group">
+        <label class="form-label">Email address</label>
+        <input type="email" name="email" class="form-input" placeholder="you@email.com" required autocomplete="email">
+      </div>
+
+      <div class="form-group" style="margin-bottom:22px;">
+        <label class="form-label">Password</label>
+        <div class="input-wrap">
+          <input type="password" name="password" id="loginPwd" class="form-input" placeholder="Enter your password" required autocomplete="current-password">
+          <button type="button" class="input-action-btn" onclick="togglePwd('loginPwd',this)">Show</button>
+        </div>
+      </div>
+
+      <div style="text-align:right;margin-bottom:16px;margin-top:-8px;">
+        <a href="/forgot-password" style="font-size:12.5px;color:var(--accent);font-weight:700;text-decoration:none;">Forgot password?</a>
+      </div>
+      <button type="submit" class="btn btn-primary btn-lg" style="width:100%;">Sign In</button>
+    </form>
+
+    <div class="auth-divider"><span>Don't have an account?</span></div>
+    <a href="/register" class="btn btn-ghost btn-lg" style="width:100%;text-align:center;">Create Account</a>
+
+    <p style="text-align:center;font-size:12px;color:var(--text-mute);margin-top:24px;line-height:1.7;">
+      By signing in, you agree to track your nutrition journey with DietMate. Your data is stored securely.
+    </p>
+  </div>
 </div>
 
 <script>
 function togglePwd(id, btn) {
-    var inp = document.getElementById(id);
-    if (inp.type === 'password') { inp.type = 'text'; btn.textContent = 'Hide'; }
-    else { inp.type = 'password'; btn.textContent = 'Show'; }
+  var inp = document.getElementById(id);
+  if (inp.type === 'password') { inp.type = 'text'; btn.textContent = 'Hide'; }
+  else { inp.type = 'password'; btn.textContent = 'Show'; }
 }
 </script>
 </body>

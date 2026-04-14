@@ -1,0 +1,196 @@
+{% extends "base.html" %}
+{% block content %}
+<style>
+.sm-img-box {
+  position:relative; overflow:hidden; background:var(--accent-mute);
+  display:flex; align-items:center; justify-content:center;
+}
+.sm-img-box img {
+  width:100%; height:100%; object-fit:cover; object-position:center;
+  display:block; transition:transform 0.4s ease;
+}
+.sm-img-box:hover img { transform:scale(1.04); }
+.sm-img-fallback {
+  width:100%; height:100%; display:flex; flex-direction:column;
+  align-items:center; justify-content:center; gap:8px;
+  color:var(--text-mute); font-size:12px; font-weight:600;
+}
+.smoothie-card:hover { transform:translateY(-4px); border-color:var(--border-h) !important; box-shadow:0 12px 32px rgba(0,0,0,0.4) !important; }
+</style>
+
+<!-- HERO BANNER -->
+<div style="position:relative;border-radius:var(--r-xl);overflow:hidden;margin-bottom:28px;min-height:220px;
+     background:linear-gradient(135deg,#0a2e1a 0%,#0d1f3c 100%);display:flex;align-items:center;padding:32px 40px;">
+  <img src="{{ url_for('static', filename='images/ui/smoothie_hero.jpg') }}"
+       alt="Smoothie Bar"
+       style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0.28;"
+       onerror="this.style.display='none'">
+  <div style="position:relative;z-index:1;max-width:480px;">
+    <div style="font-size:11px;font-weight:800;color:var(--accent);text-transform:uppercase;letter-spacing:1.2px;margin-bottom:10px;">Smoothie Bar</div>
+    <h1 style="font-family:'Syne',sans-serif;font-size:38px;font-weight:800;color:#fff;line-height:1.15;letter-spacing:-1px;margin-bottom:12px;">
+      Blend Your Way<br>to <span style="color:var(--accent);">Better Health</span>
+    </h1>
+    <p style="color:rgba(255,255,255,0.65);font-size:14.5px;font-weight:500;line-height:1.65;margin-bottom:20px;">
+      {{ all_smoothies|length }} curated smoothie recipes — from green detox to post-workout power shakes.
+    </p>
+    <div style="display:flex;gap:12px;flex-wrap:wrap;">
+      <div style="background:rgba(255,255,255,0.10);backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,0.15);border-radius:var(--r-md);padding:12px 20px;text-align:center;">
+        <div style="font-family:'Syne',sans-serif;font-size:22px;font-weight:800;color:var(--accent);">{{ all_smoothies|length }}</div>
+        <div style="font-size:11px;color:rgba(255,255,255,0.6);font-weight:600;text-transform:uppercase;letter-spacing:0.6px;">Smoothies</div>
+      </div>
+      <div style="background:rgba(255,255,255,0.10);backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,0.15);border-radius:var(--r-md);padding:12px 20px;text-align:center;">
+        <div style="font-family:'Syne',sans-serif;font-size:22px;font-weight:800;color:var(--accent2);">5 min</div>
+        <div style="font-size:11px;color:rgba(255,255,255,0.6);font-weight:600;text-transform:uppercase;letter-spacing:0.6px;">Avg Prep</div>
+      </div>
+      <div style="background:rgba(255,255,255,0.10);backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,0.15);border-radius:var(--r-md);padding:12px 20px;text-align:center;">
+        <div style="font-family:'Syne',sans-serif;font-size:22px;font-weight:800;color:#fb923c;">3</div>
+        <div style="font-size:11px;color:rgba(255,255,255,0.6);font-weight:600;text-transform:uppercase;letter-spacing:0.6px;">Goals</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- FILTER BAR -->
+<div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:16px;">
+  <input type="text" id="searchInput" class="form-input" placeholder="Search smoothies..."
+         oninput="filterSmoothies()" style="min-width:200px;flex:1;max-width:320px;">
+  <div style="display:flex;gap:6px;flex-wrap:wrap;">
+    <button class="filter-chip active" onclick="setGoalFilter('all',this)">All</button>
+    <button class="filter-chip" onclick="setGoalFilter('Weight Loss',this)">Weight Loss</button>
+    <button class="filter-chip" onclick="setGoalFilter('Muscle Gain',this)">Muscle Gain</button>
+    <button class="filter-chip" onclick="setGoalFilter('All',this)">General</button>
+  </div>
+</div>
+
+<!-- ALL SMOOTHIES GRID (non-featured, or all if none are featured) -->
+<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+  <div class="section-title">{{ 'All Smoothies' if not featured else 'More Smoothies' }}</div>
+  <span style="font-size:13px;color:var(--text-mute);font-weight:600;" id="smCount">{{ all_smoothies|length }} smoothies</span>
+</div>
+
+<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px;" id="smoothiesGrid">
+{% set seen_sm = namespace(ids=[]) %}{% for s in all_smoothies %}{% if s.name not in seen_sm.ids %}{% set _ = seen_sm.ids.append(s.name) %}{% set image_path = resolve_image(s.image, 'smoothies') if s.image else 'images/smoothies/' + s.name.lower().replace(' ', '_').replace('-', '_') + '.jpg' %}
+<div class="smoothie-card"
+     data-name="{{ s.name|lower }}"
+     data-goal="{{ s.goal }}"
+     style="background:var(--surface);border:1px solid var(--border-ui);border-radius:var(--r-lg);
+            overflow:hidden;box-shadow:var(--sh-card);transition:all 0.22s ease;cursor:pointer;">
+
+  <div style="height:4px;background:'{{ s.color }}';"></div>
+
+  <a href="/smoothie/{{ s.smoothie_id }}" style="text-decoration:none;display:block;">
+    <div class="sm-img-box" style="height:200px;">
+      <img src="{{ url_for('static', filename=image_path) }}"
+           alt="{{ s.name }}"
+           style="width:100%;height:100%;object-fit:cover;"
+           onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+      <div class="sm-img-fallback" style="display:none;position:absolute;inset:0;flex-direction:column;gap:6px;align-items:center;justify-content:center;">
+        <span style="font-size:44px;">🥤</span>
+        <span style="font-size:11px;color:var(--text-mute);font-weight:700;text-align:center;padding:0 12px;">{{ s.name[:20] }}</span>
+      </div>
+
+      <div style="position:absolute;top:10px;left:10px;display:flex;gap:5px;flex-wrap:wrap;">
+        {% if s.goal and s.goal != 'All' %}
+        <span style="background:rgba(0,0,0,0.72);backdrop-filter:blur(8px);color:'{{ s.color }}';
+             font-size:10px;font-weight:800;padding:3px 10px;border-radius:var(--r-pill);">
+          {{ s.goal }}
+        </span>
+        {% endif %}
+        {% if s.is_featured %}
+        <span style="background:rgba(240,180,41,0.9);color:#000;font-size:10px;font-weight:800;padding:3px 8px;border-radius:var(--r-pill);">⭐</span>
+        {% endif %}
+      </div>
+      <button onclick="event.preventDefault();toggleSmFav(event,'{{ s.smoothie_id }}',this)"
+              style="position:absolute;top:10px;right:10px;background:rgba(0,0,0,0.65);backdrop-filter:blur(8px);
+                     border:none;border-radius:50%;width:32px;height:32px;cursor:pointer;
+                     display:flex;align-items:center;justify-content:center;font-size:15px;
+                     color:'{{ '#ff4757' if s.is_fav else '#fff' }}';">
+        {{ '♥' if s.is_fav else '♡' }}
+      </button>
+      <div style="position:absolute;bottom:10px;right:10px;background:rgba(0,0,0,0.7);backdrop-filter:blur(8px);
+           color:#fff;font-size:11px;font-weight:700;padding:3px 10px;border-radius:var(--r-pill);">
+        {{ s.prep_time }} min
+      </div>
+    </div>
+
+    <div style="padding:16px;">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px;">
+        <div style="font-family:'Syne',sans-serif;font-size:15px;font-weight:700;color:var(--text);">{{ s.name }}</div>
+        <div style="display:flex;align-items:center;gap:3px;flex-shrink:0;">
+          <span style="color:var(--gold);font-size:12px;">&#9733;</span>
+          <span style="font-size:12px;font-weight:700;color:var(--text);">{{ "%.1f"|format(s.rating) }}</span>
+        </div>
+      </div>
+      <div style="font-size:12.5px;color:var(--text-sec);line-height:1.55;margin-bottom:12px;
+           display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;">
+        {{ s.description }}
+      </div>
+
+      <!-- Nutrition pills -->
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;
+           background:var(--raised);border:1px solid var(--border-ui);border-radius:var(--r-md);padding:10px;">
+        <div style="text-align:center;">
+          <div style="font-size:13px;font-weight:800;color:var(--accent);font-family:'JetBrains Mono',monospace;">{{ s.calories }}</div>
+          <div style="font-size:9px;color:var(--text-mute);font-weight:700;text-transform:uppercase;margin-top:2px;">kcal</div>
+        </div>
+        <div style="text-align:center;">
+          <div style="font-size:13px;font-weight:800;color:var(--macro-p);font-family:'JetBrains Mono',monospace;">{{ s.protein }}g</div>
+          <div style="font-size:9px;color:var(--text-mute);font-weight:700;text-transform:uppercase;margin-top:2px;">protein</div>
+        </div>
+        <div style="text-align:center;">
+          <div style="font-size:13px;font-weight:800;color:var(--macro-c);font-family:'JetBrains Mono',monospace;">{{ s.carbs }}g</div>
+          <div style="font-size:9px;color:var(--text-mute);font-weight:700;text-transform:uppercase;margin-top:2px;">carbs</div>
+        </div>
+        <div style="text-align:center;">
+          <div style="font-size:13px;font-weight:800;color:var(--macro-f);font-family:'JetBrains Mono',monospace;">{{ s.fat }}g</div>
+          <div style="font-size:9px;color:var(--text-mute);font-weight:700;text-transform:uppercase;margin-top:2px;">fat</div>
+        </div>
+      </div>
+    </div>
+  </a>
+</div>
+{% endif %}{% else %}
+<div class="empty-state" style="grid-column:1/-1;padding:40px;text-align:center;">
+  <p style="color:var(--text-mute);">No smoothies found in the database.</p>
+</div>
+{% endfor %}
+</div>
+
+<script>
+var activeGoal = 'all';
+
+function setGoalFilter(goal, btn) {
+  activeGoal = goal;
+  document.querySelectorAll('.filter-chip').forEach(function(b) { b.classList.remove('active'); });
+  btn.classList.add('active');
+  filterSmoothies();
+}
+
+function filterSmoothies() {
+  var q = (document.getElementById('searchInput').value || '').toLowerCase().trim();
+  var cards = document.querySelectorAll('#smoothiesGrid .smoothie-card');
+  var n = 0;
+  cards.forEach(function(card) {
+    var matchName = !q || card.dataset.name.includes(q);
+    var matchGoal = activeGoal === 'all' || card.dataset.goal === activeGoal;
+    var show = matchName && matchGoal;
+    card.style.display = show ? 'block' : 'none';
+    if (show) n++;
+  });
+  var el = document.getElementById('smCount');
+  if (el) el.textContent = n + ' smoothie' + (n !== 1 ? 's' : '');
+}
+
+function toggleSmFav(e, smId, btn) {
+  e.stopPropagation();
+  fetch('/favorite/toggle', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ smoothie_id: smId })
+  }).then(function(r) { return r.json(); }).then(function(d) {
+    btn.textContent = d.status === 'added' ? '♥' : '♡';
+    btn.style.color = d.status === 'added' ? '#ff4757' : '#fff';
+  });
+}
+</script>
+{% endblock %}

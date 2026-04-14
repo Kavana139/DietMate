@@ -62,9 +62,9 @@
             </div>
 
             <div class="bmi-preview" id="bmiPreview" style="display:none;">
-                <div style="font-size:10px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.7px;margin-bottom:6px;">BMI Preview</div>
+                <div style="font-size:10px;font-weight:700;color:var(--text-mute);text-transform:uppercase;letter-spacing:.7px;margin-bottom:6px;">BMI Preview</div>
                 <div style="display:flex;align-items:center;gap:12px;">
-                    <span style="font-family:'Fraunces',serif;font-size:26px;font-weight:700;color:var(--text-primary);" id="bmiVal">—</span>
+                    <span style="font-family:'Syne',sans-serif;font-size:26px;font-weight:700;color:var(--text);" id="bmiVal">—</span>
                     <span id="bmiCat" style="font-size:12px;font-weight:700;padding:4px 14px;border-radius:999px;border:1px solid;"></span>
                 </div>
             </div>
@@ -163,7 +163,7 @@ function updateBMI() {
     document.getElementById('bmiVal').textContent = bmi;
     var cat = document.getElementById('bmiCat');
     if (bmi < 18.5)      { cat.textContent='Underweight'; cat.style.background='var(--gold-bg)';   cat.style.color='var(--gold)'; cat.style.borderColor='rgba(240,192,96,0.3)'; }
-    else if (bmi < 25)   { cat.textContent='Normal';      cat.style.background='var(--accent-muted)'; cat.style.color='var(--accent)'; cat.style.borderColor='rgba(0,232,122,0.3)'; }
+    else if (bmi < 25)   { cat.textContent='Normal';      cat.style.background='var(--accent-mute)'; cat.style.color='var(--accent)'; cat.style.borderColor='rgba(0,232,122,0.3)'; }
     else if (bmi < 30)   { cat.textContent='Overweight';  cat.style.background='var(--gold-bg)';   cat.style.color='var(--gold)'; cat.style.borderColor='rgba(240,192,96,0.3)'; }
     else                 { cat.textContent='Obese';        cat.style.background='var(--red-bg)';    cat.style.color='var(--red)';  cat.style.borderColor='rgba(255,87,87,0.3)'; }
 }

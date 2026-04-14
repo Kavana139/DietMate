@@ -1,0 +1,159 @@
+{% extends "base.html" %}
+{% block content %}
+<h1 class="page-title">Account Settings</h1>
+<p class="page-subtitle">Manage your profile, password, and privacy settings.</p>
+
+{% if success %}<div class="flash-message flash-success">&#10003; {{ success }}</div>{% endif %}
+{% if error %}<div class="error-box" style="margin-bottom:16px;">{{ error }}</div>{% endif %}
+
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:18px;">
+
+  <!-- Profile -->
+  <div style="background:var(--surface);border:1px solid var(--border-ui);border-radius:var(--r-lg);padding:22px;box-shadow:var(--sh-card);">
+    <div class="section-title" style="margin-bottom:14px;">Profile Information</div>
+    <form method="POST">
+      <input type="hidden" name="action" value="update_profile">
+      <div class="form-group"><label class="form-label">Full Name</label><input type="text" name="name" class="form-input" value="{{ user.name }}"></div>
+      <div class="form-group"><label class="form-label">Height (cm)</label><input type="number" name="height" class="form-input" value="{{ user.height }}"></div>
+      <div class="form-group"><label class="form-label">Weight (kg)</label><input type="number" name="weight" class="form-input" value="{{ user.weight }}" step="0.1"></div>
+      <div class="form-group" style="margin-bottom:20px;"><label class="form-label">Age</label><input type="number" name="age" class="form-input" value="{{ user.age }}"></div>
+      <button type="submit" class="btn btn-primary" style="width:100%;">Save Profile</button>
+    </form>
+  </div>
+
+  <!-- Food preference -->
+  <div style="background:var(--surface);border:1px solid var(--border-ui);border-radius:var(--r-lg);padding:22px;box-shadow:var(--sh-card);">
+    <div class="section-title" style="margin-bottom:14px;">Food Preference</div>
+    <form method="POST">
+      <input type="hidden" name="action" value="update_food_pref">
+      <div class="diet-type-cards" style="margin-bottom:20px;">
+        <div class="diet-type-card {% if user.food_type=='veg' %}selected{% endif %}" onclick="selectFoodType(this,'veg')">
+          <span class="diet-tick">&#10003;</span>
+          <div class="diet-card-title">Vegetarian</div>
+          <div class="diet-card-desc">Plant-based meals with dairy</div>
+        </div>
+        <div class="diet-type-card {% if user.food_type=='nonveg' %}selected{% endif %}" onclick="selectFoodType(this,'nonveg')">
+          <span class="diet-tick">&#10003;</span>
+          <div class="diet-card-title">Non-Vegetarian</div>
+          <div class="diet-card-desc">Includes meat, fish, eggs</div>
+        </div>
+      </div>
+      <input type="hidden" name="food_type" id="foodTypePref" value="{{ user.food_type }}">
+      <button type="submit" class="btn btn-primary" style="width:100%;">Save Preference</button>
+    </form>
+
+    <div style="margin-top:20px;padding-top:18px;border-top:1px solid var(--border-ui);">
+      <div class="section-title" style="margin-bottom:10px;">Account Info</div>
+      <div style="display:flex;flex-direction:column;gap:8px;">
+        <div style="display:flex;justify-content:space-between;font-size:13.5px;">
+          <span style="color:var(--text-sec);">Email</span>
+          <span style="color:var(--text);font-weight:700;">{{ user.email }}</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;font-size:13.5px;">
+          <span style="color:var(--text-sec);">Member since</span>
+          <span style="color:var(--text);font-weight:700;">{{ user.created_at.strftime('%d %b %Y') if user.created_at else '—' }}</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;font-size:13.5px;">
+          <span style="color:var(--text-sec);">Current goal</span>
+          <span class="badge badge-accent">{{ user.goal or '—' }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Change Password -->
+  <div style="background:var(--surface);border:1px solid var(--border-ui);border-radius:var(--r-lg);padding:22px;box-shadow:var(--sh-card);">
+    <div class="section-title" style="margin-bottom:14px;">Change Password</div>
+    <form method="POST">
+      <input type="hidden" name="action" value="change_password">
+      <div class="form-group">
+        <label class="form-label">Current Password</label>
+        <div class="input-wrap">
+          <input type="password" name="old_password" id="oldPw" class="form-input" placeholder="Enter current password">
+          <button type="button" class="input-action-btn" onclick="togglePwd('oldPw',this)">Show</button>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">New Password</label>
+        <div class="input-wrap">
+          <input type="password" name="new_password" id="newPw" class="form-input" placeholder="Min 8 chars">
+          <button type="button" class="input-action-btn" onclick="togglePwd('newPw',this)">Show</button>
+        </div>
+      </div>
+      <div class="form-group" style="margin-bottom:20px;">
+        <label class="form-label">Confirm New Password</label>
+        <div class="input-wrap">
+          <input type="password" name="confirm_password" id="confPw" class="form-input" placeholder="Repeat new password">
+          <button type="button" class="input-action-btn" onclick="togglePwd('confPw',this)">Show</button>
+        </div>
+      </div>
+      <button type="submit" class="btn btn-primary" style="width:100%;">Change Password</button>
+    </form>
+  </div>
+
+  <!-- Login Activity -->
+  <div style="background:var(--surface);border:1px solid var(--border-ui);border-radius:var(--r-lg);padding:22px;box-shadow:var(--sh-card);">
+    <div class="section-title" style="margin-bottom:14px;">Recent Login Activity</div>
+    {% if activity %}
+    {% for act in activity %}
+    {% set dot_color = 'var(--accent)' if act[0]=='login' else ('var(--red)' if act[0]=='failed' else 'var(--gold)') %}
+    <div style="display:flex;gap:12px;align-items:flex-start;padding:10px 0;border-bottom:1px solid var(--border-ui);">
+      <div style="width:8px;height:8px;border-radius:50%;margin-top:5px;flex-shrink:0;background:'{{ dot_color }}';"></div>
+      <div style="flex:1;">
+        <div style="font-size:13px;font-weight:700;color:var(--text);text-transform:capitalize;">{{ act[0] }}</div>
+        <div style="font-size:11.5px;color:var(--text-mute);margin-top:2px;">{{ act[2] or 'Unknown device' }} &middot; {{ act[1] or 'Unknown IP' }}</div>
+        <div style="font-size:11px;color:var(--text-mute);margin-top:1px;">{{ act[3].strftime('%d %b %Y, %I:%M %p') if act[3] else '' }}</div>
+      </div>
+    </div>
+    {% endfor %}
+    {% if activity_more %}
+    <div id="moreActivity" style="display:none;">
+      {% for act in activity_more %}
+      {% set dot_color = 'var(--accent)' if act[0]=='login' else ('var(--red)' if act[0]=='failed' else 'var(--gold)') %}
+      <div style="display:flex;gap:12px;align-items:flex-start;padding:10px 0;border-bottom:1px solid var(--border-ui);">
+        <div style="width:8px;height:8px;border-radius:50%;margin-top:5px;flex-shrink:0;background:'{{ dot_color }}';"></div>
+        <div style="flex:1;">
+          <div style="font-size:13px;font-weight:700;color:var(--text);text-transform:capitalize;">{{ act[0] }}</div>
+          <div style="font-size:11.5px;color:var(--text-mute);margin-top:2px;">{{ act[2] or 'Unknown device' }} &middot; {{ act[1] or 'Unknown IP' }}</div>
+          <div style="font-size:11px;color:var(--text-mute);margin-top:1px;">{{ act[3].strftime('%d %b %Y, %I:%M %p') if act[3] else '' }}</div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    <button id="seeMoreBtn" onclick="
+        document.getElementById('moreActivity').style.display='block';
+        document.getElementById('seeMoreBtn').style.display='none';
+        document.getElementById('seeLessBtn').style.display='inline';"
+            style="margin-top:10px;font-size:12px;color:var(--accent);background:none;border:none;cursor:pointer;font-weight:700;font-family:inherit;">
+      + See {{ activity_more|length }} more
+    </button>
+    <button id="seeLessBtn" onclick="
+        document.getElementById('moreActivity').style.display='none';
+        document.getElementById('seeMoreBtn').style.display='inline';
+        document.getElementById('seeLessBtn').style.display='none';"
+            style="display:none;margin-top:10px;font-size:12px;color:var(--text-mute);background:none;border:none;cursor:pointer;font-weight:700;font-family:inherit;">
+      - See less
+    </button>
+    {% endif %}
+    {% else %}
+    <p style="font-size:13px;color:var(--text-mute);">No recent activity recorded.</p>
+    {% endif %}
+    <div style="margin-top:16px;padding:12px;background:var(--blue-bg);border:1px solid rgba(0,229,255,0.18);border-radius:var(--r-md);font-size:12.5px;color:var(--blue);font-weight:600;">
+      Login and logout events are emailed to you for security. Your data is private and never shared.
+    </div>
+  </div>
+
+</div>
+<script>
+function togglePwd(id, btn) {
+  var inp = document.getElementById(id);
+  if (inp.type==='password'){inp.type='text';btn.textContent='Hide';}
+  else{inp.type='password';btn.textContent='Show';}
+}
+function selectFoodType(card, type) {
+  document.querySelectorAll('.diet-type-card').forEach(c=>c.classList.remove('selected'));
+  card.classList.add('selected');
+  document.getElementById('foodTypePref').value = type;
+}
+</script>
+{% endblock %}

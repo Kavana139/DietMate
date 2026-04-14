@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Progress Report — DietMate</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+* { box-sizing:border-box; margin:0; padding:0; }
+body { font-family:'Segoe UI',Arial,sans-serif; background:#f8f9fc; color:#111; padding:32px; }
+.report { max-width:900px; margin:0 auto; background:#fff; border-radius:16px; padding:40px; box-shadow:0 4px 32px rgba(0,0,0,0.08); }
+.header { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:32px; padding-bottom:24px; border-bottom:2px solid #e5e7eb; }
+.logo { font-size:24px; font-weight:800; color:#059659; letter-spacing:-0.5px; }
+.report-meta { text-align:right; font-size:13px; color:#6b7280; }
+.section { margin-bottom:28px; }
+.section-title { font-size:16px; font-weight:800; color:#111; margin-bottom:14px; padding-bottom:8px; border-bottom:1px solid #e5e7eb; }
+.stats-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:14px; margin-bottom:24px; }
+.stat-box { background:#f9fafb; border:1px solid #e5e7eb; border-radius:12px; padding:16px; text-align:center; }
+.stat-val  { font-size:28px; font-weight:800; color:#059659; }
+.stat-lbl  { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.6px; color:#6b7280; margin-top:4px; }
+.meal-row  { display:flex; align-items:center; padding:10px 0; border-bottom:1px solid #f3f4f6; font-size:13px; }
+.meal-row:last-child { border-bottom:none; }
+.meal-name { flex:1; font-weight:600; color:#111; }
+.meal-time { width:120px; color:#6b7280; }
+.meal-cal  { width:80px; text-align:right; font-weight:800; color:#059659; font-family:monospace; }
+.meal-date { width:100px; color:#9ca3af; font-size:11px; }
+.badges    { display:flex; gap:12px; flex-wrap:wrap; margin-top:12px; }
+.badge-item { text-align:center; padding:14px 20px; border-radius:12px; flex:1; min-width:120px; }
+.print-btn { position:fixed; top:20px; right:20px; background:#059659; color:#fff; border:none; border-radius:10px; padding:12px 24px; font-size:14px; font-weight:700; cursor:pointer; box-shadow:0 4px 16px rgba(5,150,89,0.3); z-index:100; }
+.print-btn:hover { background:#047444; }
+
+@media print {
+  body { background:#fff; padding:0; }
+  .report { box-shadow:none; border-radius:0; padding:20px; }
+  .print-btn { display:none !important; }
+  .header { margin-bottom:20px; }
+}
+</style>
+</head>
+<body>
+
+<button class="print-btn" onclick="window.print()">
+  Print / Save PDF
+</button>
+
+<div class="report">
+
+  <!-- Header -->
+  <div class="header">
+    <div>
+      <div class="logo">DietMate</div>
+      <div style="font-size:13px;color:#6b7280;margin-top:4px;">Your Personal Nutrition Companion</div>
+    </div>
+    <div class="report-meta">
+      <div style="font-size:18px;font-weight:800;color:#111;margin-bottom:4px;">Progress Report</div>
+      <div>{{ user_name }}</div>
+      <div>Goal: {{ goal or 'Not set' }}</div>
+      <div>Generated: {{ today }}</div>
+    </div>
+  </div>
+
+  <!-- Summary stats -->
+  <div class="section">
+    <div class="section-title">30-Day Summary</div>
+    <div class="stats-grid">
+      <div class="stat-box">
+        <div class="stat-val">{{ daily|length }}</div>
+        <div class="stat-lbl">Days Logged</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-val">{{ streak.current }}</div>
+        <div class="stat-lbl">Current Streak</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-val">{{ streak.longest }}</div>
+        <div class="stat-lbl">Best Streak</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-val">{{ goal_cal }}</div>
+        <div class="stat-lbl">Daily Goal (kcal)</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Streak Achievements -->
+  <div class="section">
+    <div class="section-title">Achievements</div>
+    <div class="badges">
+      {% for days, name, color, icon in [(10,'Bronze','#cd7f32','★'),(25,'Silver','#999','★'),(50,'Gold','#ffd700','★'),(75,'Platinum','#b0c4de','★'),(100,'Diamond','#00bcd4','★')] %}
+      {% set earned = streak.total >= days %}
+      <div class="badge-item" style="background:'{{ color }}'18;border:2px solid '{{ color if earned else '#e5e7eb' }}';opacity:'{{ '1' if earned else '0.35' }}';">
+        <div style="font-size:22px;color:'{{ color }}';margin-bottom:4px;">{{ icon }}</div>
+        <div style="font-weight:800;font-size:13px;color:'{{ color }}';">{{ name }}</div>
+        <div style="font-size:11px;color:#6b7280;margin-top:2px;">{{ days }} days</div>
+        {% if earned %}<div style="font-size:10px;color:#059659;font-weight:700;margin-top:3px;">Earned</div>{% endif %}
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+
+  <!-- 30-Day Calorie Chart -->
+  {% if daily %}
+  <div class="section">
+    <div class="section-title">30-Day Calorie History</div>
+    <canvas id="calorieChart" height="80"></canvas>
+  </div>
+  {% endif %}
+
+  <!-- Weight Log -->
+  {% if weights %}
+  <div class="section">
+    <div class="section-title">Weight Log</div>
+    <canvas id="weightChart" height="80" style="margin-bottom:16px;"></canvas>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:8px;">
+      {% for w, d in weights[:10] %}
+      <div style="background:#f9fafb;border:1px solid #e5e7eb;border-radius:8px;padding:8px 12px;font-size:12px;">
+        <div style="font-weight:700;color:#059659;">{{ w }} kg</div>
+        <div style="color:#6b7280;">{{ d }}</div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+  {% endif %}
+
+  <!-- Recent Meals -->
+  <div class="section">
+    <div class="section-title">Recent Meals (Last 50)</div>
+    {% if meals %}
+    <div style="border:1px solid #e5e7eb;border-radius:10px;overflow:hidden;">
+      <div style="display:flex;background:#f9fafb;padding:10px 12px;font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:0.5px;color:#6b7280;border-bottom:1px solid #e5e7eb;">
+        <span style="flex:1;">Meal</span>
+        <span style="width:120px;">Time</span>
+        <span style="width:80px;text-align:right;">Calories</span>
+        <span style="width:100px;text-align:right;">Date</span>
+      </div>
+      {% for name, time, cal, date in meals %}
+      <div class="meal-row" style="padding:10px 12px;">
+        <span class="meal-name">{{ name }}</span>
+        <span class="meal-time">{{ time }}</span>
+        <span class="meal-cal">{{ cal }} kcal</span>
+        <span class="meal-date">{{ date }}</span>
+      </div>
+      {% endfor %}
+    </div>
+    {% else %}
+    <p style="color:#6b7280;font-size:13px;">No meals logged yet.</p>
+    {% endif %}
+  </div>
+
+  <!-- Footer -->
+  <div style="margin-top:32px;padding-top:20px;border-top:1px solid #e5e7eb;text-align:center;font-size:12px;color:#9ca3af;">
+    Generated by DietMate on {{ today }} &nbsp;|&nbsp; Keep logging, keep growing!
+  </div>
+</div>
+
+<script>
+{% if daily %}
+var calDates = [{% for d in daily|reverse %}'{{ d[0] }}'{% if not loop.last %},{% endif %}{% endfor %}];
+var calVals  = [{% for d in daily|reverse %}{{ d[1]|int }}{% if not loop.last %},{% endif %}{% endfor %}];
+var goal     = {{ goal_cal }};
+
+new Chart(document.getElementById('calorieChart'), {
+  type: 'line',
+  data: {
+    labels: calDates,
+    datasets: [
+      {
+        label: 'Calories',
+        data: calVals,
+        borderColor: '#059659',
+        backgroundColor: 'rgba(5,150,89,0.08)',
+        borderWidth: 2.5,
+        pointRadius: 4,
+        pointBackgroundColor: '#059659',
+        tension: 0.4,
+        fill: true
+      },
+      {
+        label: 'Goal',
+        data: calDates.map(function(){ return goal; }),
+        borderColor: '#f0c060',
+        borderWidth: 1.5,
+        borderDash: [6,3],
+        pointRadius: 0,
+        fill: false
+      }
+    ]
+  },
+  options: {
+    responsive:true,
+    plugins:{ legend:{ display:false }, tooltip:{ callbacks:{ label:function(c){ return c.dataset.label+': '+c.raw+' kcal'; }}}},
+    scales:{
+      x:{ grid:{color:'rgba(0,0,0,0.04)'}, ticks:{color:'#9ca3af',maxTicksLimit:10,font:{size:11}}},
+      y:{ grid:{color:'rgba(0,0,0,0.04)'}, ticks:{color:'#9ca3af',callback:function(v){return v+' kcal';}}, min:0}
+    }
+  }
+});
+{% endif %}
+
+{% if weights %}
+var wDates = [{% for w,d in weights|reverse %}'{{ d }}'{% if not loop.last %},{% endif %}{% endfor %}];
+var wVals  = [{% for w,d in weights|reverse %}{{ w }}{% if not loop.last %},{% endif %}{% endfor %}];
+
+new Chart(document.getElementById('weightChart'), {
+  type: 'line',
+  data: {
+    labels: wDates,
+    datasets: [{
+      label: 'Weight (kg)',
+      data: wVals,
+      borderColor: '#7c3aed',
+      backgroundColor: 'rgba(124,58,237,0.06)',
+      borderWidth: 2.5,
+      pointRadius: 4,
+      pointBackgroundColor: '#7c3aed',
+      tension: 0.4,
+      fill: true
+    }]
+  },
+  options: {
+    responsive:true,
+    plugins:{ legend:{display:false} },
+    scales:{
+      x:{ grid:{color:'rgba(0,0,0,0.04)'}, ticks:{color:'#9ca3af',maxTicksLimit:8,font:{size:11}}},
+      y:{ grid:{color:'rgba(0,0,0,0.04)'}, ticks:{color:'#9ca3af',callback:function(v){return v+' kg';}}}
+    }
+  }
+});
+{% endif %}
+</script>
+</body>
+</html>

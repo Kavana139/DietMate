@@ -1,0 +1,207 @@
+{% extends "base.html" %}
+{% block content %}
+<style>
+.cal-nav-btn {
+  width:32px;height:32px;border-radius:50%;background:var(--surface);
+  border:1px solid var(--border-ui);color:var(--text);font-size:14px;
+  cursor:pointer;display:flex;align-items:center;justify-content:center;
+  transition:all 0.2s var(--spring);text-decoration:none;
+}
+.cal-nav-btn:hover { background:var(--accent-mute);border-color:var(--border-h);color:var(--accent);transform:scale(1.1); }
+.cal-stats { display:flex;flex-direction:column;gap:8px;width:280px;flex-shrink:0; }
+.cal-stat-card {
+  background:linear-gradient(135deg,rgba(255,255,255,0.03),rgba(255,255,255,0.01));border:1px solid var(--border-ui);
+  border-radius:var(--r-lg);padding:12px;text-align:center;
+  transition:all 0.25s var(--spring);position:relative;overflow:hidden;
+}
+.cal-stat-card::before {
+  content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(110,232,154,0.1),rgba(0,212,255,0.1));opacity:0;transition:opacity 0.25s var(--spring);border-radius:var(--r-lg);
+}
+.cal-stat-card:hover { transform:translateY(-3px);border-color:var(--border-h);background:linear-gradient(135deg,rgba(110,232,154,0.08),rgba(0,212,255,0.05));box-shadow:0 4px 12px rgba(110,232,154,0.1); }
+.cal-stat-card:hover::before { opacity:1; }
+.cal-stat-card > * { position:relative;z-index:1; }
+.cal-container { display:flex;gap:16px;align-items:flex-start; }
+.cal-left { flex:1;min-width:0; }
+.cal-right { display:flex;flex-direction:column;gap:12px;width:280px;flex-shrink:0; }
+.cal-stat-val { font-family:'Syne',sans-serif;font-size:16px;font-weight:800;color:var(--accent);text-shadow:0 2px 4px rgba(110,232,154,0.1); }
+.cal-stat-lbl { font-size:9px;font-weight:700;color:var(--text-mute);text-transform:uppercase;letter-spacing:0.4px;margin-top:2px; }
+.cal-grid-wrap { background:var(--surface);border:1px solid var(--border-ui);border-radius:var(--r-xl);padding:10px;box-shadow:var(--sh-card);max-width:600px; }
+.cal-day-headers { display:grid;grid-template-columns:repeat(7,1fr);gap:3px;margin-bottom:4px; }
+.cal-day-header { text-align:center;font-size:9px;font-weight:800;color:var(--text-mute);text-transform:uppercase;letter-spacing:0.4px;padding:2px 0; }
+.cal-week { display:grid;grid-template-columns:repeat(7,1fr);gap:3px;margin-bottom:3px; }
+.cal-day-cell {
+  aspect-ratio:1;border-radius:8px;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;position:relative;
+  transition:all 0.22s var(--spring);cursor:default;font-size:10px;
+}
+.cal-day-cell.has-data { cursor:pointer; }
+.cal-day-cell.has-data:hover { transform:scale(1.05);z-index:2;box-shadow:0 4px 12px rgba(0,0,0,0.3); }
+.cal-day-cell.no-log { background:var(--raised);border:1px solid var(--border-ui); }
+.cal-day-cell.partial { background:rgba(240,180,41,0.1);border:1px solid rgba(240,180,41,0.3); }
+.cal-day-cell.on-track { background:rgba(110,232,154,0.12);border:1px solid rgba(110,232,154,0.3); }
+.cal-day-cell.is-today { background:var(--accent-mute);border:1px solid var(--accent);box-shadow:0 0 0 1px rgba(110,232,154,0.08); }
+.cal-day-cell.future { background:transparent;border:1px dashed rgba(255,255,255,0.05);opacity:0.35; }
+.cal-day-num { font-size:11px;font-weight:700;line-height:1; }
+.cal-day-cell.no-log .cal-day-num { color:var(--text-mute); }
+.cal-day-cell.partial .cal-day-num { color:var(--gold);font-weight:800; }
+.cal-day-cell.on-track .cal-day-num { color:var(--accent);font-weight:800; }
+.cal-day-cell.is-today .cal-day-num { color:var(--accent);font-weight:900;font-size:12px; }
+.cal-day-cell.future .cal-day-num { color:var(--text-mute); }
+.cal-day-kcal { font-size:7px;font-weight:800;margin-top:0px;font-family:'JetBrains Mono',monospace; }
+.cal-day-cell.partial .cal-day-kcal { color:var(--gold); }
+.cal-day-cell.on-track .cal-day-kcal { color:var(--accent); }
+.cal-day-cell.is-today .cal-day-kcal { color:var(--accent); }
+.cal-dot { width:3px;height:3px;border-radius:50%;margin-top:0px; }
+.cal-day-cell.on-track .cal-dot { background:var(--accent); }
+.cal-day-cell.partial .cal-dot { background:var(--gold); }
+.today-pulse {
+  position:absolute;top:3px;right:3px;width:4px;height:4px;border-radius:50%;
+  background:var(--accent);box-shadow:0 0 0 0 rgba(110,232,154,0.3);
+  animation:todayPulse 2s ease-in-out infinite;
+}
+@keyframes todayPulse {
+  0%,100% { box-shadow:0 0 0 0 rgba(110,232,154,0.4); }
+  50%      { box-shadow:0 0 0 3px rgba(110,232,154,0); }
+}
+.cal-legend { display:flex;gap:14px;flex-wrap:wrap;margin-top:10px;padding:10px 12px;border-top:1px solid var(--border-ui);justify-content:center;background:rgba(110,232,154,0.02);border-radius:0 0 var(--r-lg) var(--r-lg); }
+.legend-item { display:flex;align-items:center;gap:6px;font-size:10px;color:var(--text-sec);font-weight:600;transition:color 0.2s; }
+.legend-item:hover { color:var(--accent); }
+.legend-dot { width:10px;height:10px;border-radius:3px;flex-shrink:0;box-shadow:0 2px 4px rgba(0,0,0,0.2); }
+</style>
+
+<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px;flex-wrap:wrap;gap:12px;background:linear-gradient(135deg,rgba(110,232,154,0.06),rgba(0,212,255,0.04));border-radius:var(--r-lg);padding:14px 16px;border:1px solid rgba(110,232,154,0.15);">
+  <div>
+    <h1 class="page-title" style="margin-bottom:2px;font-size:22px;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">Diet Calendar</h1>
+    <p class="page-subtitle" style="margin-bottom:0;font-size:11px;color:var(--text-sec);">Track your nutrition journey</p>
+  </div>
+  <div style="display:flex;align-items:center;gap:6px;background:rgba(255,255,255,0.04);padding:6px 10px;border-radius:var(--r-lg);border:1px solid var(--border-ui);">
+    <a href="/calendar?year={{ prev_year }}&month={{ prev_month }}" class="cal-nav-btn" style="width:28px;height:28px;margin:-2px;padding:0;">&#8592;</a>
+    <span style="font-family:'Syne',sans-serif;font-size:15px;font-weight:800;color:var(--accent);letter-spacing:-0.2px;min-width:120px;text-align:center;">{{ month_name }} {{ year }}</span>
+    <a href="/calendar?year={{ next_year }}&month={{ next_month }}" class="cal-nav-btn" style="width:28px;height:28px;margin:-2px;padding:0;">&#8594;</a>
+  </div>
+</div>
+
+<!-- Stats Row -->
+{% set days_logged = cal_data.values() | selectattr('calories', 'gt', 0) | list | length %}
+{% set days_on_track = cal_data.values() | selectattr('calories', 'ge', goal_cal * 0.8) | list | length %}
+{% set total_kcal = namespace(val=0) %}
+{% for d in cal_data.values() %}{% set total_kcal.val = total_kcal.val + d.get('calories',0) %}{% endfor %}
+{% set avg_kcal = (total_kcal.val // days_logged) if days_logged > 0 else 0 %}
+
+<div class="cal-container">
+  <div class="cal-left">
+    <!-- Calendar Grid -->
+    <div class="cal-grid-wrap">
+  <div class="cal-day-headers">
+    {% for day in ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'] %}
+    <div class="cal-day-header">{{ day }}</div>
+    {% endfor %}
+  </div>
+
+  {% for week in weeks %}
+  <div class="cal-week">
+    {% for day in week %}
+    {% if day == 0 %}
+      <div></div>
+    {% else %}
+      {% set ds = '%04d-%02d-%02d'|format(year, month, day) %}
+      {% set info = cal_data.get(ds, {}) %}
+      {% set cal_v = info.get('calories', 0) %}
+      {% set meals_count = info.get('meals', 0) %}
+      {% set is_today = ds == today %}
+      {% set logged = cal_v > 0 %}
+      {% set on_track = cal_v >= goal_cal * 0.8 %}
+      {% set is_future = ds > today %}
+
+      <div class="cal-day-cell
+        {% if is_today %}is-today
+        {% elif is_future %}future
+        {% elif on_track and logged %}on-track
+        {% elif logged %}partial
+        {% else %}no-log{% endif %}
+        {% if logged and not is_future %}has-data{% endif %}"
+        title="{% if logged %}{{ cal_v }} kcal · {{ meals_count }} meal{{ 's' if meals_count != 1 else '' }}{% elif is_today %}Today — log your meals!{% elif is_future %}Upcoming{% else %}No meals logged{% endif %}">
+
+        {% if is_today %}<div class="today-pulse"></div>{% endif %}
+
+        <div class="cal-day-num">{{ day }}</div>
+
+        {% if logged %}
+          <div class="cal-day-kcal">{{ cal_v }}</div>
+          <div class="cal-dot"></div>
+        {% elif is_today %}
+          <div style="font-size:7px;color:var(--accent);font-weight:700;margin-top:1px;letter-spacing:0.2px;">TODAY</div>
+        {% endif %}
+      </div>
+    {% endif %}
+    {% endfor %}
+  </div>
+  {% endfor %}
+    </div>
+  </div>
+
+  <div class="cal-right">
+    <!-- Stats Cards Sidebar -->
+    <div class="cal-stats">
+      <div class="cal-stat-card" style="border-top:3px solid var(--accent);">
+        <div class="cal-stat-val">{{ days_logged }}</div>
+        <div class="cal-stat-lbl">Days Logged</div>
+      </div>
+      <div class="cal-stat-card" style="border-top:3px solid var(--accent2);">
+        <div class="cal-stat-val" style="color:var(--accent2);">{{ days_on_track }}</div>
+        <div class="cal-stat-lbl">On Track</div>
+      </div>
+      <div class="cal-stat-card" style="border-top:3px solid var(--gold);">
+        <div class="cal-stat-val" style="color:var(--gold);">{{ avg_kcal }}</div>
+        <div class="cal-stat-lbl">Avg kcal/day</div>
+      </div>
+      <div class="cal-stat-card" style="border-top:3px solid var(--macro-p);">
+        <div class="cal-stat-val" style="color:var(--macro-p);">{{ goal_cal }}</div>
+        <div class="cal-stat-lbl">Daily Goal</div>
+      </div>
+    </div>
+
+    <!-- Legend Sidebar -->
+    <div style="background:var(--surface);border:1px solid var(--border-ui);border-radius:var(--r-lg);padding:12px;overflow:hidden;">
+      <div style="display:flex;flex-direction:column;gap:10px;margin-top:0;">
+        <div class="legend-item">
+          <div class="legend-dot" style="background:rgba(110,232,154,0.12);border:1.5px solid rgba(110,232,154,0.3);"></div>
+          <span style="font-size:9px;">On Track</span>
+        </div>
+        <div class="legend-item">
+          <div class="legend-dot" style="background:rgba(240,180,41,0.1);border:1.5px solid rgba(240,180,41,0.3);"></div>
+          <span style="font-size:9px;">Partial</span>
+        </div>
+        <div class="legend-item">
+          <div class="legend-dot" style="background:var(--raised);border:1px solid var(--border-ui);"></div>
+          <span style="font-size:9px;">Not Logged</span>
+        </div>
+        <div class="legend-item">
+          <div class="legend-dot" style="background:var(--accent-mute);border:2px solid var(--accent);"></div>
+          <span style="font-size:9px;">Today</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Monthly Progress Bar -->
+<div style="margin-top:16px;background:var(--surface);border:1px solid var(--border-ui);border-radius:var(--r-lg);padding:18px 22px;box-shadow:var(--sh-card);">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+    <span style="font-size:13px;font-weight:800;color:var(--text);">Monthly Consistency</span>
+    <span style="font-size:13px;font-weight:700;color:var(--accent);">{{ days_logged }} days logged this month</span>
+  </div>
+  {% set pct = ((days_logged / 30 * 100) | round | int) %}
+  <div style="height:10px;background:var(--raised);border-radius:var(--r-pill);overflow:hidden;">
+    <div style="height:100%;width:'{{ [pct,100]|min }}%';background:linear-gradient(90deg,var(--accent-dim),var(--accent),var(--accent2));border-radius:var(--r-pill);transition:width 1.2s ease;position:relative;overflow:hidden;">
+      <div style="position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.18),transparent);animation:shimmer 2s infinite;background-size:200% 100%;"></div>
+    </div>
+  </div>
+  <div style="display:flex;justify-content:space-between;margin-top:6px;font-size:11px;color:var(--text-mute);font-weight:600;">
+    <span>0 days</span>
+    <span style="color:var(--accent);font-weight:700;">{{ pct }}% consistency</span>
+    <span>30 days</span>
+  </div>
+</div>
+
+{% endblock %}

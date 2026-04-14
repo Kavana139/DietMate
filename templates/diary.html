@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+{% block content %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<div style="display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px;">
+  <div>
+    <h1 class="page-title">Food Diary</h1>
+    <p class="page-subtitle" style="margin-bottom:0;">Your complete nutrition log for {{ date }}.</p>
+  </div>
+  <div style="display:flex;gap:8px;align-items:center;">
+    <input type="date" value="{{ date }}" class="form-input" style="padding:8px 14px;font-size:13px;width:auto;"
+           onchange="window.location.href='/diary?date='+this.value">
+    <a href="/diary?date={{ date }}" class="btn btn-ghost btn-sm">Today</a>
+  </div>
+</div>
+
+<!-- Summary cards -->
+<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:20px;">
+  {% set tot_cal = totals[0] or 0 %}
+  {% set tot_p   = totals[1] or 0 %}
+  {% set tot_c   = totals[2] or 0 %}
+  {% set tot_f   = totals[3] or 0 %}
+  <div class="prog-stat card-glow" style="position:relative;overflow:hidden;">
+    <div style="position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--accent),var(--accent2));"></div>
+    <div class="prog-stat-label">Calories</div>
+    <div class="prog-stat-val" style="color:var(--accent);">{{ tot_cal }}</div>
+    <div style="font-size:12px;color:var(--text-mute);font-weight:600;margin-top:4px;">/ {{ goal_cal }} kcal</div>
+    {% set pct = [[tot_cal / goal_cal * 100, 100]|min, 0]|max|int if goal_cal > 0 else 0 %}
+    <div class="cal-bar-track" style="margin-top:10px;"><div class="cal-bar-fill" style="width:'{{ pct }}%';"></div></div>
+  </div>
+  <div class="prog-stat" style="border-top:3px solid var(--macro-p);">
+    <div class="prog-stat-label">Protein</div>
+    <div class="prog-stat-val" style="color:var(--macro-p);">{{ tot_p }}g</div>
+    <div style="font-size:12px;color:var(--text-mute);font-weight:600;margin-top:4px;">/ {{ protein_goal }}g</div>
+  </div>
+  <div class="prog-stat" style="border-top:3px solid var(--macro-c);">
+    <div class="prog-stat-label">Carbs</div>
+    <div class="prog-stat-val" style="color:var(--macro-c);">{{ tot_c }}g</div>
+    <div style="font-size:12px;color:var(--text-mute);font-weight:600;margin-top:4px;">/ {{ carbs_goal }}g</div>
+  </div>
+  <div class="prog-stat" style="border-top:3px solid var(--macro-f);">
+    <div class="prog-stat-label">Fat</div>
+    <div class="prog-stat-val" style="color:var(--macro-f);">{{ tot_f }}g</div>
+    <div style="font-size:12px;color:var(--text-mute);font-weight:600;margin-top:4px;">/ {{ fat_goal }}g</div>
+  </div>
+</div>
+
+<!-- Entries -->
+<div style="background:var(--surface);border:1px solid var(--border-ui);border-radius:var(--r-lg);padding:22px;box-shadow:var(--sh-card);">
+  <div class="section-title" style="margin-bottom:14px;">Logged Meals</div>
+  {% if entries %}
+  {% set slot_icons = {'Early Morning':'🌅','Breakfast':'☀️','Mid Snack':'🍎','Lunch':'🍛','Evening Snack':'🌤️','Dinner':'🌙'} %}
+  <div style="display:flex;flex-direction:column;gap:0;">
+    {% for entry in entries %}
+    <div style="display:flex;align-items:center;gap:14px;padding:14px 0;border-bottom:1px solid var(--border-ui);">
+      <div style="width:38px;height:38px;border-radius:9px;background:var(--raised);border:1px solid var(--border-ui);
+           display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0;">
+        {{ slot_icons.get(entry[1], '🍽️') }}
+      </div>
+      <div style="flex:1;">
+        <div style="font-size:14px;font-weight:600;color:var(--text);">{{ entry[2] }}</div>
+        <div style="font-size:12px;color:var(--text-mute);margin-top:2px;">{{ entry[1] }} &middot; {{ entry[7].strftime('%I:%M %p') if entry[7] else '' }}</div>
+      </div>
+      <div style="text-align:right;">
+        <div style="font-size:14px;font-weight:800;color:var(--accent);font-family:'JetBrains Mono',monospace;">{{ entry[3] }} kcal</div>
+        <div style="font-size:11px;color:var(--text-mute);font-weight:600;font-family:'JetBrains Mono',monospace;">
+          P:{{ entry[4]|round(1) }}g C:{{ entry[5]|round(1) }}g F:{{ entry[6]|round(1) }}g
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+    <!-- Total row -->
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:14px 0;font-weight:800;">
+      <span style="font-size:14px;color:var(--text);">Total</span>
+      <span style="font-size:16px;color:var(--accent);font-family:'JetBrains Mono',monospace;">{{ tot_cal }} kcal</span>
+    </div>
+  </div>
+  {% else %}
+  <div style="text-align:center;padding:40px 20px;color:var(--text-mute);">
+    <div style="font-size:40px;opacity:0.3;margin-bottom:12px;">📋</div>
+    <p style="font-size:14px;">No meals logged for this date. <a href="/auto_diet" style="color:var(--accent);font-weight:700;text-decoration:none;">Log a meal</a></p>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

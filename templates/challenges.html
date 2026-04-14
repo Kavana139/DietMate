@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% block content %}
+<h1 class="page-title">Mini Challenges</h1>
+<p class="page-subtitle">Join a health challenge to build consistent habits. Every day counts.</p>
+
+<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px;">
+{% for c in challenges %}
+<div style="background:var(--surface);border:1px solid '{% if c.active %}var(--border-h){% else %}var(--border-ui){% endif %}';
+     border-radius:var(--r-lg);padding:22px;box-shadow:var(--sh-card);
+     {% if c.completed %}background:var(--accent-mute);{% endif %}">
+
+  <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px;">
+    <div>
+      <div style="font-family:'Syne',sans-serif;font-size:16px;font-weight:800;color:var(--text);margin-bottom:4px;">{{ c.title }}</div>
+      <div style="font-size:12.5px;color:var(--text-sec);">{{ c.desc }}</div>
+    </div>
+    <div style="font-size:11px;font-weight:800;padding:4px 10px;border-radius:var(--r-pill);flex-shrink:0;margin-left:10px;
+         background:'{% if c.completed %}var(--accent){% elif c.active %}var(--blue-bg){% else %}var(--raised){% endif %}';
+         color:'{% if c.completed %}var(--on-accent){% elif c.active %}var(--blue){% else %}var(--text-mute){% endif %}';
+         border:1px solid '{% if c.completed %}var(--accent){% elif c.active %}rgba(0,229,255,0.3){% else %}var(--border-ui){% endif %}';">
+      {% if c.completed %}Done!{% elif c.active %}Active{% else %}{{ c.days }}d{% endif %}
+    </div>
+  </div>
+
+  {% if c.active %}
+  <div style="margin-bottom:12px;">
+    <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--text-mute);font-weight:700;margin-bottom:6px;">
+      <span>Day {{ c.days_done }} of {{ c.days }}</span>
+      <span>{{ c.pct }}%</span>
+    </div>
+    <div style="height:6px;background:var(--raised);border-radius:var(--r-pill);overflow:hidden;">
+      <div style="height:100%;width:'{{ c.pct }}%';background:'{% if c.completed %}var(--accent){% else %}var(--blue){% endif %}';border-radius:var(--r-pill);transition:width 0.5s ease;"></div>
+    </div>
+  </div>
+  {% endif %}
+
+  {% if not c.active %}
+  <form method="POST" action="/challenges/{{ c.id }}/join">
+    <button type="submit" class="btn btn-primary" style="width:100%;margin-top:8px;">Join Challenge</button>
+  </form>
+  {% elif not c.completed %}
+  <form method="POST" action="/challenges/{{ c.id }}/leave">
+    <button type="submit" class="btn btn-ghost" style="width:100%;margin-top:8px;font-size:12px;">Quit Challenge</button>
+  </form>
+  {% else %}
+  <div style="text-align:center;margin-top:8px;font-size:14px;font-weight:800;color:var(--accent);">Challenge Complete!</div>
+  {% endif %}
+</div>
+{% endfor %}
+</div>
+{% endblock %}

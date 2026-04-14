@@ -1,0 +1,794 @@
+recipe_id,meal_id,recipe_name,description,instructions,prep_time,cook_time,servings,difficulty,category,diet_type,goal_tag,image_file,is_featured,rating,calories,protein,carbs,fat,fiber,tags,created_at
+1,1,"Creamy Banana Oats Bowl","Hearty overnight-style oats cooked with ripe banana, topped with seeds and honey.","1. Add 1/2 cup oats to saucepan with 1.5 cups milk.
+2. Cook on medium heat, stirring 5-7 min.
+3. Mash 1 ripe banana, stir into oats.
+4. Add cinnamon, vanilla, pinch of salt.
+5. Remove from heat, let thicken 2 min.
+6. Top with sliced banana, chia seeds, honey.
+7. Add chopped walnuts for crunch.",10,10,1,Easy,Breakfast,veg,"Weight Loss",recipes/oats_porridge.jpg,1,4.6,280,9.00,48.00,6.50,4.50,"breakfast,oats,banana,healthy,quick","2026-04-08 02:12:04"
+2,2,"Peanut Butter Power Toast","High-satiety breakfast with whole wheat toast, creamy PB, banana slices, and chia seeds.","1. Toast 2 slices whole wheat bread till golden.
+2. Spread 1.5 tbsp natural peanut butter on each.
+3. Slice 1 banana into rounds.
+4. Arrange banana slices on toast.
+5. Drizzle 1 tsp honey.
+6. Sprinkle chia seeds and a pinch of cinnamon.
+7. Serve immediately.",5,3,1,Easy,Breakfast,veg,"Weight Gain",recipes/wheat_toast_pb.jpg,0,4.5,280,9.50,34.00,12.50,4.00,"breakfast,peanutbutter,toast,quick","2026-04-08 02:12:04"
+3,3,"Colourful Vegetable Poha","Light, aromatic flattened rice cooked with vegetables, mustard, and turmeric.","1. Rinse 1.5 cups thick poha, drain, rest 5 min.
+2. Heat oil, add mustard seeds, curry leaves.
+3. Add onion, green chili, saute 3 min.
+4. Add peas, carrot, cook 4 min.
+5. Add turmeric, salt, sugar — mix.
+6. Add soaked poha, toss gently.
+7. Cook 3 min, squeeze lemon, garnish coriander.",10,15,2,Easy,Breakfast,veg,"Weight Loss",recipes/veg_poha.jpg,0,4.2,180,4.50,32.00,3.50,3.00,"breakfast,poha,indian,lowcalorie","2026-04-08 02:12:04"
+4,4,"High-Protein Moong Cheela","Savory moong dal crepes packed with protein — an Indian superfood breakfast.","1. Soak 1 cup moong dal 4 hours, drain.
+2. Grind to smooth batter with ginger, green chili.
+3. Add chopped onion, coriander, salt, ajwain.
+4. Heat non-stick pan, lightly oil.
+5. Pour ladle of batter, spread thin circle.
+6. Add finely chopped veggies on top.
+7. Cook 3 min each side till golden crisp.",15,20,3,Medium,Breakfast,veg,"Muscle Gain",recipes/moong_cheela.jpg,1,4.6,210,12.50,28.00,5.00,4.50,"breakfast,protein,moong,indian","2026-04-08 02:12:04"
+5,5,"Layered Greek Yogurt Parfait","Elegant parfait with protein-rich yogurt, fresh fruits, granola, and honey.","1. Take 200g thick Greek yogurt in a tall glass.
+2. Add 2 tbsp crunchy granola as base layer.
+3. Add mixed berries: strawberry, blueberry, raspberry.
+4. Repeat yogurt-granola-fruit layers.
+5. Drizzle 1 tsp raw honey on top.
+6. Add 5-6 mint leaves for freshness.
+7. Dust with cinnamon, serve immediately.",5,0,1,Easy,Breakfast,veg,All,recipes/yogurt_parfait.jpg,1,4.7,240,14.00,28.00,7.00,2.00,"breakfast,yogurt,parfait,highprotein,quick","2026-04-08 02:12:04"
+6,6,"Traditional Idli Sambar","Soft steamed rice cakes with spiced vegetable lentil soup — South India classic.","1. Ferment idli batter overnight (or use store-bought).
+2. Grease idli molds, pour batter, steam 12-15 min.
+3. For sambar: pressure cook toor dal with tomato, turmeric.
+4. Saute onion, drumstick, brinjal in oil.
+5. Add tamarind water, sambar powder, cooked dal.
+6. Temper with mustard, curry leaves, dried red chili.
+7. Serve hot idlis with sambar and coconut chutney.",480,30,4,Hard,Breakfast,veg,"Weight Loss",recipes/idli_sambar.jpg,0,4.5,220,8.00,42.00,2.50,3.50,"breakfast,idli,sambar,southindian,fermented","2026-04-08 02:12:04"
+7,7,"Masala Vegetable Upma","South Indian semolina porridge with vegetables, mustard seeds, and curry leaves.","1. Dry roast 1 cup fine rava (semolina) till light golden.
+2. Heat oil, add mustard, urad dal, curry leaves.
+3. Add onion, ginger, green chili — saute 3 min.
+4. Add carrot, peas, beans — cook 5 min.
+5. Add 2.5 cups boiling water, salt.
+6. Slowly pour roasted rava, stir constantly.
+7. Cover and cook 5 min, serve with coconut chutney.",10,20,2,Medium,Breakfast,veg,"Weight Loss",recipes/upma.jpg,0,4.0,210,5.50,38.00,5.00,4.00,"breakfast,upma,southindian,semolina","2026-04-08 02:12:04"
+8,8,"Fluffy 3-Ingredient Banana Pancakes","Naturally sweet gluten-friendly pancakes with banana, oats, and eggs.","1. Mash 2 very ripe bananas in a bowl until smooth.
+2. Add 1 cup oats blended to flour.
+3. Add 2 eggs, vanilla, pinch of cinnamon.
+4. Mix till batter forms — it will be thick.
+5. Pour small rounds on greased non-stick pan.
+6. Cook on medium 2-3 min, flip carefully.
+7. Stack and serve with berries and maple syrup.",5,15,2,Easy,Breakfast,veg,All,recipes/banana_pancakes.jpg,0,4.4,260,8.00,40.00,8.00,4.00,"breakfast,pancakes,banana,glutenfree","2026-04-08 02:12:04"
+9,9,"Indian Spicy Masala Omelette","Bold, flavourful egg-free omelette made from chickpea flour with Indian spices.","1. Mix 1 cup besan with water to pancake batter consistency.
+2. Add turmeric, chili powder, cumin, salt.
+3. Fold in: onion, tomato, green chili, coriander.
+4. Heat oil in flat pan.
+5. Pour mixture, spread in circle.
+6. Cook 3-4 min each side till cooked through.
+7. Serve with mint chutney and toast.",5,10,2,Easy,Breakfast,veg,All,recipes/masala_omelette.jpg,0,4.3,180,8.00,22.00,7.00,4.00,"breakfast,masala,omelette,spicy,indian","2026-04-08 02:12:04"
+10,10,"Smashed Avocado Sourdough Toast","Trendy nutritious toast with avocado, cherry tomatoes, and chili flakes.","1. Toast 2 thick slices sourdough bread.
+2. Halve 1 ripe avocado, remove pit.
+3. Scoop flesh into bowl, mash with fork.
+4. Add lemon juice, salt, black pepper, garlic powder.
+5. Spread generously on toast.
+6. Top with halved cherry tomatoes.
+7. Sprinkle red chili flakes, sesame seeds, drizzle olive oil.",5,3,1,Easy,Breakfast,veg,All,recipes/avocado_toast.jpg,1,4.8,250,5.00,24.00,16.00,7.00,"breakfast,avocado,toast,healthy,trendy","2026-04-08 02:12:04"
+11,11,"Fluffy Egg White Omelette","Low-calorie high-protein omelette perfect for weight loss and cutting phase.","1. Separate 4 large egg whites into clean bowl.
+2. Whisk until frothy with salt, pepper, dried herbs.
+3. Lightly spray non-stick pan with oil.
+4. Pour egg whites, tilt to spread thin.
+5. Add spinach, sliced mushroom, bell pepper on one side.
+6. Fold omelette over filling.
+7. Cook 1 more minute, serve with hot sauce.",5,8,1,Easy,Breakfast,nonveg,"Weight Loss",recipes/egg_white_omelette.jpg,0,4.4,130,18.00,2.00,5.00,0.50,"breakfast,eggwhite,protein,lowcalorie,diet","2026-04-08 02:12:04"
+12,12,"Classic Boiled Eggs on Toast","Simple, satisfying protein-packed breakfast with perfectly boiled eggs.","1. Bring water to full boil in saucepan.
+2. Gently lower 2-3 eggs, cook 9 min for hard-boiled.
+3. Transfer to ice water, peel when cool.
+4. Toast 2 slices whole wheat bread.
+5. Slice eggs, arrange on toast.
+6. Season with salt, pepper, paprika.
+7. Add sliced avocado or tomato on the side.",2,10,1,Easy,Breakfast,nonveg,"Weight Loss",recipes/boiled_eggs_toast.jpg,0,4.2,220,14.00,18.00,10.00,2.00,"breakfast,eggs,boiled,simple,protein","2026-04-08 02:12:04"
+13,13,"Creamy Scrambled Eggs with Spinach","Silky, protein-rich scrambled eggs folded with iron-rich spinach.","1. Crack 3 eggs into bowl, whisk with 2 tbsp milk.
+2. Heat 1 tsp butter in non-stick pan on LOW heat.
+3. Add 1 cup fresh spinach, wilt for 1 min.
+4. Pour egg mixture over spinach.
+5. Stir gently in slow figure-8 motions.
+6. Remove from heat while still slightly wet — residual heat finishes them.
+7. Season, serve on toast or grain bowl.",3,7,1,Easy,Breakfast,nonveg,"Muscle Gain",recipes/scrambled_eggs.jpg,0,4.5,200,16.00,6.00,12.00,1.50,"breakfast,eggs,scrambled,spinach,protein","2026-04-08 02:12:04"
+14,14,"Protein Chicken Sausage Wrap","High-protein breakfast wrap with grilled chicken sausage, egg, and salad.","1. Grill 2 chicken sausages till browned all over (8 min).
+2. Scramble 1 egg in separate pan with pinch of salt.
+3. Warm 1 large whole wheat tortilla on dry pan.
+4. Spread 1 tbsp hummus or mustard on tortilla.
+5. Add sliced sausage, scrambled egg.
+6. Add shredded lettuce, tomato slice, cheese.
+7. Roll tight, slice diagonally, serve.",5,12,1,Easy,Breakfast,nonveg,"Muscle Gain",recipes/chicken_sausage_wrap.jpg,0,4.3,320,22.00,26.00,14.00,2.00,"breakfast,chicken,wrap,protein,highcalorie","2026-04-08 02:12:04"
+15,15,"Tuna Avocado Power Toast","Omega-rich tuna on avocado toast — double protein and healthy fat bomb.","1. Drain 1 small can tuna in water completely.
+2. Mix tuna with 1 tsp lemon juice, salt, herbs.
+3. Toast 2 slices sourdough or wheat bread.
+4. Mash 1/2 avocado with lemon, salt, black pepper.
+5. Spread avocado generously on toast.
+6. Pile tuna mixture on top.
+7. Add capers, red onion rings, everything bagel seasoning.",5,3,1,Easy,Breakfast,nonveg,"Muscle Gain",recipes/tuna_sandwich.jpg,0,4.5,290,22.00,22.00,14.00,5.00,"breakfast,tuna,avocado,omega3,protein","2026-04-08 02:12:04"
+16,16,"Apple Almond Butter Snack","Simple, satisfying snack with natural sugars, healthy fats, and fiber.","1. Core 1 medium apple, slice into 8 wedges.
+2. Arrange on plate in fan pattern.
+3. Add 1.5 tbsp natural almond or peanut butter.
+4. Sprinkle a few raisins or granola.
+5. Add pinch of cinnamon on the butter.
+6. Optional: drizzle tiny bit of honey.
+7. Eat within 30 min for best freshness.",3,0,1,Easy,Snack,veg,All,recipes/apple_almond.jpg,0,4.4,180,4.50,20.00,10.00,4.00,"snack,apple,almondButter,fiber,healthy","2026-04-08 02:12:04"
+17,17,"Crunchy Ghee Roasted Makhana","Air-popped lotus seeds roasted in ghee — a zero-junk Indian superfood snack.","1. Heat 1 tsp ghee in wide pan on low-medium.
+2. Add 2 cups makhana, stir continuously.
+3. Roast 8-10 min till crispy throughout.
+4. Remove from heat.
+5. Add salt, chili powder, chaat masala.
+6. Toss well, cool completely — they crisp more on cooling.
+7. Store airtight, eat within 3 days.",2,10,2,Easy,Snack,veg,"Weight Loss",recipes/makhana.jpg,0,4.5,110,3.50,14.00,5.00,0.50,"snack,makhana,lotus,lowcalorie,crunchy","2026-04-08 02:12:04"
+18,18,"Trail Mix Nuts and Seeds","Energy-dense mix of nuts and seeds — perfect pre-workout or desk snack.","1. Measure: 10 almonds, 8 cashews, 5 walnuts.
+2. Add 1 tsp pumpkin seeds, 1 tsp sunflower seeds.
+3. Add a few dried cranberries or raisins.
+4. Optional: lightly toast in dry pan 3 min for crunch.
+5. Season with tiny pinch of himalayan salt.
+6. Mix all together in small bowl.
+7. Portion into 30g servings for calorie control.",3,3,4,Easy,Snack,veg,All,recipes/mixed_nuts.jpg,0,4.3,170,5.00,8.00,14.00,2.50,"snack,nuts,seeds,trailmix,energy","2026-04-08 02:12:04"
+19,19,"Rainbow Seasonal Fruit Bowl","Colorful vitamin-rich fruit bowl with a variety of textures.","1. Cut seasonal fruits: mango, papaya, watermelon, grapes.
+2. Slice banana, add orange segments.
+3. Mix together in large bowl.
+4. Sprinkle chaat masala and lemon juice (Indian style).
+5. Or: add honey and mint for Mediterranean style.
+6. Top with pomegranate seeds for antioxidants.
+7. Serve chilled.",8,0,2,Easy,Snack,veg,"Weight Loss",recipes/fruit_salad.jpg,0,4.2,120,2.00,28.00,0.50,4.00,"snack,fruit,vitamins,antioxidants,refreshing","2026-04-08 02:12:04"
+20,20,"Roasted Garlic Hummus with Veggies","Creamy homemade hummus with roasted garlic and fresh vegetable sticks.","1. Drain and rinse 1 can chickpeas.
+2. Roast 4 garlic cloves (skins on) at 200°C for 20 min.
+3. Squeeze roasted garlic out.
+4. Blend chickpeas, roasted garlic, 3 tbsp tahini, lemon juice.
+5. Add 2 tbsp olive oil, cumin, salt — blend smooth.
+6. Add cold water for desired consistency.
+7. Plate with drizzle of olive oil, paprika. Serve with cucumber, carrot, bell pepper sticks.",5,20,4,Easy,Snack,veg,All,recipes/hummus_veggies.jpg,0,4.6,180,6.50,20.00,8.50,5.50,"snack,hummus,chickpeas,veggies,protein","2026-04-08 02:12:04"
+21,21,"Zesty Masala Sprouts Chaat","Protein-packed sprouted moong with tangy chutneys and crunchy sev.","1. Sprout moong dal 2 days ahead (rinse twice daily).
+2. Lightly steam sprouts 2 min to remove rawness.
+3. Cool completely.
+4. Mix: chopped onion, tomato, cucumber, green chili.
+5. Add chaat masala, roasted cumin, lemon juice, salt.
+6. Add green chutney and tamarind chutney to taste.
+7. Toss well, top with sev, coriander, pomegranate.",10,5,2,Easy,Snack,veg,"Weight Loss",recipes/sprouts_chaat.jpg,0,4.4,140,9.50,20.00,2.00,5.00,"snack,sprouts,protein,chaat,indian","2026-04-08 02:12:04"
+22,22,"Spicy Chicken Tikka Bites","Tender marinated chicken pieces grilled to perfection — a lean protein snack.","1. Cut 200g chicken breast into small cubes.
+2. Marinate: yogurt, lemon, ginger-garlic paste, tikka masala, salt.
+3. Marinate minimum 2 hours, overnight is best.
+4. Skewer on toothpicks or small skewers.
+5. Grill on high heat 10-12 min, turning halfway.
+6. Should have slight char on outside.
+7. Serve with mint chutney and lemon wedge.",130,12,2,Easy,Snack,nonveg,"Muscle Gain",recipes/chicken_tikka.jpg,0,4.6,160,22.00,4.00,7.00,0.50,"snack,chicken,tikka,protein,grill","2026-04-08 02:12:04"
+23,23,"Perfect Hard Boiled Eggs","Nutrition-dense snack that is portable, filling, and supremely high in protein.","1. Place eggs in single layer in saucepan.
+2. Cover with cold water by 1 inch.
+3. Bring to boil over medium-high heat.
+4. Once boiling, reduce heat, cook exactly 10 min.
+5. Transfer immediately to ice water.
+6. Rest 15 min — this makes peeling easy.
+7. Peel, slice, season with salt, pepper, paprika.",0,12,2,Easy,Snack,nonveg,"Weight Loss",recipes/hard_boiled_eggs.jpg,0,4.2,140,12.00,1.00,10.00,0.00,"snack,eggs,boiled,protein,portable","2026-04-08 02:12:04"
+24,24,"Tuna Protein Crackers","Quick assembly protein snack with omega-3 rich tuna on whole grain crackers.","1. Drain 1 small can (85g) tuna in water.
+2. Mix tuna with 1 tsp mayo, lemon juice, salt, pepper.
+3. Add finely chopped celery or cucumber for crunch.
+4. Arrange 8-10 whole grain crackers on plate.
+5. Top each cracker with tuna mixture.
+6. Add sliced cherry tomato on top.
+7. Garnish with dill or parsley.",5,0,1,Easy,Snack,nonveg,"Weight Loss",recipes/tuna_crackers.jpg,0,4.1,160,16.00,14.00,4.00,1.50,"snack,tuna,crackers,omega3,protein","2026-04-08 02:12:04"
+25,25,"Restaurant-Style Dal Tadka","Creamy arhar dal tempered with ghee, cumin, garlic, and whole spices.","1. Pressure cook 1 cup arhar dal with 3 cups water, turmeric, salt (3 whistles).
+2. Mash slightly, adjust consistency with water.
+3. Heat ghee in tadka pan on high heat.
+4. Add cumin seeds — let them splutter.
+5. Add chopped onion, cook till deep golden (8 min).
+6. Add ginger-garlic paste, cook 2 min.
+7. Add tomatoes, red chili, garam masala — cook 5 min.
+8. Pour tadka over dal, stir, garnish coriander.
+9. Serve with steamed rice and pickle.",10,25,3,Medium,Lunch,veg,All,recipes/dal_tadka_rice.jpg,1,4.7,380,16.50,58.00,7.50,8.00,"lunch,dal,protein,indian,comfort","2026-04-08 02:12:04"
+26,26,"Silky Paneer Butter Masala","Velvety rich tomato-cashew curry with soft paneer cubes — restaurant quality.","1. Blend: 4 tomatoes, 10 cashews, 1 onion to smooth paste.
+2. Heat butter, add bay leaf, cardamom, cinnamon.
+3. Pour paste, cook on medium 10-12 min, stirring often.
+4. Oil will separate at edges — this is key.
+5. Add kashmiri red chili, garam masala, sugar, salt.
+6. Add cream, stir, simmer 5 min.
+7. Cube 250g paneer, add to gravy.
+8. Cook 5 min gently.
+9. Add kasuri methi, serve with hot rotis.",15,30,3,Medium,Lunch,veg,"Weight Gain",recipes/paneer_butter.jpg,1,4.9,480,18.00,40.00,28.00,3.00,"lunch,paneer,butter,rich,indian","2026-04-08 02:12:04"
+27,27,"North Indian Rajma Chawal","Kidney beans curry — complete plant-based protein with steamed rice.","1. Soak rajma overnight, drain.
+2. Pressure cook with fresh water and salt (5-6 whistles).
+3. Heat oil, add bay leaf, cumin.
+4. Fry onion till brown (8 min), add ginger-garlic.
+5. Add tomato puree, all powdered spices — cook till oil leaves.
+6. Add boiled rajma with 1 cup water.
+7. Simmer 15-20 min till thick, creamy gravy.
+8. Mash a few beans against pan side for thickness.
+9. Garnish coriander, serve with steamed rice.",480,30,4,Medium,Lunch,veg,All,recipes/rajma_chawal.jpg,0,4.6,420,18.00,72.00,6.50,12.00,"lunch,rajma,beans,protein,northindian","2026-04-08 02:12:04"
+28,29,"Luscious Palak Paneer","Iron-rich spinach curry with soft paneer — a complete nutritional powerhouse.","1. Blanch 3 cups spinach in boiling water 2 min.
+2. Immediately transfer to ice water (preserves green color).
+3. Blend spinach to smooth paste.
+4. Heat oil, add cumin, chopped onion.
+5. Add ginger-garlic paste, cook 3 min.
+6. Add tomato, red chili, coriander powder — cook 5 min.
+7. Add spinach puree, stir.
+8. Add cream, salt, garam masala.
+9. Add 200g paneer cubes, cook 5 min gently.",10,25,3,Medium,Lunch,veg,"Muscle Gain",recipes/palak_paneer.jpg,1,4.8,350,16.50,28.00,18.00,4.50,"lunch,palak,paneer,iron,spinach,protein","2026-04-08 02:12:04"
+29,33,"Quinoa Vegetable Power Bowl","Complete amino acid profile in one bowl — inspired by MyFitnessPal power users.","1. Rinse 1 cup quinoa thoroughly (removes bitter coating).
+2. Cook in 2 cups water with pinch of salt (15 min, let steam 5 min).
+3. Toss broccoli, bell pepper, sweet potato in olive oil.
+4. Roast vegetables at 200°C for 25 min.
+5. Make tahini dressing: tahini, lemon, garlic, water, salt.
+6. Layer quinoa in bowl, add roasted veggies.
+7. Add 1/4 can chickpeas, sliced avocado.
+8. Drizzle dressing generously.
+9. Top with pumpkin seeds and herbs.",15,30,2,Easy,Lunch,veg,"Muscle Gain",recipes/quinoa_bowl.jpg,1,4.7,380,14.00,52.00,14.00,8.00,"lunch,quinoa,protein,bowl,healthy,vegan","2026-04-08 02:12:04"
+30,35,"Zesty Black Bean Tacos","Mexican-inspired tacos with spiced black beans, avocado, and fresh salsa.","1. Heat oil in pan, add cumin and garlic.
+2. Add 1 can black beans (drained), season chili powder, salt.
+3. Mash half the beans roughly for creamy texture.
+4. Warm 6 small corn tortillas directly on flame.
+5. Make salsa: tomato, onion, coriander, lime, jalapeno.
+6. Assemble: beans, shredded purple cabbage, fresh salsa.
+7. Top with avocado slices, squeeze of lime.
+8. Add hot sauce if desired.",15,15,2,Easy,Lunch,veg,"Muscle Gain",recipes/black_bean_tacos.jpg,0,4.5,180,11.00,24.00,5.00,8.00,"lunch,tacos,mexican,blackbean,vegan","2026-04-08 02:12:04"
+31,36,"Mediterranean Chickpea Spinach Salad","Iron-rich spinach with crispy roasted chickpeas and lemon dressing.","1. Drain chickpeas, toss with olive oil, cumin, paprika, salt.
+2. Roast at 200°C for 25-30 min till crispy.
+3. Make lemon dressing: lemon juice, olive oil, garlic, salt, honey.
+4. In large bowl, toss baby spinach with dressing.
+5. Add roasted chickpeas, cherry tomatoes, cucumber.
+6. Add kalamata olives, thinly sliced red onion.
+7. Crumble feta on top.
+8. Add toasted pine nuts or pumpkin seeds.",5,25,2,Easy,Lunch,veg,"Weight Loss",recipes/chickpea_salad.jpg,0,4.3,260,12.50,32.00,9.00,7.00,"lunch,salad,chickpeas,mediterranean,iron","2026-04-08 02:12:04"
+32,37,"Teriyaki Tofu Vegetable Stir Fry","Japanese-inspired protein stir fry with crispy tofu and colourful vegetables.","1. Press 400g firm tofu between towels 20 min.
+2. Cube and marinate in teriyaki sauce 15 min.
+3. Make extra teriyaki: soy sauce, mirin, sake, brown sugar.
+4. Heat wok on highest heat with sesame oil.
+5. Cook tofu till golden on all 4 sides (8-10 min). Set aside.
+6. Stir fry vegetables: broccoli, snap peas, carrot, mushroom.
+7. Add tofu back, pour sauce, toss.
+8. Serve over steamed jasmine rice.
+9. Garnish sesame seeds and spring onion.",20,20,2,Medium,Lunch,veg,"Muscle Gain",recipes/tofu_stir_fry.jpg,0,4.3,220,14.50,16.00,11.00,4.00,"lunch,tofu,teriyaki,japanese,protein","2026-04-08 02:12:04"
+33,41,"Herb Grilled Chicken Brown Rice Bowl","Lean protein meets complex carbs — the perfect macro-balanced lunch.","1. Pound chicken breast to even thickness.
+2. Marinate 30 min: yogurt, lemon, garlic, cumin, herbs, chili.
+3. Cook brown rice (35 min) — prep in advance.
+4. Grill chicken on HIGH heat 6-7 min each side.
+5. Let rest 5 min before slicing — CRUCIAL for juiciness.
+6. Slice against grain into strips.
+7. Build bowl: rice base, chicken strips, cucumber raita.
+8. Add cherry tomatoes, green onion.
+9. Drizzle extra lemon.",35,15,2,Medium,Lunch,nonveg,"Muscle Gain",recipes/grilled_chicken_rice.jpg,1,4.8,420,38.00,42.00,10.00,4.00,"lunch,chicken,grilled,rice,protein,mealprep","2026-04-08 02:12:04"
+34,43,"Authentic Kerala Fish Curry","Tangy coconut-based fish curry with kokum — South Indian coastal comfort food.","1. Marinate fish: turmeric, salt, chili powder — 15 min.
+2. Heat coconut oil in clay pot or deep pan.
+3. Add mustard seeds, curry leaves, dried red chilies.
+4. Add shallots, ginger, green chili — saute 5 min.
+5. Add tomatoes, red chili powder, coriander powder.
+6. Add thick coconut milk, piece of kokum, salt.
+7. Simmer 5 min till sauce thickens.
+8. Add marinated fish pieces.
+9. Cook gently 10 min, garnish curry leaves.",15,25,3,Medium,Lunch,nonveg,All,recipes/fish_curry.jpg,0,4.6,380,28.00,40.00,12.00,4.00,"lunch,fish,kerala,coconut,curry,seafood","2026-04-08 02:12:04"
+35,47,"Lemon Garlic Herb Baked Salmon","Omega-3 rich salmon fillet baked with aromatic garlic, herbs, and lemon.","1. Preheat oven to 200°C, line tray with parchment.
+2. Pat salmon dry — important for good crust.
+3. Mix: 3 tbsp olive oil, 4 garlic cloves minced, rosemary, thyme, lemon zest.
+4. Brush generously on flesh side.
+5. Season well with salt and black pepper.
+6. Bake 15-18 min — it should flake easily.
+7. Squeeze fresh lemon over salmon.
+8. Serve with steamed asparagus and quinoa.
+9. Garnish capers and fresh dill.",5,18,2,Easy,Lunch,nonveg,"Weight Loss",recipes/baked_salmon.jpg,1,4.9,350,32.00,16.00,16.00,3.00,"lunch,salmon,omega3,baked,healthy,protein","2026-04-08 02:12:04"
+36,49,"Macro-Perfect Chicken Breast Salad","High-protein salad with grilled chicken, avocado, and Greek yogurt dressing.","1. Season chicken breast with Italian herbs, garlic, salt, pepper.
+2. Sear in hot pan 6-7 min each side on medium-high.
+3. Rest 5 min, slice thinly against grain.
+4. Make dressing: Greek yogurt, lemon, Dijon mustard, garlic, herbs.
+5. Toss romaine, cucumber, cherry tomatoes, avocado.
+6. Add red onion, corn kernels if desired.
+7. Plate salad, arrange chicken strips on top.
+8. Drizzle yogurt dressing generously.
+9. Top with toasted pumpkin seeds.",10,15,2,Easy,Lunch,nonveg,"Muscle Gain",recipes/chicken_breast_salad.jpg,1,4.7,380,36.00,20.00,16.00,5.00,"lunch,chicken,salad,protein,healthy","2026-04-08 02:12:04"
+37,50,"Tuna Brown Rice Macro Bowl","Complete macro meal with perfect protein-carb-fat ratios in one bowl.","1. Cook 1 cup brown rice (40 min) — batch cook ahead.
+2. Drain 1 can tuna in water completely.
+3. Mix tuna with lemon, dill, celery, salt, pepper.
+4. Slice: avocado, cucumber, cherry tomatoes.
+5. Build bowl: rice base (1 cup cooked).
+6. Add tuna, avocado, veggies arranged by color.
+7. Add edamame for extra protein.
+8. Make dressing: sesame oil, soy sauce, ginger, honey.
+9. Drizzle dressing, top sesame seeds.",5,35,2,Easy,Lunch,nonveg,"Muscle Gain",recipes/tuna_rice_bowl.jpg,0,4.5,360,28.00,38.00,10.00,4.00,"lunch,tuna,rice,bowl,mealprep,omega3","2026-04-08 02:12:04"
+38,56,"Healing Mung Bean Khichdi","Detoxifying one-pot dal-rice — Ayurvedic superfood for gut healing.","1. Wash 1/2 cup rice and 1/4 cup split moong dal together.
+2. Soak 20 min, drain.
+3. Pressure cook with 3 cups water, turmeric, salt (3 whistles).
+4. Heat ghee, add cumin, asafoetida (hing), ginger.
+5. Add vegetables: carrot, peas, green beans.
+6. Cook 5 min, add to khichdi.
+7. Mix well, add ghee generously.
+8. Adjust water for porridge consistency.
+9. Serve with yogurt, pickle, and papad.",5,20,2,Easy,Dinner,veg,"Weight Loss",recipes/khichdi.jpg,1,4.6,220,10.00,38.00,3.50,5.00,"dinner,khichdi,detox,comfort,easy,digestive","2026-04-08 02:12:04"
+39,60,"Ginger Teriyaki Tofu","Crispy baked tofu with ginger teriyaki glaze — better than takeout.","1. Press tofu 30 min, cube into 2cm pieces.
+2. Toss with cornstarch, salt — this creates crispiness.
+3. Bake at 200°C for 25 min, flipping halfway.
+4. Sauce: soy sauce, mirin, fresh ginger, garlic, sesame oil, honey.
+5. Simmer sauce 5 min till slightly thick.
+6. Toss crispy tofu in sauce.
+7. Serve over rice noodles or cauliflower rice.
+8. Garnish sesame seeds, green onion, chili flakes.",35,25,2,Medium,Dinner,veg,"Muscle Gain",recipes/tofu_stir_fry.jpg,0,4.3,220,14.00,16.00,11.00,4.00,"dinner,tofu,teriyaki,japanese,vegan","2026-04-08 02:12:04"
+40,64,"Low-Carb Zucchini Noodles Pesto","Spiralized zucchini with vibrant homemade basil pesto — guilt-free pasta night.","1. Spiralize 3 medium zucchinis or use vegetable peeler for ribbons.
+2. Blend pesto: 2 cups basil, 3 tbsp pine nuts, 2 garlic, parmesan, olive oil.
+3. Heat 1 tsp olive oil, add zucchini noodles.
+4. Toss quickly on HIGH heat — only 3 min or they go soggy.
+5. Remove from heat.
+6. Toss with 3-4 tbsp pesto.
+7. Add halved cherry tomatoes.
+8. Season with salt, cracked pepper.
+9. Top with extra parmesan and pine nuts.",15,5,2,Easy,Dinner,veg,"Weight Loss",recipes/zucchini_noodles.jpg,0,4.2,160,5.00,12.00,12.00,5.00,"dinner,zucchini,pesto,lowcarb,keto,light","2026-04-08 02:12:04"
+41,71,"Mediterranean Lemon Grilled Fish","Light, protein-rich grilled fish — ideal weight-loss dinner.","1. Score fish fillet diagonally 3 times on each side.
+2. Marinate 20 min: lemon juice, garlic, fresh herbs, olive oil, salt, pepper.
+3. Bring fish to room temperature before grilling.
+4. Preheat grill or grill pan to high — very hot.
+5. Grill 4-5 min each side depending on thickness.
+6. Fish is done when it flakes easily with fork.
+7. Plate on bed of mixed salad greens.
+8. Add lemon wedge and drizzle extra olive oil.
+9. Garnish fresh herbs.",25,10,2,Easy,Dinner,nonveg,"Weight Loss",recipes/grilled_fish.jpg,0,4.5,280,26.00,10.00,14.00,2.00,"dinner,fish,grilled,protein,mediterranean,light","2026-04-08 02:12:04"
+42,73,"One-Tray Herb Baked Chicken","Complete meal — chicken thighs roasted with vegetables on one baking tray.","1. Preheat oven to 200°C.
+2. Cube vegetables: sweet potato, carrot, broccoli, zucchini, onion.
+3. Toss veggies with olive oil, thyme, rosemary, garlic, salt, pepper.
+4. Rub chicken thighs with paprika, garlic powder, cumin, salt.
+5. Place chicken and veggies on single large baking tray.
+6. Bake 40 min, flip veggies halfway.
+7. Chicken should be golden with juices running clear.
+8. Rest 5 min before serving.
+9. Drizzle tray juices over everything.",15,40,3,Easy,Dinner,nonveg,"Muscle Gain",recipes/baked_chicken.jpg,1,4.7,380,34.00,18.00,18.00,4.00,"dinner,chicken,baked,mealprep,vegetables,easy","2026-04-08 02:12:04"
+43,76,"Restaurant-Quality Pan-Seared Steak","Perfectly cooked ribeye with herb butter — for serious muscle building.","1. Remove steak from fridge 30 min before cooking — room temperature is ESSENTIAL.
+2. Season VERY generously with coarse salt and black pepper on all sides.
+3. Heat cast iron skillet till SMOKING HOT — this creates the sear.
+4. Add 1 tbsp oil, place steak, do not touch for 3-4 min.
+5. Flip, add 2 tbsp butter, 4 garlic cloves, fresh rosemary, thyme.
+6. Tilt pan, continuously spoon herb butter over steak (basting) for 3 min.
+7. For medium: internal temp 63°C. For medium-rare: 57°C.
+8. REST on wire rack 5-8 min — this is non-negotiable.
+9. Slice against grain, serve with roasted potato wedges.",35,10,1,Hard,Dinner,nonveg,"Weight Gain",recipes/beef_steak.jpg,0,4.8,480,36.00,2.00,34.00,0.00,"dinner,steak,beef,muscle,protein,highcalorie","2026-04-08 02:12:04"
+44,79,"Japanese Miso Glazed Salmon","Umami-rich miso-glazed salmon — restaurant quality in 30 minutes.","1. Mix glaze: 3 tbsp white miso, 2 tbsp mirin, 1 tbsp sake, 1 tsp brown sugar.
+2. Marinate salmon 30 min (up to 4 hours) in glaze.
+3. Preheat oven to 220°C with grill/broil setting.
+4. Line tray with aluminium foil.
+5. Place salmon skin-side down.
+6. Broil 10-12 min till caramelized and slightly charred.
+7. Watch carefully — miso burns quickly.
+8. While salmon cooks, blanch pak choi and green beans.
+9. Plate salmon over greens, sprinkle sesame seeds.",35,12,2,Medium,Dinner,nonveg,"Weight Loss",recipes/steam_salmon.jpg,1,4.8,350,32.00,28.00,13.00,3.00,"dinner,salmon,miso,japanese,omega3,gourmet","2026-04-08 02:12:04"
+45,83,"Indulgent PB Banana French Toast","High-calorie satisfying french toast for weight gain goals.","1. Whisk 2 eggs with 3 tbsp whole milk, 1 tsp vanilla, cinnamon.
+2. Dip thick (2cm) wheat bread slices in mixture, let soak 30 seconds each side.
+3. Melt 1 tbsp butter in pan on medium heat.
+4. Cook soaked bread 3-4 min each side till golden.
+5. Spread 1.5 tbsp natural peanut butter on each slice.
+6. Slice 1 banana, arrange on top.
+7. Drizzle pure maple syrup.
+8. Add mixed berries on side.
+9. Dust with powdered sugar.",5,10,2,Easy,Breakfast,veg,"Weight Gain",recipes/pb_banana_toast.jpg,0,4.6,380,14.00,50.00,14.00,5.00,"breakfast,french,toast,pbandbanana,weightgain","2026-04-08 02:12:04"
+46,87,"Spicy Chicken Arrabiata Pasta","Italian-inspired pasta with spiced chicken — calorie-dense muscle meal.","1. Cook 200g penne or rigatoni al dente in salted water.
+2. Reserve 1/2 cup pasta water before draining.
+3. Season chicken with Italian herbs, salt, pepper.
+4. Sear in hot pan 6 min each side, slice when rested.
+5. In same pan: saute garlic in olive oil, add chili flakes.
+6. Add 1 can crushed tomatoes, simmer 10 min.
+7. Season with salt, sugar, fresh basil.
+8. Toss pasta in sauce with pasta water for glossy coating.
+9. Plate, top with chicken slices and grated parmesan.",10,25,2,Medium,Lunch,nonveg,"Weight Gain",recipes/chicken_pasta.jpg,0,4.6,520,34.00,58.00,16.00,4.00,"lunch,pasta,chicken,italian,weightgain,highcalorie","2026-04-08 02:12:04"
+47,28,"Classic Chole Bhature","Crispy fried bread with spiced chickpea curry — a North Indian indulgence.","1. Soak chickpeas overnight, pressure cook till soft.
+2. Heat oil, add whole spices: bay leaf, clove, cardamom.
+3. Brown onions deeply (12 min), add ginger-garlic.
+4. Add tomato puree and all spice powders.
+5. Cook till oil separates (8 min).
+6. Add chickpeas with 1 cup water, simmer 20 min.
+7. For bhature: knead maida with yogurt, oil, salt till smooth.
+8. Rest 30 min, roll thick circles.
+9. Deep fry in hot oil till puffed and golden.",480,45,4,Hard,Lunch,veg,"Weight Gain",recipes/chole_bhature.jpg,0,4.7,650,16.00,85.00,28.00,8.00,"lunch,chole,bhature,northindian,indulgent","2026-04-08 02:12:04"
+48,30,"Aromatic Vegetable Biryani","Fragrant long-grain rice cooked with spiced vegetables and whole spices.","1. Wash and soak basmati rice 30 min.
+2. Fry onions in ghee till deep brown (caramelized).
+3. Add whole spices: cardamom, cloves, cinnamon, star anise.
+4. Add vegetables: carrot, peas, beans, cauliflower.
+5. Add yogurt, biryani masala, salt.
+6. Layer half-cooked rice over vegetables.
+7. Top with fried onions, saffron milk, ghee, mint.
+8. Seal pot with dough or foil (dum cooking).
+9. Cook on very low heat 25 min. Rest 10 min before opening.",30,45,4,Hard,Lunch,veg,All,recipes/veg_biryani.jpg,0,4.6,450,10.00,76.00,12.00,6.00,"lunch,biryani,rice,vegetable,fragrant,special","2026-04-08 02:12:04"
+49,31,"South Indian Sambar Rice","Comforting lentil-vegetable soup mixed with steamed rice.","1. Pressure cook toor dal with turmeric and water.
+2. Saute onion, tomato, drumstick in oil.
+3. Add sambar powder, tamarind water, salt.
+4. Add cooked dal to vegetables.
+5. Temper: mustard, cumin, curry leaves, dried chili.
+6. Pour tadka over sambar, simmer 10 min.
+7. Cook separate white rice.
+8. Mix sambar generously with rice.
+9. Serve with papad, pickle, and ghee.",10,30,3,Medium,Lunch,veg,"Weight Loss",recipes/sambar_rice.jpg,0,4.3,340,12.00,55.00,8.00,7.00,"lunch,sambar,rice,southindian,comfort,healthy","2026-04-08 02:12:04"
+50,32,"Smoky Baingan Bharta","Charred roasted eggplant mashed with spices and fresh vegetables.","1. Char brinjal directly over flame till completely blackened.
+2. Cover in foil, rest 10 min — easier to peel.
+3. Peel and mash the soft flesh.
+4. Heat oil, add cumin seeds.
+5. Add onion, cook till golden.
+6. Add ginger-garlic, green chili, cook 2 min.
+7. Add tomatoes, all spices, cook 5 min.
+8. Add mashed brinjal, mix thoroughly.
+9. Garnish coriander, serve with rotis.",10,25,3,Medium,Lunch,veg,"Weight Loss",recipes/baingan_bharta.jpg,0,4.4,280,6.00,38.00,12.00,6.00,"lunch,baingan,eggplant,smoky,northindian","2026-04-08 02:12:04"
+51,34,"Digestive Moong Dal Soup","Light, warming moong dal soup — easy to digest and calorie-conscious.","1. Wash 3/4 cup split moong dal.
+2. Heat ghee, add cumin, asafoetida.
+3. Add ginger, green chili, cook 1 min.
+4. Add moong dal, stir 2 min.
+5. Add 4 cups water, salt, turmeric.
+6. Pressure cook 2 whistles.
+7. Add lemon juice, fresh coriander.
+8. Adjust consistency — can be thin or thick.
+9. Serve hot with rice or as a soup.",5,20,3,Easy,Lunch,veg,"Weight Loss",recipes/lentil_soup.jpg,0,4.2,220,13.00,32.00,4.50,9.00,"lunch,soup,moong,digestive,light,healthy","2026-04-08 02:12:04"
+52,38,"Asian Cauliflower Fried Rice","Low-carb cauliflower rice stir-fried with vegetables and umami sauce.","1. Pulse cauliflower florets in food processor to rice size.
+2. Heat sesame oil in wok on HIGHEST possible heat.
+3. Add minced garlic and ginger, stir 1 min.
+4. Add vegetables: peas, carrot, corn, edamame.
+5. Add cauliflower rice, toss continuously on high 4-5 min.
+6. Push everything aside, crack 2 eggs in center.
+7. Scramble eggs, then mix with rice.
+8. Season: soy sauce, sesame oil, white pepper.
+9. Top with green onion, sesame seeds.",10,15,2,Medium,Lunch,veg,"Weight Loss",recipes/cauli_rice.jpg,0,4.1,240,8.00,38.00,7.50,5.00,"lunch,cauliflower,fried,rice,lowcarb,asian","2026-04-08 02:12:04"
+53,39,"Nourishing Avocado Brown Rice Bowl","Calorie-dense bowl with healthy fats, complex carbs for steady energy.","1. Cook 1 cup brown rice, cool slightly.
+2. Slice 1 ripe avocado into fan shape.
+3. Roast cherry tomatoes with olive oil at 180°C for 15 min.
+4. Pan-fry 1/2 cup chickpeas with smoked paprika till crispy.
+5. Build bowl: warm brown rice.
+6. Fan avocado slices, add roasted tomatoes.
+7. Add crispy chickpeas, sliced cucumber, corn.
+8. Make tahini dressing: tahini, lemon, garlic, water, cumin.
+9. Drizzle dressing, top with microgreens and sesame.",10,35,2,Easy,Lunch,veg,"Weight Gain",recipes/avocado_rice.jpg,0,4.5,360,10.00,52.00,14.00,8.00,"lunch,avocado,bowl,rice,healthy,filling","2026-04-08 02:12:04"
+54,40,"Green Goddess Chickpea Salad","Vibrant salad with herby avocado dressing and protein-rich chickpeas.","1. Make green dressing: blend avocado, basil, garlic, lemon, olive oil, salt.
+2. Thin with water to pourable consistency.
+3. Drain and rinse 1 can chickpeas, pat dry.
+4. Massage 2 cups kale with 1 tsp olive oil and pinch of salt.
+5. Add cucumber, green bell pepper, celery, edamame.
+6. Add chickpeas and sliced avocado.
+7. Pour green dressing over salad.
+8. Toss gently, top with hemp seeds.
+9. Serve immediately.",15,0,2,Easy,Lunch,veg,"Weight Loss",recipes/green_salad_chickpeas.jpg,0,4.4,280,11.00,36.00,11.00,9.00,"lunch,salad,green,chickpeas,avocado,vegan","2026-04-08 02:12:04"
+55,42,"Creamy Butter Chicken with Naan","Rich, aromatic butter chicken — a global favourite.","1. Marinate chicken 2 hours: yogurt, lemon, spices.
+2. Grill or pan-sear till charred on outside.
+3. Blend: tomatoes, cashews, onion to smooth sauce.
+4. Heat butter, add whole spices.
+5. Pour sauce, cook 15 min till rich and thick.
+6. Add kashmiri chili, garam masala, kasuri methi.
+7. Add cream, stir.
+8. Add grilled chicken pieces, simmer 10 min.
+9. Serve with butter naan and salad.",130,30,3,Medium,Lunch,nonveg,"Weight Gain",recipes/chicken_curry.jpg,1,4.9,480,32.00,42.00,18.00,3.00,"lunch,butterchicken,naan,rich,indian,nonveg","2026-04-08 02:12:04"
+56,44,"Spicy Egg Curry","Boiled eggs in a flavourful tomato-onion gravy — quick protein dinner.","1. Hard boil 4-6 eggs, peel.
+2. Score eggs with knife for sauce to penetrate.
+3. Shallow fry eggs in oil till golden outside — 3 min.
+4. In same pan: saute onion till golden.
+5. Add ginger-garlic, cook 2 min.
+6. Add tomato puree, all spices — cook 8 min.
+7. Add 1 cup water, bring to simmer.
+8. Add fried eggs, cook 10 min gently.
+9. Garnish coriander, serve with rice or roti.",5,25,3,Medium,Lunch,nonveg,All,recipes/egg_curry.jpg,0,4.4,320,20.00,30.00,12.00,2.00,"lunch,eggs,curry,protein,indian,quick","2026-04-08 02:12:04"
+57,45,"Royal Mutton Biryani","Slow-cooked aromatic mutton biryani — a celebratory rice dish.","1. Marinate mutton overnight: yogurt, spices, raw papaya.
+2. Deep fry onions (birista) till dark brown.
+3. Cook mutton on pressure cooker with whole spices.
+4. Par-cook basmati rice till 70% done.
+5. Layer in heavy pot: mutton, fried onions, mint, saffron milk.
+6. Top with rice layer, more onions and saffron.
+7. Seal with dough or foil.
+8. Dum cook on very low heat 35 min.
+9. Rest 15 min, mix gently from bottom.",480,60,4,Hard,Lunch,nonveg,"Weight Gain",recipes/mutton_biryani.jpg,0,4.8,580,28.00,68.00,18.00,4.00,"lunch,biryani,mutton,special,celebratory","2026-04-08 02:12:04"
+58,46,"Coastal Prawn Masala","Juicy prawns in spiced tomato-coconut gravy — coastal India comfort.","1. Clean and devein 300g large prawns.
+2. Marinate with turmeric, salt, chili.
+3. Heat coconut oil, add mustard, curry leaves.
+4. Add onion, cook till golden.
+5. Add ginger-garlic, tomatoes, all spices.
+6. Cook till oil separates (8 min).
+7. Add 1/2 cup coconut milk.
+8. Add prawns, cook 8-10 min — don't overcook.
+9. Garnish coriander, serve with rice.",20,20,3,Medium,Lunch,nonveg,All,recipes/prawn_masala.jpg,0,4.6,400,26.00,38.00,14.00,3.00,"lunch,prawn,seafood,coastal,coconut,indian","2026-04-08 02:12:04"
+59,48,"Turkey Avocado Club Sandwich","Stacked protein sandwich with lean turkey, creamy avocado, and veggies.","1. Toast 3 slices whole grain bread.
+2. Mash 1/2 avocado with lemon, salt.
+3. Spread avocado on bottom slice.
+4. Layer: turkey breast slices, romaine.
+5. Add second bread, spread mustard.
+6. Add tomato, cucumber, red onion.
+7. Top third slice.
+8. Cut diagonally, secure with toothpick.
+9. Serve with side salad.",10,5,1,Easy,Lunch,nonveg,"Weight Loss",recipes/turkey_sandwich.jpg,0,4.4,340,24.00,32.00,12.00,4.00,"lunch,turkey,sandwich,club,protein,quick","2026-04-08 02:12:04"
+60,51,"Garlic Butter Shrimp Stir Fry","Quick high-protein shrimp stir fry with garlic butter sauce.","1. Peel and devein shrimp, pat completely dry.
+2. Season with salt, pepper, paprika.
+3. Heat large pan till very hot, add butter and oil.
+4. Add shrimp in single layer, cook 2 min each side.
+5. Remove shrimp.
+6. In same pan: add minced garlic, cook 1 min.
+7. Add white wine or stock, reduce.
+8. Add red chili flakes, lemon juice.
+9. Toss shrimp in sauce with fresh parsley.",10,10,2,Easy,Lunch,nonveg,"Weight Loss",recipes/shrimp_stir_fry.jpg,0,4.5,280,24.00,22.00,10.00,3.00,"lunch,shrimp,garlic,stir,fry,quick,protein","2026-04-08 02:12:04"
+61,52,"Hoisin Asian Turkey Lettuce Wraps","Light crunchy wraps with spiced turkey — a MyFitnessPal crowd favourite.","1. Brown 300g ground turkey in pan with 1 tsp oil.
+2. Add minced garlic, grated ginger — cook 2 min.
+3. Add: 3 tbsp soy sauce, 2 tbsp hoisin, 1 tsp sesame oil, rice vinegar.
+4. Cook till sauce coats turkey (3 min).
+5. Add finely diced water chestnuts, green onion.
+6. Separate iceberg lettuce into cup shapes.
+7. Spoon turkey into each leaf.
+8. Drizzle with sriracha.
+9. Serve with extra sauce and lime.",10,15,3,Easy,Lunch,nonveg,"Weight Loss",recipes/turkey_lettuce.jpg,0,4.5,220,26.00,14.00,6.00,2.00,"lunch,turkey,lettuce,wraps,asian,lowcarb","2026-04-08 02:12:04"
+62,54,"Deconstructed Greek Chicken Bowl","Mediterranean bowl with grilled chicken, feta, olives and tzatziki.","1. Marinate chicken: olive oil, lemon, garlic, oregano, salt.
+2. Grill 7 min each side till cooked through.
+3. Make tzatziki: Greek yogurt, grated cucumber, garlic, dill, lemon.
+4. Cook 1 cup bulgur wheat or quinoa.
+5. Build bowl: grain base, sliced chicken.
+6. Add cucumber, cherry tomatoes, kalamata olives.
+7. Crumble feta cheese on top.
+8. Dollop tzatziki generously.
+9. Drizzle olive oil, sprinkle oregano.",20,15,2,Medium,Lunch,nonveg,"Muscle Gain",recipes/greek_chicken_bowl.jpg,0,4.6,420,38.00,30.00,16.00,5.00,"lunch,greek,chicken,bowl,mediterranean","2026-04-08 02:12:04"
+63,55,"Japanese Miso Salmon Rice Bowl","Nutritious bowl inspired by Japanese teishoku dining.","1. Follow miso glaze recipe for salmon.
+2. Cook 1 cup Japanese short-grain rice.
+3. Season rice: 1 tsp rice vinegar, 1 tsp sugar, pinch of salt.
+4. Prepare toppings: sliced avocado, edamame, cucumber.
+5. Make quick pickled carrots: carrot, rice vinegar, sugar, salt, 20 min.
+6. Plate warm rice in bowl.
+7. Add glazed salmon piece.
+8. Arrange toppings beautifully by color.
+9. Drizzle ponzu or soy sauce, sesame seeds.",35,20,2,Medium,Lunch,nonveg,"Weight Loss",recipes/steam_salmon.jpg,0,4.7,360,32.00,28.00,13.00,3.00,"lunch,salmon,miso,rice,bowl,japanese","2026-04-08 02:12:04"
+64,57,"Paneer Tikka Salad Bowl","Grilled paneer tikka over fresh salad with mint dressing.","1. Cube 200g paneer, marinate 1 hour: yogurt, tikka masala, lemon.
+2. Skewer paneer with bell peppers and onion.
+3. Grill on hot grill 10 min, turning every 2-3 min.
+4. Make mint dressing: yogurt, mint, lemon, garlic, salt.
+5. Toss mixed greens with light dressing.
+6. Add cucumber, cherry tomato, red onion rings.
+7. Place hot paneer tikka skewers on salad.
+8. Drizzle extra mint dressing.
+9. Sprinkle chaat masala and chat with lemon.",70,15,2,Medium,Dinner,veg,"Muscle Gain",recipes/paneer_tikka_salad.jpg,0,4.5,280,18.00,16.00,16.00,4.00,"dinner,paneer,tikka,salad,protein,grilled","2026-04-08 02:12:04"
+65,58,"Clear Vegetable Detox Soup","Light, soothing clear soup with vegetables and healing spices.","1. Heat 1 tsp olive oil in pot.
+2. Add ginger, garlic, cook 1 min.
+3. Add vegetables: carrot, celery, zucchini, spinach.
+4. Stir 2 min.
+5. Add 4 cups vegetable stock.
+6. Season: soy sauce, black pepper, salt, lemon.
+7. Bring to boil, reduce heat.
+8. Simmer 10 min.
+9. Serve hot with fresh herbs garnish.",5,15,3,Easy,Dinner,veg,"Weight Loss",recipes/veg_clear_soup.jpg,0,4.1,120,5.00,20.00,2.00,4.00,"dinner,soup,detox,clear,light,vegetables","2026-04-08 02:12:04"
+66,59,"Hearty Lauki Moong Dal","Bottle gourd cooked with moong dal — light, digestive Indian comfort dinner.","1. Peel and cube 1 medium lauki (bottle gourd).
+2. Pressure cook moong dal till soft.
+3. Heat ghee, add cumin, asafoetida.
+4. Add onion, cook 4 min.
+5. Add tomato, ginger, turmeric, chili.
+6. Add lauki, stir 5 min.
+7. Add cooked moong dal and water.
+8. Simmer 15 min together till all tender.
+9. Season with salt, garnish coriander.",10,25,3,Easy,Dinner,veg,"Weight Loss",recipes/lauki_dal.jpg,0,4.2,180,8.00,28.00,4.00,6.00,"dinner,lauki,moong,dal,digestive,light,indian","2026-04-08 02:12:04"
+67,61,"Ajwain Methi Paratha with Raita","Flaky whole wheat flatbread with fenugreek and ajwain — nutritious dinner.","1. Mix 2 cups whole wheat flour, 1 cup methi leaves.
+2. Add ajwain, chili powder, salt, oil.
+3. Knead with water to smooth dough.
+4. Rest 20 min.
+5. Roll into thin circles, fold in thirds twice.
+6. Roll again to create layers.
+7. Cook on hot tawa with ghee till brown spots appear.
+8. For raita: yogurt, cucumber, cumin, salt, coriander.
+9. Serve hot parathas with cool raita.",25,25,3,Medium,Dinner,veg,All,recipes/methi_paratha.jpg,0,4.3,180,7.00,28.00,5.00,5.00,"dinner,methi,paratha,ajwain,indian,flatbread","2026-04-08 02:12:04"
+68,63,"Spicy Grilled Paneer Kebabs","Juicy paneer cubes marinated in spices and grilled to smoky perfection.","1. Cube 250g paneer into 3cm pieces.
+2. Make marinade: hung curd, ginger-garlic, tandoori masala, oil, lemon.
+3. Marinate paneer minimum 2 hours.
+4. Skewer with bell peppers and onion chunks.
+5. Brush grill with oil, heat to high.
+6. Grill kebabs 12-15 min, turning every 3 min.
+7. Should have good char marks.
+8. Serve on bed of onion rings.
+9. Squeeze lemon, sprinkle chaat masala.",130,15,3,Medium,Dinner,veg,"Muscle Gain",recipes/grilled_paneer.jpg,0,4.5,240,16.00,12.00,14.00,3.00,"dinner,paneer,kebab,grilled,protein,indian","2026-04-08 02:12:04"
+69,65,"Crispy Garlic Roasted Broccoli","Simple, nutritious side dish — roasted broccoli is a superfood upgrade.","1. Cut broccoli into even medium florets.
+2. Toss with olive oil, minced garlic, salt, black pepper.
+3. Spread in single layer on baking sheet — do not crowd.
+4. Roast at 220°C for 20 min.
+5. Should have crispy, slightly charred tips.
+6. Remove from oven.
+7. Squeeze fresh lemon juice.
+8. Add parmesan shavings if desired.
+9. Serve as side dish with main protein.",5,20,3,Easy,Dinner,veg,"Weight Loss",recipes/steamed_broccoli.jpg,0,4.2,120,4.00,18.00,4.00,4.00,"dinner,broccoli,roasted,garlic,superfood,side","2026-04-08 02:12:04"
+70,66,"Lemongrass Thai Vegetable Soup","Fragrant coconut-lemongrass soup with vegetables and tofu.","1. Saute garlic, ginger, lemongrass in coconut oil.
+2. Add 1-2 tsp Thai green curry paste, cook 2 min.
+3. Pour 1 can coconut milk and 2 cups vegetable stock.
+4. Add vegetables: mushroom, baby corn, bok choy.
+5. Season: fish sauce (or soy), lime juice, palm sugar.
+6. Add cubed firm tofu for protein.
+7. Simmer 15 min.
+8. Taste and adjust — should be creamy, tangy, spicy.
+9. Garnish fresh basil, sliced chili, lime wedge.",10,20,3,Easy,Dinner,veg,All,recipes/mixed_veg_soup.jpg,0,4.3,160,6.00,22.00,6.00,5.00,"dinner,thai,soup,lemongrass,coconut,light","2026-04-08 02:12:04"
+71,67,"Healing Moong Dal Soup","Gentle, detoxifying moong dal soup — best dinner for clean eating days.","1. Rinse 1 cup split yellow moong till water runs clear.
+2. Boil 4 cups water.
+3. Add moong, cook uncovered 20 min till completely soft.
+4. Skim any foam that rises.
+5. Heat ghee, add cumin, turmeric, asafoetida.
+6. Add chopped ginger, green chili.
+7. Pour tadka over dal.
+8. Add lemon juice, salt.
+9. Thin with warm water if needed. Serve piping hot.",5,25,3,Easy,Dinner,veg,"Weight Loss",recipes/moong_soup.jpg,0,4.2,140,8.00,20.00,4.00,6.00,"dinner,moong,soup,detox,healing,light,indian","2026-04-08 02:12:04"
+72,68,"Garlic Herb Asparagus","Elegant, nutrition-dense asparagus roasted with garlic — a superfood side.","1. Trim woody ends of asparagus by snapping naturally.
+2. Toss in olive oil, minced garlic, salt, pepper, thyme.
+3. Spread in tight single layer on baking sheet.
+4. Roast at 220°C for 12-15 min.
+5. Toss halfway through.
+6. Tips should be slightly crispy, stalks tender.
+7. Remove from oven, immediately squeeze lemon.
+8. Add parmesan shavings.
+9. Serve immediately.",3,15,2,Easy,Dinner,veg,"Weight Loss",recipes/grilled_asparagus.jpg,0,4.4,80,3.50,12.00,2.50,3.50,"dinner,asparagus,roasted,light,superfood,side","2026-04-08 02:12:04"
+73,69,"Comforting Sweet Potato Mash","Naturally sweet, fiber-rich mash with warming spices.","1. Peel and cube 3 large sweet potatoes.
+2. Boil in salted water till fork-tender (20 min).
+3. Drain completely, mash while still hot.
+4. Add 2 tbsp butter and 1/4 cup warm milk.
+5. Beat with wooden spoon till smooth.
+6. Add salt, cinnamon, nutmeg, pinch of ginger.
+7. Taste and adjust sweetness.
+8. Transfer to serving bowl.
+9. Top with toasted pecans and fresh thyme.",5,25,4,Easy,Dinner,veg,"Weight Gain",recipes/sweet_potato.jpg,0,4.3,260,5.00,48.00,6.00,7.00,"dinner,sweetpotato,mash,comfort,fiber,weightgain","2026-04-08 02:12:04"
+74,70,"Soft Fluffy Whole Wheat Rotis","Healthy whole grain rotis — backbone of any Indian meal.","1. Sift 2 cups whole wheat atta into bowl.
+2. Add 1 tsp oil, pinch of salt.
+3. Add warm water gradually, knead 8-10 min till soft elastic dough.
+4. Cover with damp cloth, rest 20-30 min.
+5. Divide into 8-10 equal balls.
+6. On floured board, roll each into thin 15cm circle.
+7. Heat tawa till very hot.
+8. Cook each roti 1 min, flip, press edges with cloth.
+9. Apply ghee immediately, serve hot.",25,20,6,Medium,Dinner,veg,All,recipes/whole_wheat_roti.jpg,0,4.4,210,5.00,42.00,3.00,4.00,"dinner,roti,wheat,indian,staple,healthy","2026-04-08 02:12:04"
+75,72,"Comforting Spiced Chicken Soup","Rich, healing chicken soup with vegetables and whole spices.","1. Boil whole chicken pieces with onion, ginger, garlic, celery.
+2. Skim foam, simmer 45 min.
+3. Remove chicken, shred meat.
+4. Strain broth, return to pot.
+5. Add vegetables: carrot, celery, peas.
+6. Season: black pepper, coriander, cumin, salt.
+7. Add shredded chicken back.
+8. Simmer 15 min more.
+9. Garnish coriander, serve with crusty bread.",15,60,4,Medium,Dinner,nonveg,"Weight Loss",recipes/chicken_soup.jpg,0,4.5,180,16.00,8.00,9.00,1.00,"dinner,chicken,soup,healing,comfort,light","2026-04-08 02:12:04"
+76,74,"Spicy Egg Bhurji","Indian-spiced scrambled eggs — a quick high-protein dinner.","1. Heat oil in pan, add cumin seeds.
+2. Add finely chopped onion, cook 4 min.
+3. Add ginger-garlic paste, green chili.
+4. Add tomato, cook 4 min till soft.
+5. Add turmeric, chili powder, coriander powder, garam masala.
+6. Break 4-5 eggs directly into pan.
+7. Stir continuously on medium heat, cooking eggs.
+8. Add salt, mix well.
+9. Garnish coriander, serve with toast or rotis.",5,10,2,Easy,Dinner,nonveg,All,recipes/egg_bhurji.jpg,0,4.4,220,16.00,8.00,14.00,1.50,"dinner,eggs,bhurji,indian,quick,protein,scrambled","2026-04-08 02:12:04"
+77,75,"Lemon Garlic Shrimp","Restaurant-style garlicky shrimp ready in under 15 minutes.","1. Devein 300g large shrimp, keep tails on.
+2. Season with salt, pepper, smoked paprika.
+3. Heat pan till very hot, add butter and olive oil.
+4. Add shrimp in single layer — do not overcrowd.
+5. Cook exactly 2 min per side.
+6. Remove shrimp, add 6 cloves minced garlic to pan.
+7. Saute 1 min, add white wine, reduce.
+8. Add shrimp back, lemon juice, parsley.
+9. Serve over pasta, rice, or zucchini noodles.",10,12,2,Easy,Dinner,nonveg,"Weight Loss",recipes/shrimp_stir_fry.jpg,0,4.5,200,18.00,6.00,12.00,1.00,"dinner,shrimp,garlic,lemon,quick,protein","2026-04-08 02:12:04"
+78,77,"Baked Italian Egg White Frittata","Italian baked egg white dish — low-calorie, high-protein, elegant.","1. Preheat oven to 180°C.
+2. Whisk 8 egg whites with salt, pepper, Italian herbs.
+3. Saute: spinach, mushroom, sun-dried tomatoes, bell pepper in olive oil.
+4. Pour egg whites over vegetables in oven-safe pan.
+5. Sprinkle feta or goat cheese crumbles.
+6. Cook on stovetop 3 min — edges should just set.
+7. Transfer to oven, bake 15-18 min till center is firm.
+8. Cool 5 min before slicing.
+9. Slice like pizza, serve warm or at room temperature.",5,25,4,Medium,Dinner,nonveg,"Weight Loss",recipes/egg_white_frittata.jpg,0,4.3,160,18.00,6.00,7.00,2.00,"dinner,frittata,egg,white,italian,baked,protein","2026-04-08 02:12:04"
+79,78,"Protein Overnight Oats","Make-ahead breakfast loaded with protein from whey and Greek yogurt.","1. In a jar: add 1/2 cup rolled oats.
+2. Add 1 scoop vanilla whey protein, mix with oats.
+3. Add 3 tbsp Greek yogurt.
+4. Pour 3/4 cup milk (or almond milk).
+5. Add 1 tsp chia seeds, pinch of cinnamon.
+6. Stir everything together.
+7. Top with fresh berries.
+8. Cover and refrigerate overnight (minimum 6 hours).
+9. Add toppings and eat cold.",5,0,1,Easy,Breakfast,nonveg,"Muscle Gain",recipes/protein_oats.jpg,0,4.5,320,18.00,46.00,8.00,5.00,"breakfast,overnight,oats,protein,whey,mealprep","2026-04-08 02:12:04"
+80,80,"Slow-Cooked Garlic Herb Chicken Thighs","Juicy chicken thighs braised with garlic, herbs, and white wine.","1. Season chicken thighs with salt, pepper, smoked paprika.
+2. Sear skin-side down in oven-safe pan 8 min till golden.
+3. Flip, sear 3 min.
+4. Remove chicken, saute 8 garlic cloves in same fat.
+5. Add fresh thyme, rosemary, white wine or stock.
+6. Scrape up brown bits — this is flavour.
+7. Add chicken back, skin-side up.
+8. Bake uncovered at 180°C for 35 min.
+9. Baste with pan juices, serve with roasted vegetables.",10,50,3,Medium,Dinner,nonveg,"Muscle Gain",recipes/baked_chicken.jpg,0,4.7,360,30.00,16.00,18.00,3.00,"dinner,chicken,thighs,garlic,herb,slowcooked","2026-04-08 02:12:04"
+81,81,"Make-Ahead Protein Overnight Oats","Batch-prep protein oats for 5 weekday breakfasts.","1. Prepare 5 jars for the week.
+2. Mix: 1/2 cup oats, 1 scoop protein powder.
+3. Add 3 tbsp Greek yogurt per jar.
+4. Pour almond milk, stir.
+5. Add different toppings: berries, banana, mango.
+6. Seal, refrigerate up to 5 days.
+7. Grab and go each morning.",20,0,5,Easy,Breakfast,veg,"Muscle Gain",recipes/protein_oats.jpg,0,4.4,300,12.00,46.00,7.00,5.00,"breakfast,mealprep,protein,oats,overnight,batch","2026-04-08 02:12:04"
+82,85,"Dark Chocolate Nut Bark","Antioxidant-rich dark chocolate with mixed nuts — healthy indulgence.","1. Melt 100g 70%+ dark chocolate in double boiler or microwave.
+2. Pour onto parchment-lined tray.
+3. Spread thin with offset spatula.
+4. Immediately top: chopped almonds, walnuts, pumpkin seeds.
+5. Add dried cranberries or blueberries.
+6. Sprinkle flaky sea salt.
+7. Refrigerate 30-45 min till completely set.
+8. Break into irregular rustic pieces.
+9. Store airtight in fridge up to 2 weeks.",5,5,4,Easy,Snack,veg,All,recipes/dark_chocolate.jpg,0,4.7,170,3.00,24.00,9.00,3.00,"snack,chocolate,dark,antioxidant,nuts,indulgent","2026-04-08 02:12:04"
+83,86,"Classic Thick Mango Lassi","Creamy, thick mango lassi — the ultimate Indian summer drink.","1. Blend 1 large ripe alphonso mango (peeled and cubed).
+2. Add 1 cup full-fat Greek yogurt.
+3. Add 1/2 cup cold whole milk.
+4. Add 2 tsp sugar or 1 tsp honey (taste first).
+5. Add pinch each: cardamom, saffron.
+6. Blend on high till completely smooth.
+7. Taste and adjust sweetness.
+8. Pour over ice cubes in tall glass.
+9. Garnish mango slice, rose water, saffron strands.",5,0,2,Easy,Snack,veg,"Weight Gain",recipes/mango_lassi.jpg,0,4.8,280,8.00,48.00,7.00,3.00,"snack,lassi,mango,indian,drink,yogurt","2026-04-08 02:12:04"
+84,87,"Homemade PB Granola Clusters","Crunchy peanut butter granola better than any store version.","1. Preheat oven to 170°C.
+2. Mix: 3 cups oats, 1/2 cup peanut butter.
+3. Add: 3 tbsp honey, 2 tbsp coconut oil, 1 tsp vanilla.
+4. Add: 1/2 cup mixed chopped nuts (almonds, cashews).
+5. Add salt, cinnamon — mix very thoroughly.
+6. Spread on lined baking sheet, press firmly (creates clusters).
+7. Bake 20 min, stir at 10 min carefully.
+8. Cool COMPLETELY before touching — this creates crunch.
+9. Break into clusters, add dried fruits, store airtight.",10,20,8,Easy,Snack,veg,"Weight Gain",recipes/pb_granola.jpg,0,4.6,420,12.00,52.00,20.00,5.00,"snack,granola,peanutbutter,clusters,crunch,mealprep","2026-04-08 02:12:04"
+85,88,"Perfect Fluffy Brown Rice","Cooking brown rice perfectly — the foundation of healthy meal prep.","1. Rinse brown rice 3 times till water runs clear.
+2. Optional: soak 30 min for faster cooking.
+3. Use ratio: 1 cup rice to 2.5 cups cold water.
+4. Add pinch of salt, bring to rolling boil.
+5. Reduce to absolute lowest heat, cover tightly.
+6. Cook undisturbed exactly 40 min.
+7. Remove from heat, keep covered 10 min.
+8. Fluff with fork gently.
+9. Freeze in portions for easy meal prep.",30,40,3,Easy,Lunch,veg,All,recipes/brown_rice.jpg,0,4.2,215,5.00,45.00,1.50,3.50,"staple,rice,brown,mealprep,healthy,carbs","2026-04-08 02:12:04"
+86,90,"Golden Turmeric Cottage Cheese Bowl","High-protein bowl with anti-inflammatory turmeric and fresh toppings.","1. Scoop 200g fresh cottage cheese into bowl.
+2. Drizzle 1 tsp extra virgin olive oil.
+3. Sprinkle: turmeric, black pepper (activates curcumin), salt.
+4. Add sliced cucumber, cherry tomatoes.
+5. Add sliced radish, spring onion.
+6. Add fresh herbs: mint or dill.
+7. Drizzle honey if serving as sweet version with fruits.
+8. Sprinkle toasted seeds for texture.
+9. Best served immediately, with toast on side.",5,0,1,Easy,Snack,veg,"Muscle Gain",recipes/cottage_cheese_bowl.jpg,0,4.4,240,22.00,14.00,10.00,2.00,"snack,cottage,cheese,protein,turmeric,antiinflammatory","2026-04-08 02:12:04"
+87,91,"Crispy 3-Cheese Ultimate Omelette","Rich, indulgent 3-egg omelette for weight gain phase.","1. Crack 3 large whole eggs, whisk well.
+2. Add 1 tbsp cream, salt, pepper, herbs.
+3. Grate: cheddar, mozzarella, and parmesan ready.
+4. Heat butter in pan, add egg mixture.
+5. Gently push cooked edges toward center.
+6. When 80% set, add all 3 cheeses to one half.
+7. Fold over, press gently.
+8. Slide onto plate.
+9. Top with fresh tomato salsa, serve with 2 toast.",3,7,1,Easy,Breakfast,nonveg,"Weight Gain",recipes/cheese_omelette.jpg,0,4.4,320,22.00,4.00,24.00,0.50,"breakfast,omelette,cheese,eggs,rich,weightgain","2026-04-08 02:12:04"
+88,92,"Tandoori Spiced Chicken Tikka","Authentic tandoori chicken tikka with classic marinade.","1. Cut chicken breast into large cubes.
+2. First marinade (30 min): raw papaya paste, lemon, salt.
+3. Second marinade (2-4 hours): hung curd, ginger-garlic, kashmiri chili, tandoori masala, oil.
+4. Skewer on metal skewers.
+5. Cook in preheated 250°C oven or over charcoal grill.
+6. Cook 15-20 min, turning every 5 min.
+7. Brush with butter while cooking.
+8. Should have slight char.
+9. Serve with mint chutney, onion rings, lemon.",270,20,3,Medium,Snack,nonveg,"Muscle Gain",recipes/chicken_tikka.jpg,0,4.7,180,24.00,6.00,7.00,0.50,"snack,chicken,tikka,tandoori,indian,protein","2026-04-08 02:12:04"
+89,93,"Loaded Tuna Salad Wrap","Quick, portable protein wrap with omega-3 rich tuna salad.","1. Drain 1 can tuna well.
+2. Mix: tuna, 1 tbsp mayo, 1 tsp Dijon, lemon, celery.
+3. Add sweet relish, salt, pepper.
+4. Warm large whole wheat tortilla.
+5. Spread tuna mixture down center.
+6. Add: romaine, tomato, cucumber, avocado slices.
+7. Fold sides in, roll tightly from bottom.
+8. Cut diagonally — secure with toothpick if needed.
+9. Wrap in parchment for easy transport.",8,2,1,Easy,Lunch,nonveg,"Weight Loss",recipes/tuna_sandwich.jpg,0,4.3,350,28.00,30.00,12.00,3.00,"lunch,tuna,wrap,portable,mealprep,omega3","2026-04-08 02:12:04"
+90,95,"Egg Salad Power Bowl","Protein-rich egg salad bowl with avocado and mixed greens.","1. Hard boil 4 eggs (10 min), cool in ice water, peel.
+2. Chop eggs roughly.
+3. Make dressing: 1 tbsp mayo, 1 tsp Dijon, lemon, salt, dill.
+4. Mix eggs with dressing.
+5. Serve over bed of mixed greens.
+6. Add avocado slices.
+7. Add cherry tomatoes, cucumber.
+8. Season with salt, pepper, paprika.
+9. Drizzle extra lemon juice.",15,0,2,Easy,Breakfast,nonveg,"Weight Loss",recipes/hard_boiled_eggs.jpg,0,4.2,220,16.00,4.00,16.00,0.50,"breakfast,eggs,salad,bowl,protein,portable","2026-04-08 02:12:04"
+91,96,"Light Chicken Clear Broth Soup","Healing, restorative light chicken soup — minimal calories, maximum comfort.","1. Place chicken bones/carcass in pot with 6 cups water.
+2. Add: halved onion, ginger slices, garlic, celery, carrot.
+3. Bring to boil, skim foam.
+4. Reduce heat, simmer 1.5 hours.
+5. Strain broth completely.
+6. Return clear broth to pot, bring to simmer.
+7. Add julienned carrot, sliced mushroom, bok choy.
+8. Season: soy sauce, salt, white pepper, sesame oil.
+9. Add thin noodles if desired, serve hot.",10,95,4,Easy,Dinner,nonveg,"Weight Loss",recipes/chicken_soup.jpg,0,4.3,120,14.00,6.00,4.00,0.50,"dinner,soup,chicken,light,broth,healing","2026-04-08 02:12:04"
+92,98,"Chilled Prawn Cocktail Salad","Elegant protein salad with poached prawns and Marie Rose sauce.","1. Bring water to boil with lemon, peppercorns, bay leaf.
+2. Poach 300g prawns 3-4 min till pink.
+3. Cool in ice water immediately.
+4. Make Marie Rose sauce: mayo, ketchup, Worcestershire, lemon, paprika.
+5. Line bowl with iceberg lettuce shreds.
+6. Add prawns, avocado cubes, cucumber.
+7. Drizzle sauce generously.
+8. Dust with paprika.
+9. Garnish lemon wedge, serve chilled.",20,5,2,Easy,Lunch,nonveg,"Weight Loss",recipes/prawn_masala.jpg,0,4.4,280,24.00,18.00,12.00,3.00,"lunch,prawn,cocktail,salad,elegant,seafood","2026-04-08 02:12:04"
+93,99,"Post-Workout Whey Protein Smoothie","Fast-absorbing post-workout shake with whey, banana, and oats.","1. Add 1 cup cold milk or almond milk to blender.
+2. Add 1 scoop vanilla whey protein powder.
+3. Add 1 frozen banana (frozen = creamier).
+4. Add 3 tbsp rolled oats.
+5. Add 1 tbsp peanut butter.
+6. Add 5 ice cubes.
+7. Blend on high 60 seconds till completely smooth.
+8. Taste — add honey if needed.
+9. Drink within 30 min of workout.",5,0,1,Easy,Snack,nonveg,"Muscle Gain",recipes/whey_smoothie.jpg,0,4.5,180,22.00,6.00,7.00,0.50,"snack,protein,smoothie,whey,postworkout,shake","2026-04-08 02:12:04"
+94,100,"Honey Vanilla Greek Yogurt","Simple, protein-dense snack with live cultures and natural sweetness.","1. Scoop 200g thick Greek yogurt into bowl.
+2. Drizzle 1-2 tsp raw honey on top.
+3. Add 1/4 tsp vanilla extract.
+4. Add pinch of cinnamon.
+5. Top with fresh berries: blueberry, strawberry, raspberry.
+6. Add 1 tbsp granola for crunch.
+7. Add 5-6 walnut halves.
+8. Optional: chia seeds for extra fiber.
+9. Serve immediately.",3,0,1,Easy,Snack,veg,All,recipes/yogurt_parfait.jpg,0,4.5,150,12.00,18.00,4.00,0.50,"snack,yogurt,greek,honey,probiotic,quick","2026-04-08 02:12:04"

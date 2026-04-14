@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% block content %}
+<h1 class="page-title">Calorie Search</h1>
+<p class="page-subtitle">Search any food to instantly get its nutrition information.</p>
+
+<form method="GET" action="/calorie-search" style="display:flex;gap:10px;margin-bottom:24px;max-width:560px;">
+  <input type="text" name="q" value="{{ query }}" class="search-box form-input"
+         placeholder="e.g. grilled chicken, oats, apple..." style="flex:1;" autofocus>
+  <button type="submit" class="btn btn-primary">Search</button>
+</form>
+
+{% if local_results %}
+<div class="section-title" style="margin-bottom:14px;">Found in DietMate Database</div>
+<div style="display:flex;flex-direction:column;gap:0;background:var(--surface);border:1px solid var(--border-ui);border-radius:var(--r-lg);overflow:hidden;box-shadow:var(--sh-card);margin-bottom:22px;">
+{% for r in local_results %}
+<div style="display:flex;align-items:center;gap:14px;padding:14px 18px;border-bottom:1px solid var(--border-ui);">
+  <div style="width:44px;height:44px;border-radius:9px;overflow:hidden;background:var(--raised);flex-shrink:0;">
+    {% if r[5] %}
+    <img src="{{ url_for('static', filename=resolve_image(r[5], 'meals')) }}" style="width:100%;height:100%;object-fit:cover;" onerror="this.src='/static/images/ui/default_recipe.jpg'">
+    {% endif %}
+  </div>
+  <div style="flex:1;">
+    <div style="font-size:14px;font-weight:700;color:var(--text);">{{ r[0] }}</div>
+    <div style="font-size:12px;color:var(--text-mute);font-weight:600;font-family:'JetBrains Mono',monospace;margin-top:2px;">
+      P:{{ r[2] }}g &nbsp; C:{{ r[3] }}g &nbsp; F:{{ r[4] }}g
+    </div>
+  </div>
+  <div style="font-size:18px;font-weight:800;color:var(--accent);font-family:'JetBrains Mono',monospace;">{{ r[1] }}<span style="font-size:12px;color:var(--text-mute);"> kcal</span></div>
+</div>
+{% endfor %}
+</div>
+{% endif %}
+
+{% if result %}
+{% if result.error %}
+<div class="error-box">{{ result.error }}</div>
+{% else %}
+<div style="background:var(--surface);border:1px solid var(--border-ui);border-radius:var(--r-lg);padding:22px;box-shadow:var(--sh-card);">
+  <div class="section-title" style="margin-bottom:6px;">Nutrition Data (via API)</div>
+  <div style="font-family:'Syne',sans-serif;font-size:20px;font-weight:800;color:var(--text);margin-bottom:16px;">{{ result.food_name }}</div>
+  <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;">
+    {% for label, val, color in [('Calories', result.calories, 'var(--accent)'), ('Protein', result.protein|string + 'g', 'var(--macro-p)'), ('Carbs', result.carbs|string + 'g', 'var(--macro-c)'), ('Fat', result.fat|string + 'g', 'var(--macro-f)')] %}
+    <div style="background:var(--raised);border:1px solid var(--border-ui);border-radius:var(--r-md);padding:14px;text-align:center;">
+      <div style="font-family:'Syne',sans-serif;font-size:22px;font-weight:800;color:'{{ color }}';">{{ val }}</div>
+      <div style="font-size:11px;font-weight:700;color:var(--text-mute);text-transform:uppercase;letter-spacing:0.6px;margin-top:4px;">{{ label }}</div>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+{% endif %}
+{% elif query and not local_results %}
+<div style="text-align:center;padding:40px;color:var(--text-mute);">
+  <div style="font-size:40px;opacity:0.3;margin-bottom:12px;">🔍</div>
+  <p style="font-size:14px;">No results for "<strong style="color:var(--text);">{{ query }}</strong>". Try a different search term.</p>
+</div>
+{% endif %}
+{% endblock %}

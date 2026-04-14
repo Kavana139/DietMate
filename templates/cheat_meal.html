@@ -1,0 +1,296 @@
+{% extends "base.html" %}
+{% block content %}
+<style>
+.cheat-hero {
+  background: linear-gradient(135deg, rgba(255,85,85,0.12) 0%, rgba(255,160,50,0.08) 100%);
+  border: 1px solid rgba(255,85,85,0.25);
+  border-radius: var(--r-xl);
+  padding: 28px 32px;
+  margin-bottom: 24px;
+  position: relative;
+  overflow: hidden;
+}
+.cheat-hero::before {
+  content: '🍕';
+  position: absolute;
+  right: 32px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 80px;
+  opacity: 0.12;
+}
+.cheat-stat-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 22px; }
+.cheat-stat {
+  background: var(--surface);
+  border: 1px solid var(--border-ui);
+  border-radius: var(--r-lg);
+  padding: 18px;
+  text-align: center;
+  transition: transform 0.25s var(--spring);
+}
+.cheat-stat:hover { transform: translateY(-3px); }
+.cheat-stat-val { font-family: 'Syne', sans-serif; font-size: 28px; font-weight: 800; }
+.cheat-stat-lbl { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.6px; color: var(--text-mute); margin-top: 4px; }
+.cheat-log-card {
+  background: var(--surface);
+  border: 1px solid var(--border-ui);
+  border-radius: var(--r-lg);
+  overflow: hidden;
+  margin-bottom: 16px;
+  box-shadow: var(--sh-card);
+}
+.cheat-item {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--border-ui);
+  transition: background 0.15s;
+}
+.cheat-item:hover { background: var(--raised); }
+.cheat-item:last-child { border-bottom: none; }
+.cheat-emoji { font-size: 28px; width: 44px; height: 44px; border-radius: 12px; background: var(--raised); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.severity-pill {
+  font-size: 10px; font-weight: 800;
+  padding: 3px 10px; border-radius: var(--r-pill);
+  text-transform: uppercase; letter-spacing: 0.5px;
+}
+.sev-low    { background: var(--accent-mute); color: var(--accent); border: 1px solid rgba(124,252,154,0.25); }
+.sev-medium { background: var(--gold-bg); color: var(--gold); border: 1px solid rgba(240,192,96,0.25); }
+.sev-high   { background: var(--red-bg); color: var(--red); border: 1px solid rgba(255,87,87,0.25); }
+.recovery-card {
+  background: linear-gradient(135deg, rgba(0,212,255,0.06), rgba(124,252,154,0.04));
+  border: 1px solid rgba(0,212,255,0.2);
+  border-radius: var(--r-lg);
+  padding: 22px;
+  margin-top: 20px;
+}
+.recovery-step {
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border-ui);
+}
+.recovery-step:last-child { border-bottom: none; }
+.step-num {
+  width: 28px; height: 28px; border-radius: 50%;
+  background: var(--accent); color: var(--on-accent);
+  font-size: 12px; font-weight: 800;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.mood-grid { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 12px; }
+.mood-btn {
+  padding: 8px 16px;
+  background: var(--raised); border: 1px solid var(--border-ui);
+  border-radius: var(--r-pill); cursor: pointer;
+  font-size: 13px; font-weight: 600; color: var(--text-sec);
+  transition: all 0.2s var(--spring);
+}
+.mood-btn:hover, .mood-btn.selected { background: var(--accent-mute); border-color: var(--border-h); color: var(--accent); }
+.guilt-meter {
+  display: flex; gap: 6px; align-items: center; margin-bottom: 14px;
+}
+.guilt-dot {
+  width: 32px; height: 32px; border-radius: 50%;
+  border: 2px solid var(--border-ui);
+  cursor: pointer; transition: all 0.2s;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 16px;
+}
+.guilt-dot.active { border-color: var(--accent); transform: scale(1.2); }
+</style>
+
+<div style="display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px;">
+  <div>
+    <h1 class="page-title">Cheat Meal Tracker</h1>
+    <p class="page-subtitle" style="margin-bottom:0;">Track indulgences without guilt. Balance is key to long-term success.</p>
+  </div>
+  <button onclick="document.getElementById('logModal').style.display='flex'" class="btn btn-primary">
+    + Log Cheat Meal
+  </button>
+</div>
+
+<!-- Hero Stats -->
+<div class="cheat-hero">
+  <div style="font-size:13px;font-weight:800;color:var(--red);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:8px;">This Month</div>
+  <div style="font-family:'Syne',sans-serif;font-size:32px;font-weight:800;color:var(--text);margin-bottom:6px;">
+    <span id="cheatCount">{{ cheat_meals|length }}</span> Cheat Meals
+  </div>
+  <div style="font-size:13.5px;color:var(--text-sec);">
+    {% if cheat_meals|length <= 4 %}
+      ✅ You're doing great! Under 5 cheat meals — perfectly balanced.
+    {% elif cheat_meals|length <= 8 %}
+      ⚠️ Moderate indulgence. Try to keep it under 8 per month.
+    {% else %}
+      🔴 More than 8 cheat meals this month. Consider your recovery plan.
+    {% endif %}
+  </div>
+</div>
+
+<!-- Stats Row -->
+<div class="cheat-stat-grid">
+  {% set total_cheat_cal = namespace(val=0) %}
+  {% for m in cheat_meals %}{% set total_cheat_cal.val = total_cheat_cal.val + (m[3] or 0) %}{% endfor %}
+  <div class="cheat-stat">
+    <div class="cheat-stat-val" style="color:var(--red);">{{ cheat_meals|length }}</div>
+    <div class="cheat-stat-lbl">Total Logged</div>
+  </div>
+  <div class="cheat-stat">
+    <div class="cheat-stat-val" style="color:var(--gold);">{{ total_cheat_cal.val }}</div>
+    <div class="cheat-stat-lbl">Extra Calories</div>
+  </div>
+  <div class="cheat-stat">
+    <div class="cheat-stat-val" style="color:var(--accent);">{{ cheat_days_clean }}</div>
+    <div class="cheat-stat-lbl">Clean Days</div>
+  </div>
+  <div class="cheat-stat">
+    <div class="cheat-stat-val" style="color:var(--blue);">{{ cheat_recovery_score }}%</div>
+    <div class="cheat-stat-lbl">Recovery Score</div>
+  </div>
+</div>
+
+<div style="display:grid;grid-template-columns:1fr 340px;gap:18px;">
+  <!-- Left: Cheat Meal Log -->
+  <div>
+    <div class="cheat-log-card">
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:16px 18px;border-bottom:1px solid var(--border-ui);background:var(--raised);">
+        <div class="section-title">Cheat Meal Log</div>
+        <span style="font-size:12px;color:var(--text-mute);font-weight:600;">Last 30 days</span>
+      </div>
+      {% if cheat_meals %}
+      {% set emojis = {'pizza':'🍕','burger':'🍔','fries':'🍟','ice cream':'🍦','chocolate':'🍫','cookie':'🍪','cake':'🎂','chips':'🥨','soda':'🥤','other':'🍽️'} %}
+      {% for m in cheat_meals %}
+      {% set sev = 'low' if (m[3] or 0) < 400 else ('high' if (m[3] or 0) > 800 else 'medium') %}
+      <div class="cheat-item">
+        <div class="cheat-emoji">
+          {{ emojis.get(m[2]|lower if m[2] else 'other', '🍽️') }}
+        </div>
+        <div style="flex:1;">
+          <div style="font-size:14px;font-weight:700;color:var(--text);">{{ m[1] or 'Unknown meal' }}</div>
+          <div style="font-size:12px;color:var(--text-mute);margin-top:2px;">
+            {{ m[2] or 'General' }} &middot; {{ m[4].strftime('%d %b') if m[4] else '' }}
+          </div>
+          {% if m[5] %}
+          <div style="font-size:11.5px;color:var(--text-sec);margin-top:3px;font-style:italic;">"{{ m[5] }}"</div>
+          {% endif %}
+        </div>
+        <div style="text-align:right;display:flex;flex-direction:column;gap:6px;align-items:flex-end;">
+          <span style="font-family:'JetBrains Mono',monospace;font-size:14px;font-weight:800;color:var(--red);">+{{ m[3] or 0 }} kcal</span>
+          <span class="severity-pill sev-{{ sev }}">{{ sev }}</span>
+        </div>
+      </div>
+      {% endfor %}
+      {% else %}
+      <div style="padding:40px;text-align:center;color:var(--text-mute);">
+        <div style="font-size:40px;margin-bottom:12px;">🥗</div>
+        <p style="font-size:14px;font-weight:600;">No cheat meals logged yet!</p>
+        <p style="font-size:13px;margin-top:4px;">Track them honestly — awareness helps you stay balanced.</p>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- Right: Recovery & Insights -->
+  <div>
+    <!-- Weekly Pattern -->
+    <div style="background:var(--surface);border:1px solid var(--border-ui);border-radius:var(--r-lg);padding:20px;margin-bottom:16px;box-shadow:var(--sh-card);">
+      <div class="section-title" style="margin-bottom:14px;">Weekly Pattern</div>
+      <div style="display:flex;gap:4px;align-items:flex-end;height:60px;margin-bottom:8px;">
+        {% set days = ['M','T','W','T','F','S','S'] %}
+        {% set day_counts = cheat_by_day %}
+        {% for i in range(7) %}
+        {% set cnt = day_counts[i] if i < day_counts|length else 0 %}
+        {% set h = (cnt * 40 + 8) if cnt > 0 else 8 %}
+        <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;">
+          <div style="width:100%;background:{% if cnt > 0 %}var(--red){% else %}var(--raised){% endif %};border-radius:4px 4px 0 0;height:{{ h }}px;transition:height 0.5s ease;"></div>
+          <span style="font-size:10px;font-weight:700;color:var(--text-mute);">{{ days[i] }}</span>
+        </div>
+        {% endfor %}
+      </div>
+      <div style="font-size:12px;color:var(--text-mute);text-align:center;">{{ most_cheat_day }} is your most common cheat day</div>
+    </div>
+
+    <!-- Recovery Planner -->
+    <div class="recovery-card">
+      <div style="font-size:13px;font-weight:800;color:var(--blue);text-transform:uppercase;letter-spacing:0.7px;margin-bottom:12px;">Recovery Planner</div>
+      <div style="font-size:13.5px;color:var(--text-sec);margin-bottom:14px;">After a cheat meal, bounce back with this plan:</div>
+      {% set recovery_steps = [
+        ('Next meal', 'Eat a high-protein, low-carb meal. Grilled chicken + salad.'),
+        ('Hydrate', 'Drink 2-3 extra glasses of water to flush excess sodium.'),
+        ('Don\'t skip', 'Never skip your next meal — it leads to overeating later.'),
+        ('Move', '20-30 min walk burns ~150 kcal and improves digestion.'),
+        ('Sleep', '7-8 hours of sleep resets hunger hormones (ghrelin) overnight.'),
+      ] %}
+      {% for title, tip in recovery_steps %}
+      <div class="recovery-step">
+        <div class="step-num">{{ loop.index }}</div>
+        <div>
+          <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:2px;">{{ title }}</div>
+          <div style="font-size:12px;color:var(--text-sec);">{{ tip }}</div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+
+<!-- Log Modal -->
+<div id="logModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.8);z-index:9999;align-items:center;justify-content:center;padding:20px;">
+  <div style="background:var(--surface);border:1px solid var(--border-ui);border-radius:var(--r-xl);padding:32px;width:100%;max-width:480px;box-shadow:var(--sh-lg);animation:fadeUp 0.35s var(--spring) both;">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:22px;">
+      <h2 style="font-family:'Syne',sans-serif;font-size:20px;font-weight:800;color:var(--text);">Log a Cheat Meal</h2>
+      <button onclick="document.getElementById('logModal').style.display='none'" style="background:none;border:none;color:var(--text-mute);font-size:22px;cursor:pointer;line-height:1;">×</button>
+    </div>
+    <form method="POST" action="/cheat-meal/log">
+      <div class="form-group">
+        <label class="form-label">Meal Name</label>
+        <input type="text" name="meal_name" class="form-input" placeholder="e.g. 2 slices of pepperoni pizza" required>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+        <div class="form-group">
+          <label class="form-label">Category</label>
+          <select name="category" class="form-input">
+            <option value="pizza">🍕 Pizza</option>
+            <option value="burger">🍔 Burger</option>
+            <option value="fries">🍟 Fries</option>
+            <option value="ice cream">🍦 Ice Cream</option>
+            <option value="chocolate">🍫 Chocolate</option>
+            <option value="cookie">🍪 Cookie/Cake</option>
+            <option value="chips">🥨 Chips/Snacks</option>
+            <option value="soda">🥤 Soda/Drinks</option>
+            <option value="other">🍽️ Other</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Est. Calories</label>
+          <input type="number" name="calories" class="form-input" placeholder="e.g. 650" min="0" max="5000">
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">How do you feel? (optional)</label>
+        <div class="mood-grid" id="moodGrid">
+          {% for mood in ['😊 No guilt','😐 A little bad','😞 Regret','💪 Worth it','🔄 Back on track'] %}
+          <button type="button" class="mood-btn" onclick="selectMood(this,'{{ mood }}')">{{ mood }}</button>
+          {% endfor %}
+        </div>
+        <input type="hidden" name="mood" id="moodInput">
+      </div>
+      <div class="form-group" style="margin-bottom:22px;">
+        <label class="form-label">Note (optional)</label>
+        <input type="text" name="note" class="form-input" placeholder="e.g. Birthday celebration">
+      </div>
+      <button type="submit" class="btn btn-primary" style="width:100%;">Log Cheat Meal</button>
+    </form>
+  </div>
+</div>
+
+<script>
+function selectMood(btn, val) {
+  document.querySelectorAll('.mood-btn').forEach(function(b){ b.classList.remove('selected'); });
+  btn.classList.add('selected');
+  document.getElementById('moodInput').value = val;
+}
+</script>
+{% endblock %}

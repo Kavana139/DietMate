@@ -1,0 +1,139 @@
+{% extends "base.html" %}
+{% block content %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<div style="margin-bottom:12px;"><a href="/smoothies" class="btn btn-ghost btn-sm">&#8592; Smoothie Bar</a></div>
+<div style="display:grid;grid-template-columns:1fr 360px;gap:22px;align-items:start;">
+  <div>
+    <div style="background:var(--surface);border:1px solid var(--border-ui);border-radius:var(--r-lg);overflow:hidden;box-shadow:var(--sh-card);margin-bottom:20px;">
+      <div style="height:4px;background:'{{ smoothie.color }}';"></div>
+      <div style="height:260px;background:var(--raised);position:relative;overflow:hidden;">
+        <img src="{{ url_for('static', filename=smoothie.image) if smoothie.image else '' }}"
+           alt="{{ smoothie.name }}"
+           style="width:100%;height:100%;object-fit:cover;{% if not smoothie.image %}display:none;{% endif %}"
+           onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+      <div style="display:'{% if smoothie.image %}none{% else %}flex{% endif %}';position:absolute;inset:0;flex-direction:column;align-items:center;justify-content:center;gap:10px;background:linear-gradient(135deg,rgba(110,232,154,0.08),rgba(0,212,255,0.08));">
+        <span style="font-size:80px;">🥤</span>
+        <span style="font-size:14px;color:var(--text-sec);font-weight:700;">{{ smoothie.name }}</span>
+      </div>
+        <button id="favBtn" onclick="toggleSmFav()"
+                style="position:absolute;top:16px;right:16px;background:rgba(0,0,0,0.65);backdrop-filter:blur(8px);
+                       border:none;border-radius:50%;width:42px;height:42px;cursor:pointer;font-size:22px;
+                       display:flex;align-items:center;justify-content:center;
+                       color:'{% if smoothie.is_fav %}'var(--red)'{% else %}'#fff'{% endif %}';">
+          {{ '♥' if smoothie.is_fav else '♡' }}
+        </button>
+      </div>
+      <div style="padding:24px;">
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px;">
+          <span class="badge badge-accent">{{ smoothie.goal }}</span>
+          <span class="badge" style="background:var(--raised);border-color:var(--border-ui);color:var(--text-sec);">{{ smoothie.prep_time }} min prep</span>
+        </div>
+        <h1 style="font-family:'Syne',sans-serif;font-size:26px;font-weight:800;color:var(--text);margin-bottom:8px;">{{ smoothie.name }}</h1>
+        <p style="font-size:14.5px;color:var(--text-sec);line-height:1.7;">{{ smoothie.description }}</p>
+      </div>
+    </div>
+
+    <div style="background:var(--surface);border:1px solid var(--border-ui);border-radius:var(--r-lg);padding:22px;margin-bottom:20px;box-shadow:var(--sh-card);">
+      <h3 style="font-family:'Syne',sans-serif;font-size:16px;font-weight:800;color:var(--text);margin-bottom:14px;">Ingredients</h3>
+      <div style="display:flex;flex-direction:column;gap:8px;">
+        {% for ing in smoothie.ingredients %}
+        <div style="display:flex;align-items:center;gap:12px;padding:8px 0;border-bottom:1px solid var(--border-ui);">
+          <div style="width:8px;height:8px;border-radius:50%;background:'{{ smoothie.color }}';flex-shrink:0;"></div>
+          <span style="font-size:14px;font-weight:600;color:var(--text);">{{ ing }}</span>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+
+    <div style="background:var(--surface);border:1px solid var(--border-ui);border-radius:var(--r-lg);padding:22px;box-shadow:var(--sh-card);">
+      <h3 style="font-family:'Syne',sans-serif;font-size:16px;font-weight:800;color:var(--text);margin-bottom:16px;">How to Make</h3>
+      <div style="display:flex;flex-direction:column;gap:12px;">
+        {% for step in smoothie.steps %}
+        <div style="display:flex;gap:14px;align-items:flex-start;">
+          <div style="width:28px;height:28px;border-radius:50%;background:'{% if loop.index <= 2 %}{{ smoothie.color }}{% else %}var(--raised){% endif %}';
+               color:'{% if loop.index <= 2 %}#000{% else %}var(--text-sec){% endif %}';font-size:12px;font-weight:800;
+               display:flex;align-items:center;justify-content:center;flex-shrink:0;border:1px solid var(--border-ui);">
+            {{ loop.index }}
+          </div>
+          <p style="font-size:14px;color:var(--text-sec);line-height:1.7;margin:0;padding-top:4px;">{{ step | replace(loop.index|string + '. ','') }}</p>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+
+  <div>
+    <div style="background:var(--surface);border:1px solid var(--border-ui);border-radius:var(--r-lg);padding:22px;margin-bottom:18px;box-shadow:var(--sh-card);">
+      <h3 style="font-family:'Syne',sans-serif;font-size:15px;font-weight:800;color:var(--text);margin-bottom:16px;">Nutrition Per Serving</h3>
+      <div style="display:flex;align-items:center;justify-content:center;margin-bottom:16px;">
+        <div style="position:relative;width:120px;height:120px;">
+          <canvas id="smChart" width="120" height="120"></canvas>
+          <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;">
+            <span style="font-family:'Syne',sans-serif;font-size:22px;font-weight:800;color:var(--text);">{{ smoothie.calories }}</span>
+            <span style="font-size:10px;color:var(--text-mute);">kcal</span>
+          </div>
+        </div>
+      </div>
+      {% for label, val, unit, color in [
+        ('Protein', smoothie.protein, 'g', 'var(--macro-p)'),
+        ('Carbs', smoothie.carbs, 'g', 'var(--macro-c)'),
+        ('Fat', smoothie.fat, 'g', 'var(--macro-f)'),
+        ('Fiber', smoothie.fiber, 'g', 'var(--accent)'),
+        ('Sugar', smoothie.sugar, 'g', 'var(--gold)'),
+      ] %}
+      <div style="display:flex;justify-content:space-between;padding:9px 0;border-bottom:1px solid var(--border-ui);">
+        <span style="font-size:13.5px;font-weight:600;color:var(--text-sec);">{{ label }}</span>
+        <span style="font-size:14px;font-weight:800;color:'{{ color }}';font-family:'JetBrains Mono',monospace;">{{ val }}{{ unit }}</span>
+      </div>
+      {% endfor %}
+    </div>
+
+    {% if related %}
+    <div style="background:var(--surface);border:1px solid var(--border-ui);border-radius:var(--r-lg);padding:18px;box-shadow:var(--sh-card);">
+      <div class="section-title" style="margin-bottom:12px;">More Smoothies</div>
+      {% for r in related %}
+      <a href="/smoothie/{{ r[0] }}" style="display:flex;gap:12px;align-items:center;text-decoration:none;
+         padding:10px;border-radius:var(--r-md);border:1px solid var(--border-ui);background:var(--raised);
+         margin-bottom:8px;transition:border-color 0.2s;"
+         onmouseover="this.style.borderColor='var(--border-h)'"
+         onmouseout="this.style.borderColor='var(--border-ui)'">
+        <div style="width:48px;height:48px;border-radius:var(--r-sm);overflow:hidden;background:var(--active);flex-shrink:0;">
+          {% set rel_img = resolve_image(r[2], 'smoothies') if r[2] else '' %}
+        <img src="{{ url_for('static', filename=rel_img) if rel_img else '' }}"
+             style="width:100%;height:100%;object-fit:cover;"
+             onerror="this.style.display='none';">
+        </div>
+        <div style="flex:1;min-width:0;">
+          <div style="font-size:13px;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ r[1] }}</div>
+          <div style="font-size:11.5px;color:var(--text-mute);">{{ r[3] }} kcal &nbsp; &#9733; {{ "%.1f"|format(r[4]) }}</div>
+        </div>
+      </a>
+      {% endfor %}
+    </div>
+    {% endif %}
+  </div>
+</div>
+<script>
+(function() {
+  var c = document.getElementById('smChart');
+  if (!c) return;
+  var p = '{{ smoothie.protein or 0 }}', ca = '{{ smoothie.carbs or 0 }}', f = '{{ smoothie.fat or 0 }}';
+  if (p + ca + f === '0') return;
+  new Chart(c, {
+    type:'doughnut',
+    data:{ datasets:[{ data:[p*4,ca*4,f*9], backgroundColor:['#7cfc9a','#00e5ff','#ffbe0b'], borderWidth:0 }] },
+    options:{ responsive:false, cutout:'78%', plugins:{ legend:{display:false}, tooltip:{enabled:false} }, animation:{duration:1200,easing:'easeOutQuart'} }
+  });
+})();
+function toggleSmFav() {
+  var btn = document.getElementById('favBtn');
+  fetch('/favorite/toggle', {
+    method:'POST', headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({ smoothie_id: '{{ smoothie.smoothie_id }}' })
+  }).then(r=>r.json()).then(d=>{
+    btn.textContent = d.status==='added' ? '♥' : '♡';
+    btn.style.color = d.status==='added' ? '#ff4757' : '#fff';
+  });
+}
+</script>
+{% endblock %}

@@ -1,0 +1,19 @@
+<!-- ====================== error.html ====================== -->
+{% extends "base.html" %}
+{% block content %}
+<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;
+     min-height:60vh;text-align:center;padding:40px 20px;">
+  <div style="font-family:'Syne',sans-serif;font-size:96px;font-weight:800;
+       background:linear-gradient(135deg,var(--accent),var(--accent2));
+       -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+       background-clip:text;line-height:1;margin-bottom:16px;">{{ code }}</div>
+  <h2 style="font-family:'Syne',sans-serif;font-size:22px;font-weight:800;color:var(--text);margin-bottom:10px;">
+    {% if code == 404 %}Page Not Found{% else %}Something Went Wrong{% endif %}
+  </h2>
+  <p style="font-size:14.5px;color:var(--text-sec);max-width:380px;line-height:1.7;margin-bottom:28px;">{{ message }}</p>
+  <div style="display:flex;gap:10px;">
+    <a href="/dashboard" class="btn btn-primary">Go to Dashboard</a>
+    <a href="javascript:history.back()" class="btn btn-ghost">Go Back</a>
+  </div>
+</div>
+{% endblock %}

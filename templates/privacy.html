@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Privacy Policy — DietMate</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+<script>(function(){ var t=localStorage.getItem('dm_theme')||'dark'; document.documentElement.setAttribute('data-theme',t); })();</script>
+<style>
+body { background:var(--bg); padding:40px 20px; margin:0; }
+.doc { max-width:760px; margin:0 auto; }
+h1 { font-family:'Syne',sans-serif; font-size:28px; font-weight:800; color:var(--text); margin-bottom:6px; }
+h2 { font-family:'Syne',sans-serif; font-size:17px; font-weight:800; color:var(--text); margin:28px 0 10px; }
+p, li { font-size:14px; color:var(--text-sec); line-height:1.8; margin-bottom:10px; }
+ul { padding-left:20px; }
+.back { display:inline-flex;align-items:center;gap:6px;font-size:13px;color:var(--text-sec);text-decoration:none;font-weight:600;margin-bottom:24px; }
+</style>
+</head>
+<body>
+<div class="doc">
+  <a href="javascript:history.back()" class="back">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+    Go Back
+  </a>
+  <div style="background:var(--surface);border:1px solid var(--border-ui);border-radius:var(--r-xl);padding:40px;">
+    <div style="font-family:'Syne',sans-serif;font-size:16px;font-weight:800;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:8px;">DietMate</div>
+    <h1>Privacy Policy</h1>
+    <p style="font-size:13px;color:var(--text-mute);">Last updated: April 2026</p>
+
+    <h2>1. Information We Collect</h2>
+    <ul>
+      <li><strong>Account information:</strong> Name, email address, password (stored as a secure hash)</li>
+      <li><strong>Health data:</strong> Age, gender, height, weight, dietary goals</li>
+      <li><strong>Usage data:</strong> Meals logged, calorie intake, streak data</li>
+      <li><strong>Security logs:</strong> Login times, IP addresses, device type</li>
+    </ul>
+
+    <h2>2. How We Use Your Information</h2>
+    <ul>
+      <li>To calculate personalised nutrition targets</li>
+      <li>To generate meal plans matching your goals</li>
+      <li>To send security notifications (login alerts, password resets)</li>
+      <li>To track your progress over time</li>
+    </ul>
+
+    <h2>3. Data Security</h2>
+    <p>Your password is never stored in plain text — it is hashed using bcrypt with a work factor of 12. Health data is stored in a secured database accessible only to your account.</p>
+
+    <h2>4. Data Sharing</h2>
+    <p>We do not sell, rent, or share your personal data with third parties. The only external services used are:</p>
+    <ul>
+      <li>Your email provider (for sending verification and notification emails)</li>
+      <li>Nutrition APIs (for food data lookup — no personal data is shared)</li>
+    </ul>
+
+    <h2>5. Your Rights</h2>
+    <ul>
+      <li>Access your data at any time from the Account page</li>
+      <li>Update or correct your information</li>
+      <li>Request deletion of your account and all associated data</li>
+    </ul>
+
+    <h2>6. Cookies</h2>
+    <p>DietMate uses only a session cookie for authentication and a localStorage value for theme preference. No tracking or advertising cookies are used.</p>
+
+    <h2>7. Contact</h2>
+    <p>For privacy concerns or data deletion requests, contact us through the app.</p>
+
+    <div style="margin-top:32px;padding-top:20px;border-top:1px solid var(--border-ui);text-align:center;font-size:12px;color:var(--text-mute);">
+      &copy; 2026 DietMate. Your privacy matters.
+    </div>
+  </div>
+</div>
+</body>
+</html>
