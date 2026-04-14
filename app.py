@@ -81,10 +81,11 @@ def inject_image_helper():
     return dict(resolve_image=resolve_image)
 
 # ─────────────────────────────────────────────────────────
-#  ANTHROPIC API KEY — get free key at console.anthropic.com
+#  GOOGLE CLOUD VISION API KEY  (for food image recognition)
+#  Flow: Image → Google Vision → food labels → Ninjas Nutrition → Result
 # ─────────────────────────────────────────────────────────
-ANTHROPIC_API_KEY = os.environ.get('ANTHROPIC_API_KEY', '')
-NINJAS_API_KEY    = os.environ.get('NINJAS_API_KEY', 'lzdgzmik9cJCbpHdMUYOcCpUye2r89BCr2rUOB7r')
+GOOGLE_VISION_API_KEY = os.environ.get('GOOGLE_VISION_API_KEY', 'AIzaSyDulJ11UJrJBc08Es1frKVloV9QeRTh-80')
+NINJAS_API_KEY        = os.environ.get('NINJAS_API_KEY',        'lzdgzmik9cJCbpHdMUYOcCpUye2r89BCr2rUOB7r')
 
 HEALTHY_TIPS = [
     "Drink a glass of water before every meal to naturally control portions.",
@@ -132,40 +133,124 @@ def inject_globals():
 # ─────────────────────────────────────────────────────────
 # AI FOOD ANALYSIS
 # ─────────────────────────────────────────────────────────
-def analyze_food_with_claude(image_b64: str, mime_type: str) -> dict:
-    url = "https://api.anthropic.com/v1/messages"
-    prompt = (
-        "You are an expert nutritionist specialising in Indian and international cuisine.\n"
-        "Look at this food image carefully and identify what dish it is.\n"
-        "Respond with ONLY a valid JSON object — no markdown, no backticks, no extra text.\n\n"
-        "Return exactly this structure:\n"
-        '{"food_name":"exact dish name","description":"Two sentences about the dish.",'
-        '"confidence":"High","per_serving":{"calories":320,"protein_g":12,"carbs_g":45,'
-        '"fat_g":8,"fiber_g":3,"sugar_g":5},"ingredients":["item1","item2","item3"],'
-        '"health_tags":[{"label":"Good carb source","type":"good"},{"label":"Moderate fat","type":"warn"}],'
-        '"notes":"One practical nutritionist tip."}\n\n'
-        "Rules: confidence=High/Medium/Low, all numbers plain integers, type=good/warn/bad"
+def analyze_food_with_google_vision(image_b64: str) -> str:
+    """
+    Step 1: Send image to Google Cloud Vision API.
+    Returns the best food-related label detected in the image.
+    Flow: Image (base64) → Google Vision labelDetection → food label string
+    """
+    url = (
+        "https://vision.googleapis.com/v1/images:annotate"
+        "?key=" + GOOGLE_VISION_API_KEY
     )
     payload = json.dumps({
-        "model": "claude-sonnet-4-20250514",
-        "max_tokens": 1024,
-        "messages": [{"role": "user", "content": [
-            {"type": "image", "source": {"type": "base64", "media_type": mime_type, "data": image_b64}},
-            {"type": "text", "text": prompt}
-        ]}]
+        "requests": [{
+            "image": {"content": image_b64},
+            "features": [
+                {"type": "LABEL_DETECTION",      "maxResults": 15},
+                {"type": "WEB_DETECTION",         "maxResults": 5},
+                {"type": "OBJECT_LOCALIZATION",   "maxResults": 5}
+            ]
+        }]
     }).encode("utf-8")
     req = urllib.request.Request(url, data=payload, headers={
-        "Content-Type": "application/json",
-        "x-api-key": ANTHROPIC_API_KEY,
-        "anthropic-version": "2023-06-01"
+        "Content-Type": "application/json"
     }, method="POST")
-    with urllib.request.urlopen(req, timeout=40) as resp:
+    with urllib.request.urlopen(req, timeout=30) as resp:
         body = json.loads(resp.read().decode("utf-8"))
-    raw = body["content"][0]["text"].strip()
-    raw = re.sub(r'^```(?:json)?\s*\n?', '', raw)
-    raw = re.sub(r'\n?```\s*$', '', raw).strip()
-    return json.loads(raw)
 
+    responses = body.get("responses", [{}])[0]
+
+    # ── Priority 1: Web detection bestGuessLabels (most accurate for food) ──
+    web = responses.get("webDetection", {})
+    best_guesses = web.get("bestGuessLabels", [])
+    if best_guesses:
+        label = best_guesses[0].get("label", "").strip()
+        if label:
+            return label
+
+    # ── Priority 2: Label annotations — filter for food-related labels ──
+    FOOD_KEYWORDS = {
+        "food","dish","cuisine","meal","recipe","ingredient","vegetable","fruit",
+        "bread","rice","pasta","soup","salad","meat","chicken","fish","seafood",
+        "dessert","cake","pizza","burger","sandwich","curry","dal","roti","biryani",
+        "snack","breakfast","lunch","dinner","drink","juice","smoothie","coffee","tea",
+        "egg","cheese","milk","yogurt","noodle","sushi","taco","wrap","bowl","stew",
+        "sauce","spice","herb","grain","bean","lentil","paneer","samosa","idli","dosa",
+    }
+    labels = responses.get("labelAnnotations", [])
+    for lbl in labels:
+        desc  = lbl.get("description", "").lower()
+        score = lbl.get("score", 0)
+        if score > 0.65 and any(kw in desc for kw in FOOD_KEYWORDS):
+            return lbl["description"]
+
+    # ── Priority 3: First high-confidence label regardless ──
+    if labels:
+        return labels[0].get("description", "food")
+
+    return "food"
+
+
+def analyze_food_with_vision_and_ninjas(image_b64: str) -> dict:
+    """
+    Complete pipeline: Image → Google Vision → food name → Ninjas Nutrition → structured result.
+    This replaces the old Claude Vision pipeline.
+    """
+    # Step 1 — Identify food from image using Google Vision
+    food_label = analyze_food_with_google_vision(image_b64)
+    food_label_clean = food_label.strip().title()
+
+    # Step 2 — Get nutrition data from Ninjas API using the identified label
+    nutrition = get_nutrition_from_text(food_label)
+
+    if nutrition and "error" not in nutrition:
+        cal   = nutrition.get("calories", 0)
+        prot  = nutrition.get("protein",  0)
+        carbs = nutrition.get("carbs",    0)
+        fat   = nutrition.get("fat",      0)
+    else:
+        # Fallback: try without title casing (API Ninjas is case-sensitive sometimes)
+        nutrition2 = get_nutrition_from_text(food_label.lower())
+        if nutrition2 and "error" not in nutrition2:
+            cal   = nutrition2.get("calories", 0)
+            prot  = nutrition2.get("protein",  0)
+            carbs = nutrition2.get("carbs",    0)
+            fat   = nutrition2.get("fat",      0)
+        else:
+            # Still no data — return identified name with zeroed nutrition
+            cal = prot = carbs = fat = 0
+
+    # Step 3 — Build health tags
+    health_tags = _build_health_tags({
+        "calories": cal, "protein": prot, "carbs": carbs, "fat": fat
+    })
+
+    # Step 4 — Build description
+    description = (
+        f"{food_label_clean} identified via Google Cloud Vision AI. "
+        f"Nutritional values sourced from the API Ninjas database per standard serving."
+    )
+
+    return {
+        "food_name":   food_label_clean,
+        "description": description,
+        "confidence":  "High" if cal > 0 else "Medium",
+        "per_serving": {
+            "calories":  int(cal),
+            "protein_g": round(float(prot),  1),
+            "carbs_g":   round(float(carbs), 1),
+            "fat_g":     round(float(fat),   1),
+            "fiber_g":   0,
+            "sugar_g":   0,
+        },
+        "ingredients": [food_label_clean],
+        "health_tags": health_tags,
+        "notes": (
+            f"Identified as '{food_label_clean}' by Google Vision. "
+            "Values are per standard serving. Adjust quantities for your portion size."
+        ),
+    }
 
 def get_nutrition_from_text(query: str) -> dict:
     url = "https://api.api-ninjas.com/v1/nutrition?query=" + urllib.request.quote(query)
@@ -184,6 +269,112 @@ def get_nutrition_from_text(query: str) -> dict:
                 "fat":      int(item.get("fat_total_g",0))}
     except Exception as e:
         return {"error": str(e)}
+
+
+def normalize_food_queries(food_name: str) -> list:
+    candidates = [food_name.strip()]
+    if ',' in food_name:
+        candidates.append(food_name.split(',')[0].strip())
+    if '-' in food_name:
+        candidates.append(food_name.split('-')[0].strip())
+    words = [p for p in food_name.lower().replace(',', ' ').replace('-', ' ').split() if p]
+    if len(words) > 1:
+        candidates.append(' '.join(words[:2]))
+        candidates.append(words[0])
+        candidates.append(words[-1])
+    seen = set(); results = []
+    for s in candidates:
+        if s and s not in seen:
+            seen.add(s)
+            results.append(s)
+    return results
+
+
+def search_open_food_facts(food_name: str) -> dict:
+    for query in normalize_food_queries(food_name):
+        try:
+            search_url = (
+                'https://world.openfoodfacts.org/cgi/search.pl?search_terms='
+                + urllib.request.quote(query)
+                + '&search_simple=1&action=process&json=1&page_size=2'
+            )
+            req = urllib.request.Request(search_url,
+                headers={'User-Agent': 'DietMate/1.0'})
+            with urllib.request.urlopen(req, timeout=10) as resp:
+                off_data = json.loads(resp.read().decode('utf-8'))
+            products = off_data.get('products', [])
+            if not products:
+                continue
+            p = products[0]
+            n = p.get('nutriments', {})
+            cal = int(n.get('energy-kcal_100g') or n.get('energy_100g') or 0)
+            prot = round(float(n.get('proteins_100g', 0) or 0), 1)
+            carbs = round(float(n.get('carbohydrates_100g', 0) or 0), 1)
+            fat = round(float(n.get('fat_100g', 0) or 0), 1)
+            fiber = round(float(n.get('fiber_100g', 0) or 0), 1)
+            sugar = round(float(n.get('sugars_100g', 0) or 0), 1)
+            name = p.get('product_name') or query
+            return {
+                'food_name': name.title(),
+                'description': f'{name.title()} — data from Open Food Facts database.',
+                'confidence': 'Medium',
+                'per_serving': {
+                    'calories': cal,
+                    'protein_g': prot,
+                    'carbs_g': carbs,
+                    'fat_g': fat,
+                    'fiber_g': fiber,
+                    'sugar_g': sugar
+                },
+                'ingredients': [name.title()],
+                'health_tags': _build_health_tags({'calories': cal, 'protein': prot, 'carbs': carbs, 'fat': fat}),
+                'notes': 'Values are per 100g from Open Food Facts. Adjust for your portion.'
+            }
+        except Exception:
+            continue
+    return None
+
+
+def search_local_recipe_nutrition(food_name: str) -> dict:
+    q = food_name.strip().lower()
+    if not q:
+        return None
+    patterns = [f'%{q}%']
+    if q.split():
+        patterns.append(f'%{q.split()[0]}%')
+        if len(q.split()) > 1:
+            patterns.append(f'%{q.split()[-1]}%')
+    cur = get_cursor(mysql)
+    for pat in patterns:
+        cur.execute(
+            "SELECT r.recipe_name, COALESCE(n.calories,0), COALESCE(n.protein,0), "
+            "COALESCE(n.carbs,0), COALESCE(n.fat,0), COALESCE(n.fiber,0), "
+            "COALESCE(n.sugar,0) "
+            "FROM recipes r JOIN meals m ON r.meal_id=m.meal_id "
+            "LEFT JOIN nutrition n ON n.meal_id=m.meal_id "
+            "WHERE LOWER(r.recipe_name) LIKE %s LIMIT 1",
+            (pat,))
+        row = cur.fetchone()
+        if row:
+            cur.close()
+            return {
+                'food_name': str(row[0]).title(),
+                'description': f'Nutritional estimate for {row[0]}.',
+                'confidence': 'Medium',
+                'per_serving': {
+                    'calories': int(row[1]),
+                    'protein_g': round(float(row[2]), 1),
+                    'carbs_g': round(float(row[3]), 1),
+                    'fat_g': round(float(row[4]), 1),
+                    'fiber_g': round(float(row[5]), 1),
+                    'sugar_g': round(float(row[6]), 1)
+                },
+                'ingredients': [str(row[0]).title()],
+                'health_tags': _build_health_tags({'calories': row[1], 'protein': row[2], 'carbs': row[3], 'fat': row[4]}),
+                'notes': 'Estimated from local recipe database. Adjust for your portion.'
+            }
+    cur.close()
+    return None
 
 
 # ═══════════════════════════════════════════════════════════
@@ -1457,10 +1648,12 @@ def analyze_food():
     mime_type = data.get('media_type', 'image/jpeg')
     food_name = data.get('food_name', '').strip()
 
-    # ── Path 1: Claude Vision (if API key set) ────────────────
-    if ANTHROPIC_API_KEY and image_b64:
+    # ── Path 1: Google Vision → Ninjas Nutrition (primary pipeline) ────
+    # Flow: Image (base64) → Google Cloud Vision API (label detection)
+    #       → food name string → Ninjas Nutrition API → structured result
+    if GOOGLE_VISION_API_KEY and image_b64:
         try:
-            result = analyze_food_with_claude(image_b64, mime_type)
+            result = analyze_food_with_vision_and_ninjas(image_b64)
             ensure_tables(mysql)
             cur = get_cursor(mysql)
             ps = result.get('per_serving', {})
@@ -1478,7 +1671,14 @@ def analyze_food():
             cur.close()
             return jsonify({'result': result})
         except Exception as e:
-            return jsonify({'error': str(e)}), 500
+            # If Google Vision fails, show text input as fallback
+            error_str = str(e)
+            if 'HTTP Error 403' in error_str or '403' in error_str:
+                # API key issue - prompt for manual entry
+                return jsonify({'needs_text': True, 'error': 'Image analysis unavailable. Please enter the food name manually below.'}), 200
+            if not food_name:
+                # Other error - still offer text fallback
+                return jsonify({'needs_text': True, 'error': f'Image analysis failed. Try entering the food name manually.'}), 200
 
     # ── Path 2: Text search via Ninjas API (free tier) ────────
     if food_name:
@@ -1507,48 +1707,20 @@ def analyze_food():
                 pass
 
         # Try Open Food Facts (completely free, no key) ────────
-        try:
-            search_url = (
-                'https://world.openfoodfacts.org/cgi/search.pl?search_terms='
-                + urllib.request.quote(food_name)
-                + '&search_simple=1&action=process&json=1&page_size=1'
-            )
-            req = urllib.request.Request(search_url,
-                headers={'User-Agent': 'DietMate/1.0'})
-            with urllib.request.urlopen(req, timeout=8) as resp:
-                off_data = json.loads(resp.read().decode('utf-8'))
-            products = off_data.get('products', [])
-            if products:
-                p = products[0]
-                n = p.get('nutriments', {})
-                cal   = int(n.get('energy-kcal_100g', 0) or 0)
-                prot  = round(float(n.get('proteins_100g', 0) or 0), 1)
-                carbs = round(float(n.get('carbohydrates_100g', 0) or 0), 1)
-                fat   = round(float(n.get('fat_100g', 0) or 0), 1)
-                fiber = round(float(n.get('fiber_100g', 0) or 0), 1)
-                name  = p.get('product_name', food_name).title()
-                result = {
-                    'food_name': name,
-                    'description': f'{name} — data from Open Food Facts database.',
-                    'confidence': 'Medium',
-                    'per_serving': {
-                        'calories': cal, 'protein_g': prot,
-                        'carbs_g': carbs, 'fat_g': fat,
-                        'fiber_g': fiber, 'sugar_g': 0
-                    },
-                    'ingredients': [name],
-                    'health_tags': _build_health_tags({'calories':cal,'protein':prot,'carbs':carbs,'fat':fat}),
-                    'notes': 'Values per 100g from Open Food Facts. Adjust for your portion.'
-                }
-                return jsonify({'result': result})
-        except Exception:
-            pass
+        off_result = search_open_food_facts(food_name)
+        if off_result:
+            return jsonify({'result': off_result})
+
+        # Try local recipe database as a final fallback
+        local_result = search_local_recipe_nutrition(food_name)
+        if local_result:
+            return jsonify({'result': local_result})
 
         return jsonify({'error': f'No nutrition data found for "{food_name}". Try a different name.'}), 404
 
     # ── Path 3: No key, no food name — show text input ────────
     return jsonify({
-        'error': 'Type the food name below to search nutrition data.',
+        'error': 'Type a food name below to search nutrition data (or upload an image for Google Vision scan).',
         'needs_text': True
     }), 400
 

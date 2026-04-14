@@ -2,7 +2,7 @@
 {% block content %}
 
 <h1 class="page-title">AI Food Scanner</h1>
-<p class="page-subtitle">Upload a photo of any food — Claude AI identifies it and gives you instant nutrition data.</p>
+<p class="page-subtitle">Upload a photo of any food and get instant nutrition data.</p>
 
 <div class="scanner-grid">
 
@@ -48,16 +48,16 @@
 
     <button class="btn btn-primary btn-lg" id="scanBtn" onclick="scanFood()"
             style="display:none;width:100%;margin-top:16px;">
-      Analyse Food with Claude AI
+      Analyse Food
     </button>
 
-    <!-- Text fallback when no API key -->
-    <div id="textFallback" style="display:none;margin-top:16px;background:var(--raised);border:1px solid var(--border-ui);border-radius:var(--r-lg);padding:16px;">
-      <div style="font-size:12px;font-weight:700;color:var(--gold);margin-bottom:10px;">
-        No AI vision key — type the food name to look up nutrition:
+    <!-- Text fallback - always visible as alternative -->
+    <div style="margin-top:16px;background:var(--raised);border:1px solid var(--border-ui);border-radius:var(--r-lg);padding:16px;">
+      <div style="font-size:11px;font-weight:800;color:var(--text-mute);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:10px;">
+        💡 Or type the food name directly:
       </div>
       <div style="display:flex;gap:8px;">
-        <input type="text" id="foodNameInput" class="form-input" placeholder="e.g. masala dosa, chicken biryani..." style="flex:1;">
+        <input type="text" id="foodNameInput" class="form-input" placeholder="e.g. masala dosa, chicken biryani, pizza..." style="flex:1;">
         <button onclick="searchByName()" class="btn btn-primary">Search</button>
       </div>
     </div>
@@ -75,7 +75,7 @@
       <div style="width:8px;height:8px;border-radius:50%;background:var(--accent);flex-shrink:0;
            animation:flamePulse 2s ease-in-out infinite;"></div>
       <span style="font-size:12px;color:var(--text-mute);font-weight:600;">
-        Powered by <strong style="color:var(--accent);">Claude claude-sonnet-4-6 Vision AI</strong> — image-based analysis
+        Powered by <strong style="color:var(--accent);">AI Vision Analysis</strong> — image-based nutrition detection
       </span>
     </div>
   </div>
@@ -104,7 +104,7 @@
 
     <div class="scanner-loading" id="scannerLoading" style="display:none;">
       <div class="scan-spinner"></div>
-      <h3>Claude AI is analysing...</h3>
+      <h3>Analysing your food...</h3>
       <div class="loading-steps">
         <div class="loading-step" id="ls1"><div class="ls-dot"></div>Identifying food item</div>
         <div class="loading-step" id="ls2"><div class="ls-dot"></div>Estimating portion size</div>
@@ -185,7 +185,7 @@
       <div class="health-tags" id="healthTags"></div>
 
       <div id="scanNotesEl" style="display:none;" class="scan-notes">
-        <div class="scan-notes-title">Claude Nutritionist Notes</div>
+        <div class="scan-notes-title">Nutritionist Notes</div>
         <div class="scan-notes-text" id="scanNotesText"></div>
       </div>
 
@@ -277,10 +277,10 @@ async function scanFood(){
     var data = await res.json();
 
     if (data.needs_text) {
-      // No API key - show text input
+      // API failed - show text input fallback
       show('scannerIdle');
-      document.getElementById('textFallback').style.display = 'block';
-      btn.disabled=false; btn.textContent='Analyse Food with Claude AI';
+      document.getElementById('foodNameInput').focus();
+      btn.disabled=false; btn.textContent='Analyse Food';
       return;
     }
     if (!res.ok || data.error){
@@ -293,7 +293,7 @@ async function scanFood(){
     document.getElementById('errorMsg').textContent = 'Network error: ' + err.message;
     show('scannerError');
   } finally {
-    btn.disabled=false; btn.textContent='Analyse Food with Claude AI';
+    btn.disabled=false; btn.textContent='Analyse Food';
   }
 }
 
